@@ -28,7 +28,7 @@
             </dependency>
             <dependency>
                 <groupId>io.ddd4j.javalin</groupId>
-                <artifactId>ddd4j-javalin-cmpt-guice</artifactId>
+                <artifactId>ddd4j-javalin-extension-guice</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>

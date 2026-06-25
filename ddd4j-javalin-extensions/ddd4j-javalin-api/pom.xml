@@ -7,6 +7,7 @@
         <groupId>io.ddd4j.javalin</groupId>
         <artifactId>ddd4j-javalin-extensions</artifactId>
         <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>ddd4j-javalin-api</artifactId>

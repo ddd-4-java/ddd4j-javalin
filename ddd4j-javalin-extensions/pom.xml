@@ -11,7 +11,7 @@
         <relativePath>../ddd4j-javalin-dependencies</relativePath>
     </parent>
 
-    <artifactId>ddd4j-javalin-cmpt</artifactId>
+    <artifactId>ddd4j-javalin-extensions</artifactId>
     <packaging>pom</packaging>
 
     <dependencyManagement>
@@ -28,7 +28,7 @@
 
     <modules>
         <module>ddd4j-javalin-api</module>
-        <module>ddd4j-javalin-cmpt-guice</module>
+        <module>ddd4j-javalin-extension-guice</module>
     </modules>
 
     <dependencies>

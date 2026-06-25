@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../ddd4j-javalin-parent</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-samples</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <modules>
+        <module>ddd4j-javalin-sample-druid</module>
+        <module>ddd4j-javalin-sample-druid-activemq</module>
+        <module>ddd4j-javalin-sample-druid-amqp</module>
+        <module>ddd4j-javalin-sample-druid-rocketmq</module>
+        <module>ddd4j-javalin-sample-hikaricp</module>
+        <module>ddd4j-javalin-sample-hikaricp-activemq</module>
+        <module>ddd4j-javalin-sample-hikaricp-amqp</module>
+        <module>ddd4j-javalin-sample-hikaricp-rocketmq</module>
+        <module>ddd4j-javalin-sample-ton4j</module>
+        <module>ddd4j-javalin-sample-web3j</module>
+    </modules>
+
+</project>

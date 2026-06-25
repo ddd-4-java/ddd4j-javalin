@@ -1,0 +1,50 @@
+package io.ddd4j.javalin.api.web.servlet.handler;
+
+import io.ddd4j.javalin.api.XHeaders;
+import io.ddd4j.javalin.api.sequence.Sequence;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+public class Slf4jMDCInterceptor implements HandlerInterceptor {
+
+    private final Sequence sequence;
+
+    public Slf4jMDCInterceptor(Sequence sequence) {
+        this.sequence = sequence;
+    }
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+
+            throws Exception {
+
+        MDC.put("requestId", StringUtils.defaultString(request.getHeader(XHeaders.X_REQUEST_ID), sequence.nextId().toString()));
+        MDC.put("requestURL", request.getRequestURL().toString());
+        MDC.put("requestURI", request.getRequestURI());
+        MDC.put("queryString", request.getQueryString());
+        MDC.put("remoteAddr", request.getRemoteAddr());
+        MDC.put("remoteHost", request.getRemoteHost());
+        MDC.put("remotePort", String.valueOf(request.getRemotePort()));
+        MDC.put("localAddr", request.getLocalAddr());
+        MDC.put("localName", request.getLocalName());
+
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+                           ModelAndView modelAndView) throws Exception {
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+                                Exception exception) throws Exception {
+        MDC.clear();
+    }
+
+}

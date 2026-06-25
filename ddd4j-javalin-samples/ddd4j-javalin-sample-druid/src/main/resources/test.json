@@ -1,0 +1,27 @@
+{
+  "tasks": {
+    "CacheTask": "* * * * *"
+  },
+  "cacheExpiresSec": 86400,
+  "databases": {
+    "write": {
+      "url": "jdbc:mysql://192.168.1.1:3306/javalin_ton?charset=utf8mb4",
+      "user": "admin",
+      "pass": "aaa",
+      "dialect": "MYSQL",
+      "poolSize": 2
+    },
+    "read": {
+      "url": "jdbc:mysql://192.168.1.1:3306/javalin_ton?charset=utf8mb4",
+      "user": "admin",
+      "pass": "aaa",
+      "dialect": "MYSQL",
+      "poolSize": 2
+    }
+  },
+  "redis": {
+    "address": "192.168.0.20",
+    "port": 6379,
+    "maxTotal": 7
+  }
+}

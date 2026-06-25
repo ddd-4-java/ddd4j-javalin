@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.ddd4j.javalin</groupId>
-        <artifactId>ddd4j-javalin-cmpt</artifactId>
+        <artifactId>ddd4j-javalin-extensions</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>ddd4j-javalin-cmpt-guice</artifactId>
+    <artifactId>ddd4j-javalin-extension-guice</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

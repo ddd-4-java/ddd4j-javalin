@@ -5,17 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.ddd4j.javalin</groupId>
-        <artifactId>ddd4j-javalin-cmpt</artifactId>
+        <artifactId>ddd4j-javalin-extensions</artifactId>
         <version>${revision}</version>
     </parent>
 
     <artifactId>ddd4j-javalin-api</artifactId>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <!-- For Servlet Api -->

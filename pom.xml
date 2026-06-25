@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!-- POM的模型版本 -->
     <modelVersion>4.0.0</modelVersion>
-    <packaging>pom</packaging>
+
+    <!-- Inherit defaults from Ddd4j 2.0.x -->
+    <parent>
+        <groupId>io.ddd4j</groupId>
+        <artifactId>ddd4j-parent</artifactId>
+        <version>2.0.x20260625-SNAPSHOT</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
     <groupId>io.ddd4j.javalin</groupId>
     <artifactId>ddd4j-javalin</artifactId>
@@ -12,7 +20,7 @@
     <modules>
         <module>ddd4j-javalin-dependencies</module>
         <module>ddd4j-javalin-bom</module>
-        <module>ddd4j-javalin-cmpt</module>
+        <module>ddd4j-javalin-extensions</module>
         <module>ddd4j-javalin-parent</module>
         <!-- samples 待瘦身后重新纳入 reactor -->
         <!-- <module>ddd4j-javalin-samples</module> -->

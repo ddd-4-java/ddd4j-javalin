@@ -491,7 +491,7 @@
             <dependency>
                 <groupId>io.ddd4j</groupId>
                 <artifactId>ddd4j-dependencies</artifactId>
-                <version>${revision}</version>
+                <version>${ddd4j.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

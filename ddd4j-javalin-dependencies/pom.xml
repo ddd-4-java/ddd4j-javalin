@@ -23,6 +23,9 @@
         <!-- Javalin 专属：legacy javax.servlet（ddd4j-dependencies 仅 pin jakarta.servlet） -->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
 
+        <!-- Javalin 专属：legacy Swagger 1.x 注解（javalin-api 使用 io.swagger.annotations） -->
+        <swagger.version>1.6.14</swagger.version>
+
         <!-- Javalin 专属：API 文档离线生成（ddd4j-javalin-parent 引用） -->
         <asciidoctorj.version>3.0.0</asciidoctorj.version>
         <asciidoctorj.pdf.version>2.3.18</asciidoctorj.pdf.version>
@@ -71,6 +74,13 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${javax.servlet-api.version}</version>
+            </dependency>
+
+            <!-- Javalin 专属：legacy Springfox（ddd4j-api 遗留注解，ddd4j-dependencies 未 pin 构件） -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

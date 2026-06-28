@@ -6,7 +6,7 @@ import lombok.Getter;
 
 public class Exchange {
     private final Context context;
-    private final static ThreadLocal<Exchange> localContext = new ThreadLocal<>();
+    private final static ThreadLocal<Exchange> localContext = new TransmittableThreadLocal<>();
     @Getter
     private final String lang;
 

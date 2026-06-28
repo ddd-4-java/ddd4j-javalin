@@ -18,9 +18,10 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
+        <!-- 使用 ddd4j-core-api 替代 ddd4j-core，避免引入 Spring 传递依赖 -->
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-core</artifactId>
+            <artifactId>ddd4j-core-api</artifactId>
         </dependency>
         <!-- For Lombok -->
         <dependency>
@@ -117,47 +118,7 @@
             <groupId>org.glassfish.expressly</groupId>
             <artifactId>expressly</artifactId>
         </dependency>
-        <!-- MyBatis-Plus / Spring（BaseServiceImpl 遗留，后续迁出 Javalin 轨） -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-extension</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.hiwepy</groupId>
-            <artifactId>spring-biz</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
+        <!-- For Jakarta Validation -->
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>

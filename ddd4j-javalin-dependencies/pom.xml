@@ -47,6 +47,13 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- ddd4j 核心 API（纯 Java，零框架依赖） -->
+            <dependency>
+                <groupId>io.ddd4j</groupId>
+                <artifactId>ddd4j-core-api</artifactId>
+                <version>${ddd4j.version}</version>
+            </dependency>
+
             <!-- Javalin 专属：核心框架与 OpenAPI 插件 -->
             <dependency>
                 <groupId>io.javalin</groupId>

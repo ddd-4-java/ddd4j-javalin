@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-dependencies</artifactId>
+        <version>${revision}</version>
+        <relativePath>../ddd4j-javalin-dependencies</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-data</artifactId>
+    <packaging>pom</packaging>
+    <description>
+        ddd4j-javalin 数据层整合聚合：mybatis / crypto / logs 子模块。
+        底层复用 io.ddd4j:ddd4j-data-* 纯 Java 实现，本层提供 Guice Module、Javalin Handler 桥接。
+        external / datascope 为 Spring 强耦合实现，Javalin 端暂不提供（按需自行适配）。
+    </description>
+
+    <modules>
+        <module>ddd4j-javalin-data-mybatis</module>
+        <module>ddd4j-javalin-data-crypto</module>
+        <module>ddd4j-javalin-data-logs</module>
+    </modules>
+
+</project>

@@ -16,7 +16,7 @@
         ddd4j 消息队列在 Javalin 轨道的桥接聚合。
         参照 ddd4j-mq 多模块范式：
         - core（MQ 契约 + Guice 桥接）
-        - disruptor / sqs / nats / ons（无 Spring 强耦合的 broker）
+        - disruptor / sqs / nats / ons / kafka（broker 桥接）
     </description>
 
     <modules>
@@ -25,6 +25,7 @@
         <module>ddd4j-javalin-mq-sqs</module>
         <module>ddd4j-javalin-mq-nats</module>
         <module>ddd4j-javalin-mq-ons</module>
+        <module>ddd4j-javalin-mq-kafka</module>
     </modules>
 
 </project>

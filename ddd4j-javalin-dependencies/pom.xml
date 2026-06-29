@@ -18,7 +18,7 @@
 
     <properties>
         <!-- Javalin 专属：HTTP 框架版本 -->
-        <javalin.version>6.3.0</javalin.version>
+        <javalin.version>7.2.2</javalin.version>
 
         <!-- Javalin 专属：legacy javax.servlet（ddd4j-dependencies 仅 pin jakarta.servlet） -->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>

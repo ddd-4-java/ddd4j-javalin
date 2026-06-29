@@ -16,7 +16,7 @@
         ddd4j 消息队列在 Javalin 轨道的桥接聚合。
         参照 ddd4j-mq 多模块范式：
         - core（MQ 契约 + Guice 桥接）
-        - disruptor / sqs / nats / ons / kafka / rocketmq / rabbitmq / activemq / pulsar / redis-stream / mqtt（broker 桥接）
+        - disruptor / sqs / nats / ons / kafka / rocketmq / rabbitmq / activemq / pulsar / redis-stream / mqtt / mqtt-mica（broker 桥接）
     </description>
 
     <modules>
@@ -32,6 +32,7 @@
         <module>ddd4j-javalin-mq-pulsar</module>
         <module>ddd4j-javalin-mq-redis-stream</module>
         <module>ddd4j-javalin-mq-mqtt</module>
+        <module>ddd4j-javalin-mq-mqtt-mica</module>
     </modules>
 
 </project>

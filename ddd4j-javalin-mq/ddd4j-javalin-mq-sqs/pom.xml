@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-mq</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>ddd4j-javalin-mq-sqs</artifactId>
+    <description>ddd4j-javalin MQ - sqs（无 Spring 强耦合，纯 Java SDK，Guice 桥接）。</description>
+    <dependencies>
+        <dependency><groupId>io.ddd4j.javalin</groupId><artifactId>ddd4j-javalin-mq-core</artifactId><version>${revision}</version></dependency>
+        <dependency><groupId>io.ddd4j</groupId><artifactId>ddd4j-mq-sqs</artifactId><version>${ddd4j.version}</version></dependency>
+    </dependencies>
+</project>

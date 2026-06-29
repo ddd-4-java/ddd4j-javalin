@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-dependencies</artifactId>
+        <version>${revision}</version>
+        <relativePath>../ddd4j-javalin-dependencies</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-mq</artifactId>
+    <packaging>pom</packaging>
+    <description>
+        ddd4j 消息队列在 Javalin 轨道的桥接聚合。
+        参照 ddd4j-mq 多模块范式：
+        - core（MQ 契约 + Guice 桥接）
+        - disruptor / sqs / nats / ons（无 Spring 强耦合的 broker）
+    </description>
+
+    <modules>
+        <module>ddd4j-javalin-mq-core</module>
+        <module>ddd4j-javalin-mq-disruptor</module>
+        <module>ddd4j-javalin-mq-sqs</module>
+        <module>ddd4j-javalin-mq-nats</module>
+        <module>ddd4j-javalin-mq-ons</module>
+    </modules>
+
+</project>

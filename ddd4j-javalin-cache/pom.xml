@@ -23,6 +23,29 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
+
+        <!-- ======== 测试：验证 CacheKit 声明式配置 + put/get 闭环 ======== -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 覆盖根 pom 的 skip=true，本模块运行集成测试 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <skipTests>false</skipTests>
+                    <!-- 覆盖根 pom 的 Java8 argLine（-XX:PermSize 在 Java21 导致 forked VM 崩溃） -->
+                    <argLine>-Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

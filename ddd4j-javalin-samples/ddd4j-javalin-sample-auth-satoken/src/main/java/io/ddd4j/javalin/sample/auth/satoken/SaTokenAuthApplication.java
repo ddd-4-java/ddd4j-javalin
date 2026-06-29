@@ -2,7 +2,7 @@ package io.ddd4j.javalin.sample.auth.satoken;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.javalin.guice.DddModule;
+import io.ddd4j.guice.core.Ddd4jGuiceModule;
 import io.ddd4j.javalin.guice.scan.DddAnnotationModule;
 import io.javalin.Javalin;
 
@@ -18,7 +18,7 @@ public class SaTokenAuthApplication {
     public static void main(String[] args) {
         // 1. 创建 Guice Injector：基础设施 + DDD 注解自动扫描绑定
         Injector injector = Guice.createInjector(
-                new DddModule(),
+                new Ddd4jGuiceModule(),
                 new DddAnnotationModule("io.ddd4j.javalin.sample.auth.satoken")
         );
 

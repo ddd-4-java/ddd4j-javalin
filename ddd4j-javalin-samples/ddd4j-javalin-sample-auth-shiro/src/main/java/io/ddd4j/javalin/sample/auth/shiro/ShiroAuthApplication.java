@@ -2,7 +2,7 @@ package io.ddd4j.javalin.sample.auth.shiro;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.javalin.guice.DddModule;
+import io.ddd4j.guice.core.Ddd4jGuiceModule;
 import io.ddd4j.javalin.guice.scan.DddAnnotationModule;
 import io.javalin.Javalin;
 
@@ -15,7 +15,7 @@ public class ShiroAuthApplication {
 
     public static void main(String[] args) {
         Injector injector = Guice.createInjector(
-                new DddModule(),
+                new Ddd4jGuiceModule(),
                 new DddAnnotationModule("io.ddd4j.javalin.sample.auth.shiro")
         );
 

@@ -47,10 +47,10 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- ddd4j 核心 API（纯 Java，零框架依赖） -->
+            <!-- ddd4j Guice 适配（提供 3 个核心 SPI 的 Guice 实现 Ddd4jGuiceModule） -->
             <dependency>
                 <groupId>io.ddd4j</groupId>
-                <artifactId>ddd4j-core-api</artifactId>
+                <artifactId>ddd4j-guice</artifactId>
                 <version>${ddd4j.version}</version>
             </dependency>
 
@@ -81,13 +81,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${javax.servlet-api.version}</version>
-            </dependency>
-
-            <!-- Javalin 专属：legacy Springfox（ddd4j-api 遗留注解，ddd4j-dependencies 未 pin 构件） -->
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${springfox.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

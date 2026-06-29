@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-dependencies</artifactId>
+        <version>${revision}</version>
+        <relativePath>../ddd4j-javalin-dependencies/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-guice</artifactId>
+    <description>
+        ddd4j-javalin 的 Guice 集成层（对齐 ddd4j-guice）。
+        复用 ddd4j-guice 的 Ddd4jGuiceModule（3 个核心 SPI 的 Guice 实现已就绪），
+        本模块仅提供 Javalin/Guice 专属能力：
+        · DddAnnotationModule —— 基于 ClassGraph 的 DDD 注解自动扫描绑定（对标 Spring @ComponentScan）。
+        不再平行重定义 DomainEventPublisher/SubjectProvider/I18nProvider 的 Guice 实现。
+    </description>
+
+    <dependencies>
+        <!-- ======== Guice IoC 容器 ======== -->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+
+        <!-- ======== ddd4j-guice：复用核心 SPI 的 Guice 实现（Ddd4jGuiceModule）======== -->
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-guice</artifactId>
+        </dependency>
+
+        <!-- ======== ddd4j-javalin 注解（DDD 构造型 + Web 参数注解，被 DddAnnotationModule 扫描）======== -->
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-annotation</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- ======== ClassGraph：高性能类路径扫描（DddAnnotationModule 自动发现 DDD 注解类）======== -->
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+        </dependency>
+
+        <!-- ======== 日志 ======== -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

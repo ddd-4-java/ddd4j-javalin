@@ -13,7 +13,7 @@
         <!-- For Javalin -->
         <dependency>
             <groupId>io.ddd4j.javalin</groupId>
-            <artifactId>ddd4j-javalin-api</artifactId>
+            <artifactId>ddd4j-javalin-core</artifactId>
             <version>${ddd4j-javalin.version}</version>
         </dependency>
         <dependency>

@@ -22,7 +22,7 @@
         <!-- ddd4j-javalin Guice 扩展（含 DddAnnotationModule ClassGraph 扫描） -->
         <dependency>
             <groupId>io.ddd4j.javalin</groupId>
-            <artifactId>ddd4j-javalin-extension-guice</artifactId>
+            <artifactId>ddd4j-javalin-guice</artifactId>
             <version>${revision}</version>
         </dependency>
         <!-- ddd4j-javalin auth sa-token 适配 -->

@@ -27,8 +27,6 @@
         <module>ddd4j-javalin-sample-hikaricp-activemq</module>
         <module>ddd4j-javalin-sample-hikaricp-amqp</module>
         <module>ddd4j-javalin-sample-hikaricp-rocketmq</module>
-        <module>ddd4j-javalin-sample-ton4j</module>
-        <module>ddd4j-javalin-sample-web3j</module>
         <!-- Auth 鉴权示例：演示 SubjectKit 统一鉴权入口（Javalin 编程式路由 + Guice） -->
         <module>ddd4j-javalin-sample-auth-satoken</module>
         <module>ddd4j-javalin-sample-auth-security</module>

@@ -28,11 +28,11 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
      * 注册 Javalin 异常处理器（统一 Shiro 异常响应）。
      */
     public static void registerExceptionHandler(Javalin app) {
-        app.exception(AuthenticationException.class, (ex, ctx) -> {
+        app.unsafe.routes.exception(AuthenticationException.class, (ex, ctx) -> {
             ctx.status(401);
             ctx.json(java.util.Map.of("code", 401, "msg", "未登录或登录已过期"));
         });
-        app.exception(AuthorizationException.class, (ex, ctx) -> {
+        app.unsafe.routes.exception(AuthorizationException.class, (ex, ctx) -> {
             ctx.status(403);
             ctx.json(java.util.Map.of("code", 403, "msg", "无权限访问"));
         });

@@ -34,7 +34,7 @@ public class Ddd4jSaTokenJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例
      */
     public static void registerExceptionHandler(Javalin app) {
-        app.exception(SaTokenException.class, (ex, ctx) -> {
+        app.unsafe.routes.exception(SaTokenException.class, (ex, ctx) -> {
             ctx.status(401);
             ctx.json(java.util.Map.of(
                     "code", ex.getCode(),

@@ -19,12 +19,12 @@ import java.util.Map;
 public class AuthController {
 
     public void register(Javalin app) {
-        app.post("/auth/login", this::login);
-        app.post("/auth/logout", this::logout);
-        app.get("/auth/me", this::me);
-        app.get("/auth/check/permission", this::checkPermission);
-        app.get("/auth/check/role", this::checkRole);
-        app.get("/auth/status", this::status);
+        app.unsafe.routes.post("/auth/login", this::login);
+        app.unsafe.routes.post("/auth/logout", this::logout);
+        app.unsafe.routes.get("/auth/me", this::me);
+        app.unsafe.routes.get("/auth/check/permission", this::checkPermission);
+        app.unsafe.routes.get("/auth/check/role", this::checkRole);
+        app.unsafe.routes.get("/auth/status", this::status);
     }
 
     public void login(Context ctx) {

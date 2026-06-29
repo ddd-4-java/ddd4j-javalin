@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-dependencies</artifactId>
+        <version>${revision}</version>
+        <relativePath>../ddd4j-javalin-dependencies/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-core</artifactId>
+    <description>
+        ddd4j-javalin 核心层：对齐 ddd4j-core，提供 Javalin 特化的契约实现。
+        包含：
+        · cqrs —— 基于 ScheduledExecutorService 的 ViewManager（实现 ddd4j-core 的 CQRS 读侧 SPI）；
+        · web  —— 基于 Javalin Context 的纯净 Web 基类（去 Spring，复用 ddd4j-core 的 ApiRestResponse/I18nProvider）。
+        所有契约类一律引用 io.ddd4j.core.* / io.ddd4j.kit.*，禁止平行重定义。
+    </description>
+
+    <dependencies>
+        <!-- ======== ddd4j 契约（唯一真相源）======== -->
+        <!-- ddd4j 核心：ApiRestResponse / DomainEventPublisher / I18nProvider / CQRS SPI（纯 Java，零框架依赖） -->
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-core</artifactId>
+        </dependency>
+
+        <!-- ======== Javalin 框架 ======== -->
+        <!-- Javalin 核心（Context / Javalin） -->
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin</artifactId>
+        </dependency>
+
+        <!-- ======== IoC（仅编译期依赖 Guice 注解，运行期由 ddd4j-javalin-guice 提供实现）======== -->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+
+        <!-- ======== 日志 ======== -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- ======== 工具 ======== -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- ======== Test ======== -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

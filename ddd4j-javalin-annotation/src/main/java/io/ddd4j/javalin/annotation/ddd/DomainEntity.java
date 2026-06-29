@@ -2,6 +2,7 @@ package io.ddd4j.javalin.annotation.ddd;
 
 import com.google.inject.Singleton;
 import io.ddd4j.annotation.ddd.DDDAnnotation;
+
 import java.lang.annotation.*;
 
 /**
@@ -15,6 +16,8 @@ import java.lang.annotation.*;
 @Inherited
 public @interface DomainEntity {
 
-    /** 是否是聚合根 */
+    /**
+     * 是否是聚合根
+     */
     boolean aggregateRoot() default false;
 }

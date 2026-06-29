@@ -12,20 +12,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 abstract public class AbstractTask implements Task {
 
-    private final AtomicBoolean running = new AtomicBoolean(false);
-
     private static final Counter taskRunTimes = Counter.builder()
-        .name("task_run_times_total")
-        .help("task run times for success/failed")
-        .labelNames("name", "result")
-        .register();
-
+            .name("task_run_times_total")
+            .help("task run times for success/failed")
+            .labelNames("name", "result")
+            .register();
     private static final Histogram taskRunDuration = Histogram.builder()
-        .name("task_run_duration")
-        .help("task run duration")
-        .labelNames("name")
-        .unit(Unit.SECONDS)
-        .register();
+            .name("task_run_duration")
+            .help("task run duration")
+            .labelNames("name")
+            .unit(Unit.SECONDS)
+            .register();
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
     @Override
     public void execute() {
@@ -42,12 +40,10 @@ abstract public class AbstractTask implements Task {
             running.set(true);
             run();
             taskRunTimes.labelValues(className, "success").inc();
-        }
-        catch (Throwable e) {
-            log.warn("Task [{}] error: {}",  className, e.getMessage(), e);
+        } catch (Throwable e) {
+            log.warn("Task [{}] error: {}", className, e.getMessage(), e);
             taskRunTimes.labelValues(className, "failed").inc();
-        }
-        finally {
+        } finally {
             log.info("Task done: {}", className);
             running.set(false);
             taskRunDuration.labelValues(className).observe(Unit.millisToSeconds(DateUtil.current() - startTs));

@@ -18,13 +18,13 @@ import org.jooq.impl.Internal;
  * A class modelling foreign key relationships and constraints of tables in the
  * default schema.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class Keys {
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
-    public static final UniqueKey<UserRecord> KEY_T_USER_PRIMARY = Internal.createUniqueKey(User.USER, DSL.name("KEY_t_user_PRIMARY"), new TableField[] { User.USER.ID }, true);
-    public static final UniqueKey<UserRecord> KEY_T_USER_UNIQ_CLIENT_USER_ID = Internal.createUniqueKey(User.USER, DSL.name("KEY_t_user_uniq_client_user_id"), new TableField[] { User.USER.CLIENT_USER_ID }, true);
+    public static final UniqueKey<UserRecord> KEY_T_USER_PRIMARY = Internal.createUniqueKey(User.USER, DSL.name("KEY_t_user_PRIMARY"), new TableField[]{User.USER.ID}, true);
+    public static final UniqueKey<UserRecord> KEY_T_USER_UNIQ_CLIENT_USER_ID = Internal.createUniqueKey(User.USER, DSL.name("KEY_t_user_uniq_client_user_id"), new TableField[]{User.USER.CLIENT_USER_ID}, true);
 
 }

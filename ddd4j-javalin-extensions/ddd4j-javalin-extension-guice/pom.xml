@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -28,6 +28,17 @@
         <dependency>
             <groupId>io.ddd4j</groupId>
             <artifactId>ddd4j-core</artifactId>
+        </dependency>
+        <!-- ddd4j-javalin 注解（DDD 注解 + Web 路由参数注解） -->
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-annotation</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!-- ClassGraph：高性能类路径扫描（用于自动发现 DDD 注解类并绑定到 Guice） -->
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>

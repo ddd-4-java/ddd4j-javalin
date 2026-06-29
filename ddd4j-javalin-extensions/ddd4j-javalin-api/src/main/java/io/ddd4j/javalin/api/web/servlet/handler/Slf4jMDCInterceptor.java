@@ -2,13 +2,12 @@ package io.ddd4j.javalin.api.web.servlet.handler;
 
 import io.ddd4j.javalin.api.XHeaders;
 import io.ddd4j.javalin.api.sequence.Sequence;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 public class Slf4jMDCInterceptor implements HandlerInterceptor {
 

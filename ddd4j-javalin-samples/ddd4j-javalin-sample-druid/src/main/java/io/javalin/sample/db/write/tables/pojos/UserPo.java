@@ -10,32 +10,33 @@ import java.io.Serializable;
 /**
  * 用户信息
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class UserPo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long    id;
+    private Long id;
     private Integer version;
-    private String  clientUserId;
+    private String clientUserId;
     private Integer level;
-    private String  userName;
-    private String  ip;
-    private String  country;
-    private String  city;
-    private String  region;
-    private String  firstName;
-    private String  lastName;
-    private String  languageCode;
-    private String  latitude;
-    private String  longitude;
+    private String userName;
+    private String ip;
+    private String country;
+    private String city;
+    private String region;
+    private String firstName;
+    private String lastName;
+    private String languageCode;
+    private String latitude;
+    private String longitude;
     private Integer status;
-    private String  type;
-    private String  channel;
-    private Long    createdAt;
-    private Long    updatedAt;
+    private String type;
+    private String channel;
+    private Long createdAt;
+    private Long updatedAt;
 
-    public UserPo() {}
+    public UserPo() {
+    }
 
     public UserPo(UserPo value) {
         this.id = value.id;
@@ -60,25 +61,25 @@ public class UserPo implements Serializable {
     }
 
     public UserPo(
-        Long    id,
-        Integer version,
-        String  clientUserId,
-        Integer level,
-        String  userName,
-        String  ip,
-        String  country,
-        String  city,
-        String  region,
-        String  firstName,
-        String  lastName,
-        String  languageCode,
-        String  latitude,
-        String  longitude,
-        Integer status,
-        String  type,
-        String  channel,
-        Long    createdAt,
-        Long    updatedAt
+            Long id,
+            Integer version,
+            String clientUserId,
+            Integer level,
+            String userName,
+            String ip,
+            String country,
+            String city,
+            String region,
+            String firstName,
+            String lastName,
+            String languageCode,
+            String latitude,
+            String longitude,
+            Integer status,
+            String type,
+            String channel,
+            Long createdAt,
+            Long updatedAt
     ) {
         this.id = id;
         this.version = version;

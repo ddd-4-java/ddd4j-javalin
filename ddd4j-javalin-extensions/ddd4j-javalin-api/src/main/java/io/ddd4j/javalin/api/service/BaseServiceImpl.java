@@ -12,6 +12,7 @@ import com.github.dozermapper.core.Mapper;
 import io.ddd4j.javalin.api.dao.BaseMapper;
 import io.ddd4j.javalin.api.dao.entities.PaginationEntity;
 import io.ddd4j.javalin.api.dao.entities.PairModel;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.biz.context.NestedMessageSource;
 import org.springframework.biz.web.servlet.support.RequestContextUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.context.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringValueResolver;
@@ -27,7 +27,6 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -47,17 +46,15 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      */
     protected static final String DEFAULT_CACHE = "defaultCache";
     protected String cacheName = DEFAULT_CACHE;
-
-    private StringValueResolver valueResolver;
-    private ApplicationEventPublisher eventPublisher;
-    private ApplicationContext context;
-
     @Autowired
     protected NestedMessageSource messageSource;
     @Autowired(required = false)
     protected CacheManager cacheManager;
     @Autowired
     protected Mapper beanMapper;
+    private StringValueResolver valueResolver;
+    private ApplicationEventPublisher eventPublisher;
+    private ApplicationContext context;
 
     @Override
     public void afterPropertiesSet() throws Exception {

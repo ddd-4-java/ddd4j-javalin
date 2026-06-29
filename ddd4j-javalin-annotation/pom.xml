@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -11,7 +11,8 @@
     </parent>
 
     <artifactId>ddd4j-javalin-annotation</artifactId>
-    <description>ddd4j-javalin 注解模块：11 个 DDD 注解同名复制（用 Guice @Singleton 元注解融合）+ Javalin 路由参数解析</description>
+    <description>ddd4j-javalin 注解模块：11 个 DDD 注解同名复制（用 Guice @Singleton 元注解融合）+ Javalin 路由参数解析
+    </description>
 
     <dependencies>
         <!-- 依赖 ddd4j-annotation（提供 DDDAnnotation marker） -->
@@ -31,4 +32,17 @@
             <artifactId>javalin</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- 禁用注解处理器：避免某些 processor（如 Javalin 注解扫描器）误删 @DomainService -->
+                    <proc>none</proc>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

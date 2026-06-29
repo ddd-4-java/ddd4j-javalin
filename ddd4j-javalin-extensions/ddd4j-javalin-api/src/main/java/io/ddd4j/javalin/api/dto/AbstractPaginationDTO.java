@@ -5,10 +5,10 @@
 package io.ddd4j.javalin.api.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
 
 @Data

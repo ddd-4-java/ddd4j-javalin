@@ -32,7 +32,7 @@ public class GuiceDomainEventPublisher implements DomainEventPublisher {
             logger.warn("Attempted to publish null domain event");
             return;
         }
-        logger.debug("Publishing domain event: {}, aggregateId: {}", event.getEventType(), event.getAggregateId());
+        logger.debug("Publishing domain event: {}", event.getClass().getName());
         eventBus.post(event);
     }
 

@@ -18,23 +18,24 @@ import java.lang.annotation.Target;
  */
 public final class AnnotationFusionVerifier {
 
-    private AnnotationFusionVerifier() {}
+    private AnnotationFusionVerifier() {
+    }
 
     public static void main(String[] args) {
         int passed = 0;
         int failed = 0;
 
         System.out.println("=== DDD 注解元注解融合验证 ===");
-        passed += verify("DomainService",       DomainService.class);
-        passed += verify("DomainRepository",    DomainRepository.class);
-        passed += verify("ApplicationService",  ApplicationService.class);
-        passed += verify("QueryService",       QueryService.class);
-        passed += verify("CommandExecutor",    CommandExecutor.class);
-        passed += verify("DomainEntity",       DomainEntity.class);
-        passed += verify("DomainValueObject",  DomainValueObject.class);
-        passed += verify("DomainGateway",      DomainGateway.class);
-        passed += verify("DomainAssembler",    DomainAssembler.class);
-        passed += verify("DomainConverter",    DomainConverter.class);
+        passed += verify("DomainService", DomainService.class);
+        passed += verify("DomainRepository", DomainRepository.class);
+        passed += verify("ApplicationService", ApplicationService.class);
+        passed += verify("QueryService", QueryService.class);
+        passed += verify("CommandExecutor", CommandExecutor.class);
+        passed += verify("DomainEntity", DomainEntity.class);
+        passed += verify("DomainValueObject", DomainValueObject.class);
+        passed += verify("DomainGateway", DomainGateway.class);
+        passed += verify("DomainAssembler", DomainAssembler.class);
+        passed += verify("DomainConverter", DomainConverter.class);
 
         System.out.println();
         System.out.println("=== @DomainEvent 不下沉验证 ===");
@@ -49,24 +50,35 @@ public final class AnnotationFusionVerifier {
 
         System.out.println();
         System.out.println("=== Web 路由参数注解验证 ===");
-        passed += verifyWebAnnotation("PathParam",   PathParam.class);
-        passed += verifyWebAnnotation("QueryParam",  QueryParam.class);
-        passed += verifyWebAnnotation("FormParam",   FormParam.class);
+        passed += verifyWebAnnotation("PathParam", PathParam.class);
+        passed += verifyWebAnnotation("QueryParam", QueryParam.class);
+        passed += verifyWebAnnotation("FormParam", FormParam.class);
         passed += verifyWebAnnotation("HeaderParam", HeaderParam.class);
         passed += verifyWebAnnotation("CookieParam", CookieParam.class);
-        passed += verifyWebAnnotation("BodyParam",   BodyParam.class);
-        passed += verifyWebAnnotation("Context",     Context.class);
+        passed += verifyWebAnnotation("BodyParam", BodyParam.class);
+        passed += verifyWebAnnotation("Context", Context.class);
 
         System.out.println();
         System.out.println("=== 业务代码使用模式验证 ===");
-        DDDAnnotation ddd = BusinessDomainService.class.getAnnotation(DDDAnnotation.class);
-        Singleton singleton = BusinessDomainService.class.getAnnotation(Singleton.class);
-        if (ddd != null && singleton != null) {
-            System.out.println("PASS: 业务代码 @DomainService 同时获得 @DDDAnnotation + @Singleton");
-            passed++;
-        } else {
-            System.out.println("FAIL: 业务代码模式验证失败 (ddd=" + ddd + ", singleton=" + singleton + ")");
+        // BusinessDomainService 直接标注了 @DomainService（来自本模块）。
+        // @DomainService 本身融合了 @DDDAnnotation 和 @Singleton 作为元注解。
+        // Class.getAnnotation() 不递归元注解——所以业务类只能直接拿到 @DomainService，
+        // 而框架（Guice/ArchUnit）通过遍历注解的 annotationType() 上的元注解来识别。
+        java.lang.annotation.Annotation domainServiceOnBiz = BusinessDomainService.class.getAnnotation(DomainService.class);
+        if (domainServiceOnBiz == null) {
+            System.out.println("FAIL: 业务类未标注 @DomainService");
             failed++;
+        } else {
+            // 通过 @DomainService 注解类型反查元注解，验证框架识别链路
+            DDDAnnotation ddd = DomainService.class.getAnnotation(DDDAnnotation.class);
+            Singleton singleton = DomainService.class.getAnnotation(Singleton.class);
+            if (ddd != null && singleton != null) {
+                System.out.println("PASS: 业务代码 @DomainService -> 元注解链路完整（@DDDAnnotation + @Singleton 可被框架识别）");
+                passed++;
+            } else {
+                System.out.println("FAIL: @DomainService 元注解缺失");
+                failed++;
+            }
         }
 
         System.out.println();
@@ -126,5 +138,7 @@ public final class AnnotationFusionVerifier {
  */
 @DomainService
 class BusinessDomainService {
-    public String hello() { return "hello"; }
+    public String hello() {
+        return "hello";
+    }
 }

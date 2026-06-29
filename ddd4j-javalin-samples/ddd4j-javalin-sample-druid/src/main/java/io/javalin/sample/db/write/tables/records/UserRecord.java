@@ -16,16 +16,72 @@ import org.jooq.impl.UpdatableRecordImpl;
 /**
  * 用户信息
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Record19<Long, Integer, String, Integer, String, String, String, String, String, String, String, String, String, String, Integer, String, String, Long, Long> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>t_user.id</code>.
+     * Create a detached UserRecord
      */
-    public void setId(Long value) {
-        set(0, value);
+    public UserRecord() {
+        super(User.USER);
+    }
+
+    /**
+     * Create a detached, initialised UserRecord
+     */
+    public UserRecord(Long id, Integer version, String clientUserId, Integer level, String userName, String ip, String country, String city, String region, String firstName, String lastName, String languageCode, String latitude, String longitude, Integer status, String type, String channel, Long createdAt, Long updatedAt) {
+        super(User.USER);
+
+        setId(id);
+        setVersion(version);
+        setClientUserId(clientUserId);
+        setLevel(level);
+        setUserName(userName);
+        setIp(ip);
+        setCountry(country);
+        setCity(city);
+        setRegion(region);
+        setFirstName(firstName);
+        setLastName(lastName);
+        setLanguageCode(languageCode);
+        setLatitude(latitude);
+        setLongitude(longitude);
+        setStatus(status);
+        setType(type);
+        setChannel(channel);
+        setCreatedAt(createdAt);
+        setUpdatedAt(updatedAt);
+    }
+
+    /**
+     * Create a detached, initialised UserRecord
+     */
+    public UserRecord(UserPo value) {
+        super(User.USER);
+
+        if (value != null) {
+            setId(value.getId());
+            setVersion(value.getVersion());
+            setClientUserId(value.getClientUserId());
+            setLevel(value.getLevel());
+            setUserName(value.getUserName());
+            setIp(value.getIp());
+            setCountry(value.getCountry());
+            setCity(value.getCity());
+            setRegion(value.getRegion());
+            setFirstName(value.getFirstName());
+            setLastName(value.getLastName());
+            setLanguageCode(value.getLanguageCode());
+            setLatitude(value.getLatitude());
+            setLongitude(value.getLongitude());
+            setStatus(value.getStatus());
+            setType(value.getType());
+            setChannel(value.getChannel());
+            setCreatedAt(value.getCreatedAt());
+            setUpdatedAt(value.getUpdatedAt());
+        }
     }
 
     /**
@@ -36,10 +92,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.version</code>. 版本
+     * Setter for <code>t_user.id</code>.
      */
-    public void setVersion(Integer value) {
-        set(1, value);
+    public void setId(Long value) {
+        set(0, value);
     }
 
     /**
@@ -50,10 +106,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.client_user_id</code>. 小程序用户ID
+     * Setter for <code>t_user.version</code>. 版本
      */
-    public void setClientUserId(String value) {
-        set(2, value);
+    public void setVersion(Integer value) {
+        set(1, value);
     }
 
     /**
@@ -64,10 +120,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.level</code>. 等级
+     * Setter for <code>t_user.client_user_id</code>. 小程序用户ID
      */
-    public void setLevel(Integer value) {
-        set(3, value);
+    public void setClientUserId(String value) {
+        set(2, value);
     }
 
     /**
@@ -78,10 +134,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.user_name</code>. userName
+     * Setter for <code>t_user.level</code>. 等级
      */
-    public void setUserName(String value) {
-        set(4, value);
+    public void setLevel(Integer value) {
+        set(3, value);
     }
 
     /**
@@ -92,10 +148,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.ip</code>. IP
+     * Setter for <code>t_user.user_name</code>. userName
      */
-    public void setIp(String value) {
-        set(5, value);
+    public void setUserName(String value) {
+        set(4, value);
     }
 
     /**
@@ -106,10 +162,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.country</code>. Country
+     * Setter for <code>t_user.ip</code>. IP
      */
-    public void setCountry(String value) {
-        set(6, value);
+    public void setIp(String value) {
+        set(5, value);
     }
 
     /**
@@ -120,10 +176,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.city</code>. city
+     * Setter for <code>t_user.country</code>. Country
      */
-    public void setCity(String value) {
-        set(7, value);
+    public void setCountry(String value) {
+        set(6, value);
     }
 
     /**
@@ -134,10 +190,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.region</code>. region
+     * Setter for <code>t_user.city</code>. city
      */
-    public void setRegion(String value) {
-        set(8, value);
+    public void setCity(String value) {
+        set(7, value);
     }
 
     /**
@@ -148,10 +204,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.first_name</code>. firstName
+     * Setter for <code>t_user.region</code>. region
      */
-    public void setFirstName(String value) {
-        set(9, value);
+    public void setRegion(String value) {
+        set(8, value);
     }
 
     /**
@@ -162,10 +218,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.last_name</code>. lastName
+     * Setter for <code>t_user.first_name</code>. firstName
      */
-    public void setLastName(String value) {
-        set(10, value);
+    public void setFirstName(String value) {
+        set(9, value);
     }
 
     /**
@@ -176,10 +232,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.language_code</code>. languageCode
+     * Setter for <code>t_user.last_name</code>. lastName
      */
-    public void setLanguageCode(String value) {
-        set(11, value);
+    public void setLastName(String value) {
+        set(10, value);
     }
 
     /**
@@ -190,10 +246,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.latitude</code>. latitude
+     * Setter for <code>t_user.language_code</code>. languageCode
      */
-    public void setLatitude(String value) {
-        set(12, value);
+    public void setLanguageCode(String value) {
+        set(11, value);
     }
 
     /**
@@ -204,10 +260,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.longitude</code>. longitude
+     * Setter for <code>t_user.latitude</code>. latitude
      */
-    public void setLongitude(String value) {
-        set(13, value);
+    public void setLatitude(String value) {
+        set(12, value);
     }
 
     /**
@@ -218,10 +274,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.status</code>.  状态
+     * Setter for <code>t_user.longitude</code>. longitude
      */
-    public void setStatus(Integer value) {
-        set(14, value);
+    public void setLongitude(String value) {
+        set(13, value);
     }
 
     /**
@@ -232,10 +288,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.type</code>. 类型
+     * Setter for <code>t_user.status</code>.  状态
      */
-    public void setType(String value) {
-        set(15, value);
+    public void setStatus(Integer value) {
+        set(14, value);
     }
 
     /**
@@ -246,10 +302,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.channel</code>. 渠道
+     * Setter for <code>t_user.type</code>. 类型
      */
-    public void setChannel(String value) {
-        set(16, value);
+    public void setType(String value) {
+        set(15, value);
     }
 
     /**
@@ -260,10 +316,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
     }
 
     /**
-     * Setter for <code>t_user.created_at</code>. 创建时间
+     * Setter for <code>t_user.channel</code>. 渠道
      */
-    public void setCreatedAt(Long value) {
-        set(17, value);
+    public void setChannel(String value) {
+        set(16, value);
     }
 
     /**
@@ -273,12 +329,20 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
         return (Long) get(17);
     }
 
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
+
     /**
-     * Setter for <code>t_user.updated_at</code>. 更新时间
+     * Setter for <code>t_user.created_at</code>. 创建时间
      */
-    public void setUpdatedAt(Long value) {
-        set(18, value);
+    public void setCreatedAt(Long value) {
+        set(17, value);
     }
+
+    // -------------------------------------------------------------------------
+    // Record19 type implementation
+    // -------------------------------------------------------------------------
 
     /**
      * Getter for <code>t_user.updated_at</code>. 更新时间
@@ -287,18 +351,17 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
         return (Long) get(18);
     }
 
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
+    /**
+     * Setter for <code>t_user.updated_at</code>. 更新时间
+     */
+    public void setUpdatedAt(Long value) {
+        set(18, value);
+    }
 
     @Override
     public Record1<Long> key() {
         return (Record1) super.key();
     }
-
-    // -------------------------------------------------------------------------
-    // Record19 type implementation
-    // -------------------------------------------------------------------------
 
     @Override
     public Row19<Long, Integer, String, Integer, String, String, String, String, String, String, String, String, String, String, Integer, String, String, Long, Long> fieldsRow() {
@@ -697,6 +760,10 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
         return this;
     }
 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     @Override
     public UserRecord value18(Long value) {
         setCreatedAt(value);
@@ -731,72 +798,5 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
         value18(value18);
         value19(value19);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached UserRecord
-     */
-    public UserRecord() {
-        super(User.USER);
-    }
-
-    /**
-     * Create a detached, initialised UserRecord
-     */
-    public UserRecord(Long id, Integer version, String clientUserId, Integer level, String userName, String ip, String country, String city, String region, String firstName, String lastName, String languageCode, String latitude, String longitude, Integer status, String type, String channel, Long createdAt, Long updatedAt) {
-        super(User.USER);
-
-        setId(id);
-        setVersion(version);
-        setClientUserId(clientUserId);
-        setLevel(level);
-        setUserName(userName);
-        setIp(ip);
-        setCountry(country);
-        setCity(city);
-        setRegion(region);
-        setFirstName(firstName);
-        setLastName(lastName);
-        setLanguageCode(languageCode);
-        setLatitude(latitude);
-        setLongitude(longitude);
-        setStatus(status);
-        setType(type);
-        setChannel(channel);
-        setCreatedAt(createdAt);
-        setUpdatedAt(updatedAt);
-    }
-
-    /**
-     * Create a detached, initialised UserRecord
-     */
-    public UserRecord(UserPo value) {
-        super(User.USER);
-
-        if (value != null) {
-            setId(value.getId());
-            setVersion(value.getVersion());
-            setClientUserId(value.getClientUserId());
-            setLevel(value.getLevel());
-            setUserName(value.getUserName());
-            setIp(value.getIp());
-            setCountry(value.getCountry());
-            setCity(value.getCity());
-            setRegion(value.getRegion());
-            setFirstName(value.getFirstName());
-            setLastName(value.getLastName());
-            setLanguageCode(value.getLanguageCode());
-            setLatitude(value.getLatitude());
-            setLongitude(value.getLongitude());
-            setStatus(value.getStatus());
-            setType(value.getType());
-            setChannel(value.getChannel());
-            setCreatedAt(value.getCreatedAt());
-            setUpdatedAt(value.getUpdatedAt());
-        }
     }
 }

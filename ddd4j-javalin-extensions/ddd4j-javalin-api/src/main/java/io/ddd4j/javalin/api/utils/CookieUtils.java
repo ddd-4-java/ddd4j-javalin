@@ -2,6 +2,7 @@ package io.ddd4j.javalin.api.utils;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.Arrays;
 import java.util.Optional;
 

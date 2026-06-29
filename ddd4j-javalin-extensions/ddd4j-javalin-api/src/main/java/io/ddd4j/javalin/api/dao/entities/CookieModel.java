@@ -21,6 +21,13 @@ public class CookieModel {
     private String cookieValue;
 
     /**
+     * Return the given name for cookies created by this generator.
+     */
+    public String getCookieName() {
+        return this.cookieName;
+    }
+
+    /**
      * Use the given name for cookies created by this generator.
      *
      * @see jakarta.servlet.http.Cookie#getName()
@@ -30,10 +37,10 @@ public class CookieModel {
     }
 
     /**
-     * Return the given name for cookies created by this generator.
+     * Return the domain for cookies created by this generator, if any.
      */
-    public String getCookieName() {
-        return this.cookieName;
+    public String getCookieDomain() {
+        return this.cookieDomain;
     }
 
     /**
@@ -47,10 +54,10 @@ public class CookieModel {
     }
 
     /**
-     * Return the domain for cookies created by this generator, if any.
+     * Return the path for cookies created by this generator.
      */
-    public String getCookieDomain() {
-        return this.cookieDomain;
+    public String getCookiePath() {
+        return this.cookiePath;
     }
 
     /**
@@ -64,10 +71,10 @@ public class CookieModel {
     }
 
     /**
-     * Return the path for cookies created by this generator.
+     * Return the maximum age for cookies created by this generator.
      */
-    public String getCookiePath() {
-        return this.cookiePath;
+    public Integer getCookieMaxAge() {
+        return this.cookieMaxAge;
     }
 
     /**
@@ -81,10 +88,11 @@ public class CookieModel {
     }
 
     /**
-     * Return the maximum age for cookies created by this generator.
+     * Return whether the cookie should only be sent using a secure protocol,
+     * such as HTTPS (SSL).
      */
-    public Integer getCookieMaxAge() {
-        return this.cookieMaxAge;
+    public boolean isCookieSecure() {
+        return this.cookieSecure;
     }
 
     /**
@@ -99,11 +107,10 @@ public class CookieModel {
     }
 
     /**
-     * Return whether the cookie should only be sent using a secure protocol,
-     * such as HTTPS (SSL).
+     * Return whether the cookie is supposed to be marked with the "HttpOnly" attribute.
      */
-    public boolean isCookieSecure() {
-        return this.cookieSecure;
+    public boolean isCookieHttpOnly() {
+        return this.cookieHttpOnly;
     }
 
     /**
@@ -114,13 +121,6 @@ public class CookieModel {
      */
     public void setCookieHttpOnly(boolean cookieHttpOnly) {
         this.cookieHttpOnly = cookieHttpOnly;
-    }
-
-    /**
-     * Return whether the cookie is supposed to be marked with the "HttpOnly" attribute.
-     */
-    public boolean isCookieHttpOnly() {
-        return this.cookieHttpOnly;
     }
 
     public String getCookieValue() {

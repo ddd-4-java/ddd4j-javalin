@@ -11,27 +11,6 @@ import java.util.function.Function;
 
 public class LotteryUtils {
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class LotteryElement {
-
-        /**
-         * 奖励数量
-         */
-        private Long amount;
-        /**
-         * 奖励出现概率
-         */
-        private Long weight;
-        /**
-         * 奖励每天出现的限额
-         */
-        private Integer quota;
-
-    }
-
     public static <T extends LotteryElement> T lottery(List<T> elements, Function<T, Long> quotaChecker) {
         // 1、打乱元素集合
         Collections.shuffle(elements);
@@ -72,6 +51,27 @@ public class LotteryUtils {
         }
         // 7、逻辑上不会找不到，以下代码是备用逻辑取奖励数量最少的元素
         return elements.stream().filter(el -> Objects.isNull(el.getQuota())).min(Comparator.comparing(LotteryElement::getAmount)).get();
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LotteryElement {
+
+        /**
+         * 奖励数量
+         */
+        private Long amount;
+        /**
+         * 奖励出现概率
+         */
+        private Long weight;
+        /**
+         * 奖励每天出现的限额
+         */
+        private Integer quota;
+
     }
 
 }

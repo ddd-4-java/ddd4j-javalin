@@ -1,13 +1,12 @@
 package io.ddd4j.javalin.api.utils;
 
 import io.ddd4j.javalin.api.XHeaders;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.biz.utils.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Slf4j
 public class WebUtils {

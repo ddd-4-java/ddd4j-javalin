@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public abstract class AbstractOrderedPaginationDTO extends AbstractPaginationDTO {
 

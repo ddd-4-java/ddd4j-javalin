@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 
 /**
- * 	键值对模型对象
+ * 键值对模型对象
  */
 @Data
 @Accessors(chain = true)

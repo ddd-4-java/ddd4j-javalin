@@ -20,114 +20,86 @@ import java.util.List;
 /**
  * 用户信息
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class User extends TableImpl<UserRecord> {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>t_user</code>
      */
     public static final User USER = new User();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<UserRecord> getRecordType() {
-        return UserRecord.class;
-    }
-
+    private static final long serialVersionUID = 1L;
     /**
      * The column <code>t_user.id</code>.
      */
     public final TableField<UserRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
-
     /**
      * The column <code>t_user.version</code>. 版本
      */
     public final TableField<UserRecord, Integer> VERSION = createField(DSL.name("version"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "版本");
-
     /**
      * The column <code>t_user.client_user_id</code>. 小程序用户ID
      */
     public final TableField<UserRecord, String> CLIENT_USER_ID = createField(DSL.name("client_user_id"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "小程序用户ID");
-
     /**
      * The column <code>t_user.level</code>. 等级
      */
     public final TableField<UserRecord, Integer> LEVEL = createField(DSL.name("level"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, "等级");
-
     /**
      * The column <code>t_user.user_name</code>. userName
      */
     public final TableField<UserRecord, String> USER_NAME = createField(DSL.name("user_name"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "userName");
-
     /**
      * The column <code>t_user.ip</code>. IP
      */
     public final TableField<UserRecord, String> IP = createField(DSL.name("ip"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "IP");
-
     /**
      * The column <code>t_user.country</code>. Country
      */
     public final TableField<UserRecord, String> COUNTRY = createField(DSL.name("country"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "Country");
-
     /**
      * The column <code>t_user.city</code>. city
      */
     public final TableField<UserRecord, String> CITY = createField(DSL.name("city"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "city");
-
     /**
      * The column <code>t_user.region</code>. region
      */
     public final TableField<UserRecord, String> REGION = createField(DSL.name("region"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "region");
-
     /**
      * The column <code>t_user.first_name</code>. firstName
      */
     public final TableField<UserRecord, String> FIRST_NAME = createField(DSL.name("first_name"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "firstName");
-
     /**
      * The column <code>t_user.last_name</code>. lastName
      */
     public final TableField<UserRecord, String> LAST_NAME = createField(DSL.name("last_name"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "lastName");
-
     /**
      * The column <code>t_user.language_code</code>. languageCode
      */
     public final TableField<UserRecord, String> LANGUAGE_CODE = createField(DSL.name("language_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "languageCode");
-
     /**
      * The column <code>t_user.latitude</code>. latitude
      */
     public final TableField<UserRecord, String> LATITUDE = createField(DSL.name("latitude"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "latitude");
-
     /**
      * The column <code>t_user.longitude</code>. longitude
      */
     public final TableField<UserRecord, String> LONGITUDE = createField(DSL.name("longitude"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "longitude");
-
     /**
      * The column <code>t_user.status</code>.  状态
      */
     public final TableField<UserRecord, Integer> STATUS = createField(DSL.name("status"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.inline("0", SQLDataType.INTEGER)), this, " 状态");
-
     /**
      * The column <code>t_user.type</code>. 类型
      */
     public final TableField<UserRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(32).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "类型");
-
     /**
      * The column <code>t_user.channel</code>. 渠道
      */
     public final TableField<UserRecord, String> CHANNEL = createField(DSL.name("channel"), SQLDataType.VARCHAR(32).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "渠道");
-
     /**
      * The column <code>t_user.created_at</code>. 创建时间
      */
     public final TableField<UserRecord, Long> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "创建时间");
-
     /**
      * The column <code>t_user.updated_at</code>. 更新时间
      */
@@ -164,6 +136,14 @@ public class User extends TableImpl<UserRecord> {
 
     public <O extends Record> User(Table<O> child, ForeignKey<O, UserRecord> key) {
         super(child, key, USER);
+    }
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<UserRecord> getRecordType() {
+        return UserRecord.class;
     }
 
     @Override

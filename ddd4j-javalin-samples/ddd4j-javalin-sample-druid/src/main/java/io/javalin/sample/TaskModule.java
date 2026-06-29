@@ -26,7 +26,7 @@ public class TaskModule extends AbstractModule {
         var configStr = FileUtil.readUtf8String(new File(configFile));
         try {
             config = objectMapper.readValue(configStr, TaskConfig.class);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Failed to parse config file", e);
         }
 
@@ -38,9 +38,9 @@ public class TaskModule extends AbstractModule {
     private void startH2(H2Config c) {
         var server = new Server();
         server.runTool(
-            "-baseDir", c.getBaseDir(), "-ifNotExists",
-            "-web", "-webAllowOthers", "-webPort", c.getWebPort().toString(), "-webExternalNames", c.getExtraNames(),
-            "-tcp", "-tcpAllowOthers", "-tcpPort", c.getTcpPort().toString()
+                "-baseDir", c.getBaseDir(), "-ifNotExists",
+                "-web", "-webAllowOthers", "-webPort", c.getWebPort().toString(), "-webExternalNames", c.getExtraNames(),
+                "-tcp", "-tcpAllowOthers", "-tcpPort", c.getTcpPort().toString()
         );
 
         Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown));

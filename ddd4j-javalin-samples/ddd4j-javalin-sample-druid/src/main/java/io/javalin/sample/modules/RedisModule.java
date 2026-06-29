@@ -44,10 +44,10 @@ public class RedisModule extends AbstractModule {
         poolConfig.setNumTestsPerEvictionRun(-1);
 
         var clientConfig = DefaultJedisClientConfig.builder()
-            .user(config.getUser())
-            .password(config.getPassword())
-            .database(config.getDatabase())
-            .build();
+                .user(config.getUser())
+                .password(config.getPassword())
+                .database(config.getDatabase())
+                .build();
         var hostPort = new HostAndPort(config.getAddress(), config.getPort());
         return new JedisPooled(poolConfig, hostPort, clientConfig);
     }

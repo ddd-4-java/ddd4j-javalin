@@ -29,6 +29,21 @@ import io.javalin.Javalin;
 public class Ddd4jSaTokenJavalinModule extends AbstractModule {
 
     /**
+     * 注册 Javalin 异常处理器（统一 Sa-Token 异常响应）。
+     *
+     * @param app Javalin 应用实例
+     */
+    public static void registerExceptionHandler(Javalin app) {
+        app.exception(SaTokenException.class, (ex, ctx) -> {
+            ctx.status(401);
+            ctx.json(java.util.Map.of(
+                    "code", ex.getCode(),
+                    "msg", ex.getMessage()
+            ));
+        });
+    }
+
+    /**
      * 提供 SubjectProvider 单例，同时写回 SubjectKit 全局注册中心。
      */
     @Provides
@@ -38,21 +53,6 @@ public class Ddd4jSaTokenJavalinModule extends AbstractModule {
         // 写回 SubjectKit 静态注册中心（Javalin 无 BeanPostProcessor，手动注册）
         SubjectKit.register(provider);
         return provider;
-    }
-
-    /**
-     * 注册 Javalin 异常处理器（统一 Sa-Token 异常响应）。
-     *
-     * @param app Javalin 应用实例
-     */
-    public static void registerExceptionHandler(Javalin app) {
-        app.exception(SaTokenException.class, (ex, ctx) -> {
-            ctx.status(401);
-            ctx.json(java.util.Map.of(
-                "code", ex.getCode(),
-                "msg", ex.getMessage()
-            ));
-        });
     }
 
 }

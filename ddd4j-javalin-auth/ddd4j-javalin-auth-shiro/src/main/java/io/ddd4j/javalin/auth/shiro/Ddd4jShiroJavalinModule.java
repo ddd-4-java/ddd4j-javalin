@@ -24,14 +24,6 @@ import org.apache.shiro.authz.AuthorizationException;
  */
 public class Ddd4jShiroJavalinModule extends AbstractModule {
 
-    @Provides
-    @Singleton
-    public SubjectProvider subjectProvider() {
-        ShiroSubjectProvider provider = new ShiroSubjectProvider();
-        SubjectKit.register(provider);
-        return provider;
-    }
-
     /**
      * 注册 Javalin 异常处理器（统一 Shiro 异常响应）。
      */
@@ -44,6 +36,14 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
             ctx.status(403);
             ctx.json(java.util.Map.of("code", 403, "msg", "无权限访问"));
         });
+    }
+
+    @Provides
+    @Singleton
+    public SubjectProvider subjectProvider() {
+        ShiroSubjectProvider provider = new ShiroSubjectProvider();
+        SubjectKit.register(provider);
+        return provider;
     }
 
 }

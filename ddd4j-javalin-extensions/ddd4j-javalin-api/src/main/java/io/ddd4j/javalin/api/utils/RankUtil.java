@@ -108,6 +108,14 @@ public class RankUtil {
          */
         private T data;
 
+        public RankModel() {
+        }
+
+        public RankModel(Integer rank, T data) {
+            this.rank = rank;
+            this.data = data;
+        }
+
         public Integer getRank() {
             return rank;
         }
@@ -121,14 +129,6 @@ public class RankUtil {
         }
 
         public void setData(T data) {
-            this.data = data;
-        }
-
-        public RankModel() {
-        }
-
-        public RankModel(Integer rank, T data) {
-            this.rank = rank;
             this.data = data;
         }
     }

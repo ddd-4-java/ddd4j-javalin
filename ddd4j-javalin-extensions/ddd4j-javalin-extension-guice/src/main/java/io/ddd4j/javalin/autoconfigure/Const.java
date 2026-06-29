@@ -5,6 +5,6 @@ public class Const {
     public static final String WRITE = "write";
     public static final String CACHE = "cache";
 
-    public static final Long DAY_MS = 24*3600*1000L;
+    public static final Long DAY_MS = 24 * 3600 * 1000L;
 
 }

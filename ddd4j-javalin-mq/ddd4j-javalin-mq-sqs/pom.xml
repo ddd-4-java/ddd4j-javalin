@@ -22,5 +22,33 @@
             <artifactId>ddd4j-mq-sqs</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+
+        <!-- ======== 测试：验证 Guice 装配 + 契约解析（用 mock AmazonSQS，无需真实 AWS）======== -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 覆盖根 pom 的 skip=true，本模块运行集成测试 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <skipTests>false</skipTests>
+                    <!-- 覆盖根 pom 的 Java8 argLine（-XX:PermSize 在 Java21 导致 forked VM 崩溃） -->
+                    <argLine>-Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

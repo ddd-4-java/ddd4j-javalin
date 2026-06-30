@@ -1,11 +1,6 @@
 package io.ddd4j.javalin.data.logs;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import io.ddd4j.data.logs.aspect.ApiOperationLogProvider;
-import io.ddd4j.data.logs.aspect.DefaultApiOperationLogProvider;
-
-import jakarta.inject.Singleton;
+import io.ddd4j.guice.data.logs.Ddd4jLogsGuiceModule;
 
 /**
  * ddd4j-javalin API 操作日志 Guice Module。
@@ -14,12 +9,6 @@ import jakarta.inject.Singleton;
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
-public class Ddd4jLogsJavalinModule extends AbstractModule {
-
-    @Provides
-    @Singleton
-    public ApiOperationLogProvider apiOperationLogProvider() {
-        return new DefaultApiOperationLogProvider();
-    }
-
+@Deprecated
+public class Ddd4jLogsJavalinModule extends Ddd4jLogsGuiceModule {
 }

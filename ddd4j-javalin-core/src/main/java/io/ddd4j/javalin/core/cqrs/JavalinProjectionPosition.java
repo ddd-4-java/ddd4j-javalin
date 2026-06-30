@@ -1,13 +1,7 @@
 package io.ddd4j.javalin.core.cqrs;
 
 import io.ddd4j.core.cqrs.projection.ProjectionPosition;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
+import io.ddd4j.guice.cqrs.GuiceProjectionPosition;
 
 /**
  * Javalin 内存版投影位置（POJO，无 JPA 依赖）。
@@ -18,21 +12,20 @@ import java.io.Serializable;
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  * @since 2.0.x
  */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class JavalinProjectionPosition implements ProjectionPosition, Serializable {
+@Deprecated
+public class JavalinProjectionPosition extends GuiceProjectionPosition {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    public JavalinProjectionPosition() {
+        super();
+    }
 
-    private String streamId;
-    private long nextEventNumber;
+    public JavalinProjectionPosition(String streamId, long nextEventNumber) {
+        super(streamId, nextEventNumber);
+    }
 
     @Override
     public ProjectionPosition withNextEventNumber(long nextEventNumber) {
-        this.nextEventNumber = nextEventNumber;
+        super.withNextEventNumber(nextEventNumber);
         return this;
     }
 }

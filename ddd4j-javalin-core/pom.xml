@@ -31,6 +31,11 @@
             <artifactId>ddd4j-web-javalin</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-guice</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
 
         <!-- ======== Javalin 框架 ======== -->
         <!-- Javalin 核心（Context / Javalin） -->

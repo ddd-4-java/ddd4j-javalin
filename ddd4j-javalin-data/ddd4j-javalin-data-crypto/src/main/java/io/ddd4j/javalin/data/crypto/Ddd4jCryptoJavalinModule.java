@@ -1,12 +1,6 @@
 package io.ddd4j.javalin.data.crypto;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import io.ddd4j.data.crypto.CryptoProperties;
-import io.ddd4j.data.crypto.strategy.CryptoStrategy;
-import io.ddd4j.data.crypto.strategy.DefaultCryptoStrategy;
-
-import jakarta.inject.Singleton;
+import io.ddd4j.guice.data.crypto.Ddd4jCryptoGuiceModule;
 
 /**
  * ddd4j-javalin 加解密 Guice Module。
@@ -16,18 +10,6 @@ import jakarta.inject.Singleton;
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
-public class Ddd4jCryptoJavalinModule extends AbstractModule {
-
-    @Provides
-    @Singleton
-    public CryptoProperties cryptoProperties() {
-        return new CryptoProperties();
-    }
-
-    @Provides
-    @Singleton
-    public CryptoStrategy defaultCryptoStrategy(CryptoProperties properties) {
-        return new DefaultCryptoStrategy(null);
-    }
-
+@Deprecated
+public class Ddd4jCryptoJavalinModule extends Ddd4jCryptoGuiceModule {
 }

@@ -1,15 +1,10 @@
 package io.ddd4j.javalin.cache;
 
-import com.google.inject.AbstractModule;
 import io.ddd4j.cache.CacheKit;
 import io.ddd4j.core.cache.Cache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.ddd4j.core.cache.CacheConfig;
+import io.ddd4j.guice.cache.Ddd4jCacheGuiceModule;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -46,25 +41,8 @@ import java.util.function.Function;
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
-public class Ddd4jCacheJavalinModule extends AbstractModule {
-
-    private static final Logger log = LoggerFactory.getLogger(Ddd4jCacheJavalinModule.class);
-
-    /** 默认本地缓存类型（构建时生效） */
-    private CacheKit.LocalCacheType defaultType = CacheKit.LocalCacheType.CAFFEINE;
-
-    /** 预构建的本地缓存声明：biz → 过期秒数 */
-    private final Map<String, Long> localCaches = new LinkedHashMap<>();
-
-    /** 预构建的本地缓存声明（Builder 模式）：biz → 配置函数 */
-    private final Map<String, Function<io.ddd4j.core.cache.CacheConfig.Builder,
-            io.ddd4j.core.cache.CacheConfig.Builder>> localCacheBuilders = new LinkedHashMap<>();
-
-    /** 注册的外部缓存声明：biz → Cache 实例 */
-    private final Map<String, Cache<? super String, ?>> externalCaches = new LinkedHashMap<>();
-
-    public Ddd4jCacheJavalinModule() {
-    }
+@Deprecated
+public class Ddd4jCacheJavalinModule extends Ddd4jCacheGuiceModule {
 
     /**
      * 设置默认本地缓存类型（影响后续 {@link #build} 方法）。
@@ -73,7 +51,7 @@ public class Ddd4jCacheJavalinModule extends AbstractModule {
      * @return this（链式调用）
      */
     public Ddd4jCacheJavalinModule setDefaultType(CacheKit.LocalCacheType defaultType) {
-        this.defaultType = defaultType;
+        super.setDefaultType(defaultType);
         return this;
     }
 
@@ -85,7 +63,7 @@ public class Ddd4jCacheJavalinModule extends AbstractModule {
      * @return this（链式调用）
      */
     public Ddd4jCacheJavalinModule build(String biz, long expiredSeconds) {
-        this.localCaches.put(biz, expiredSeconds);
+        super.build(biz, expiredSeconds);
         return this;
     }
 
@@ -96,10 +74,8 @@ public class Ddd4jCacheJavalinModule extends AbstractModule {
      * @param builder 配置构建器函数
      * @return this（链式调用）
      */
-    public Ddd4jCacheJavalinModule build(String biz,
-                                         Function<io.ddd4j.core.cache.CacheConfig.Builder,
-                                                 io.ddd4j.core.cache.CacheConfig.Builder> builder) {
-        this.localCacheBuilders.put(biz, builder);
+    public Ddd4jCacheJavalinModule build(String biz, Function<CacheConfig.Builder, CacheConfig.Builder> builder) {
+        super.build(biz, builder);
         return this;
     }
 
@@ -111,35 +87,7 @@ public class Ddd4jCacheJavalinModule extends AbstractModule {
      * @return this（链式调用）
      */
     public Ddd4jCacheJavalinModule register(String biz, Cache<? super String, ?> cache) {
-        this.externalCaches.put(biz, cache);
+        super.register(biz, cache);
         return this;
-    }
-
-    @Override
-    protected void configure() {
-        // 1. 设置默认本地缓存类型
-        CacheKit.setDefaultType(defaultType);
-
-        // 2. 预构建本地缓存（简单过期模式）
-        for (Map.Entry<String, Long> entry : localCaches.entrySet()) {
-            CacheKit.build(entry.getKey(), entry.getValue());
-            log.debug("Built local cache: biz={}, expire={}s", entry.getKey(), entry.getValue());
-        }
-
-        // 3. 预构建本地缓存（Builder 模式）
-        for (Map.Entry<String, Function<io.ddd4j.core.cache.CacheConfig.Builder,
-                io.ddd4j.core.cache.CacheConfig.Builder>> entry : localCacheBuilders.entrySet()) {
-            CacheKit.build(entry.getKey(), entry.getValue());
-            log.debug("Built local cache (builder): biz={}", entry.getKey());
-        }
-
-        // 4. 注册外部缓存实例
-        for (Map.Entry<String, Cache<? super String, ?>> entry : externalCaches.entrySet()) {
-            CacheKit.register(entry.getKey(), entry.getValue());
-            log.debug("Registered external cache: biz={}", entry.getKey());
-        }
-
-        log.info("Ddd4jCacheJavalinModule initialized: {} local caches, {} external caches",
-                localCaches.size() + localCacheBuilders.size(), externalCaches.size());
     }
 }

@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import io.ddd4j.auth.security.subject.SecuritySubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.web.javalin.auth.security.SecurityExceptionHandlerRegistrar;
 import io.javalin.Javalin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,33 +85,6 @@ public class Ddd4jSecurityJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        // 401：未认证（凭证错误 / 认证异常 / 账号过期）
-        registerSecurityException(app, AuthenticationException.class, 401, "未登录或登录已过期");
-        registerSecurityException(app, BadCredentialsException.class, 401, "账号或密码错误");
-        registerSecurityException(app, AccountExpiredException.class, 401, "账号已过期");
-
-        // 403：账号锁定 / 禁用
-        registerSecurityException(app, LockedException.class, 403, "账号已被锁定");
-        registerSecurityException(app, DisabledException.class, 403, "账号已被禁用");
-
-        // 403：无权限访问
-        registerSecurityException(app, AccessDeniedException.class, 403, "无权限访问");
-    }
-
-    /**
-     * 注册单个 Spring Security 异常的 Javalin 处理器。
-     *
-     * @param app             Javalin 应用
-     * @param exceptionClass  Spring Security 异常类型
-     * @param status          HTTP 状态码（401/403）
-     * @param message         响应消息
-     */
-    private static <E extends Exception> void registerSecurityException(
-            Javalin app, Class<E> exceptionClass, int status, String message) {
-        app.unsafe.routes.exception(exceptionClass, (ex, ctx) -> {
-            log.warn("Spring Security 鉴权异常：{} - {}", exceptionClass.getSimpleName(), ex.getMessage());
-            ctx.status(status);
-            ctx.json(Map.of("code", status, "msg", message));
-        });
+        SecurityExceptionHandlerRegistrar.register(app);
     }
 }

@@ -29,6 +29,11 @@
             <artifactId>ddd4j-core</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-web-javalin</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
         <!-- Guice -->
         <dependency>
             <groupId>com.google.inject</groupId>

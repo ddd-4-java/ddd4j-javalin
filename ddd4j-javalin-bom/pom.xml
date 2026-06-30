@@ -34,6 +34,11 @@
                 <artifactId>ddd4j-javalin-core</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>io.ddd4j</groupId>
+                <artifactId>ddd4j-web-javalin</artifactId>
+                <version>${ddd4j.version}</version>
+            </dependency>
             <!-- ddd4j-javalin Guice 集成（DDD 注解自动扫描绑定） -->
             <dependency>
                 <groupId>io.ddd4j.javalin</groupId>

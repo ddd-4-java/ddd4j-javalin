@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import io.ddd4j.auth.satoken.subject.SaTokenSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.web.javalin.auth.satoken.SaTokenExceptionHandlerRegistrar;
 import io.javalin.Javalin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,13 +67,6 @@ public class Ddd4jSaTokenJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        app.unsafe.routes.exception(SaTokenException.class, (ex, ctx) -> {
-            log.warn("Sa-Token 鉴权异常：code={}, msg={}", ex.getCode(), ex.getMessage());
-            ctx.status(401);
-            ctx.json(java.util.Map.of(
-                    "code", ex.getCode(),
-                    "msg", ex.getMessage() != null ? ex.getMessage() : ""
-            ));
-        });
+        SaTokenExceptionHandlerRegistrar.register(app);
     }
 }

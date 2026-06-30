@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import io.ddd4j.auth.shiro.subject.ShiroSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.web.javalin.auth.shiro.ShiroExceptionHandlerRegistrar;
 import io.javalin.Javalin;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -77,33 +78,6 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        // 401：未认证（未登录 / Token 失效 / 账号不存在 / 密码错误）
-        registerShiroException(app, AuthenticationException.class, 401, "未登录或登录已过期");
-        registerShiroException(app, UnknownAccountException.class, 401, "账号不存在");
-        registerShiroException(app, IncorrectCredentialsException.class, 401, "账号或密码错误");
-
-        // 403：账号锁定
-        registerShiroException(app, LockedAccountException.class, 403, "账号已被锁定");
-
-        // 403：无权限 / 无角色
-        registerShiroException(app, UnauthorizedException.class, 403, "无权限访问");
-        registerShiroException(app, AuthorizationException.class, 403, "无权限访问");
-    }
-
-    /**
-     * 注册单个 Shiro 异常的 Javalin 处理器。
-     *
-     * @param app             Javalin 应用
-     * @param exceptionClass  Shiro 异常类型
-     * @param status          HTTP 状态码（401/403）
-     * @param message         响应消息
-     */
-    private static <E extends Exception> void registerShiroException(
-            Javalin app, Class<E> exceptionClass, int status, String message) {
-        app.unsafe.routes.exception(exceptionClass, (ex, ctx) -> {
-            log.warn("Shiro 鉴权异常：{} - {}", exceptionClass.getSimpleName(), ex.getMessage());
-            ctx.status(status);
-            ctx.json(Map.of("code", status, "msg", message));
-        });
+        ShiroExceptionHandlerRegistrar.register(app);
     }
 }

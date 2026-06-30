@@ -1,12 +1,6 @@
 package io.ddd4j.javalin.mq.redisstream;
 
 import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.publish.MQEventPublisher;
-import io.ddd4j.mq.redisstream.consumer.RedisStreamConsumerEndpointRegistrar;
-import io.ddd4j.mq.redisstream.publisher.RedisStreamMQEventPublisher;
-import io.ddd4j.mq.redisstream.spi.RedisStreamMQBrokerAdapter;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**

@@ -12,7 +12,8 @@
     <artifactId>ddd4j-javalin-mq-rabbitmq</artifactId>
     <description>
         ddd4j-javalin MQ - rabbitmq：Guice 桥接 ddd4j-mq-rabbitmq 的 BrokerAdapter 装配。
-        业务方提供 spring-amqp 的 RabbitTemplate，Module 用轻量 ApplicationContext + RabbitListenerEndpointRegistry 适配 ConsumerRegistrar。
+        业务方提供 spring-amqp 的 RabbitTemplate，Module 用轻量 ApplicationContext + RabbitListenerEndpointRegistry 适配
+        ConsumerRegistrar。
     </description>
     <dependencies>
         <dependency>

@@ -7,14 +7,6 @@ import io.ddd4j.core.util.SubjectKit;
 import io.ddd4j.web.javalin.auth.security.SecurityExceptionHandlerRegistrar;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.core.AuthenticationException;
-
-import java.util.Map;
 
 /**
  * ddd4j-javalin + Spring Security Guice 整合模块。
@@ -55,19 +47,6 @@ import java.util.Map;
 @Slf4j
 public class Ddd4jSecurityJavalinModule extends AbstractModule {
 
-    @Override
-    protected void configure() {
-        // 创建 SubjectProvider 实例并 eager 绑定（单例）
-        SecuritySubjectProvider provider = new SecuritySubjectProvider();
-        bind(SubjectProvider.class).toInstance(provider);
-
-        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
-        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
-        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
-        SubjectKit.register(provider);
-        log.info("SecuritySubjectProvider registered to SubjectKit (eager, at Injector creation)");
-    }
-
     /**
      * 注册 Javalin 异常处理器：统一 Spring Security 鉴权异常响应
      * （对标 Spring @ControllerAdvice SecurityExceptionHandler）。
@@ -84,5 +63,18 @@ public class Ddd4jSecurityJavalinModule extends AbstractModule {
      */
     public static void registerExceptionHandler(Javalin app) {
         SecurityExceptionHandlerRegistrar.register(app);
+    }
+
+    @Override
+    protected void configure() {
+        // 创建 SubjectProvider 实例并 eager 绑定（单例）
+        SecuritySubjectProvider provider = new SecuritySubjectProvider();
+        bind(SubjectProvider.class).toInstance(provider);
+
+        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
+        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
+        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
+        SubjectKit.register(provider);
+        log.info("SecuritySubjectProvider registered to SubjectKit (eager, at Injector creation)");
     }
 }

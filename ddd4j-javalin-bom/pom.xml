@@ -16,6 +16,37 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Javalin 聚合与基础入口 -->
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-ddd</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-cache</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-data</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-auth</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-extensions</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <!-- ddd4j 核心契约（纯 Java，零框架依赖） -->
             <dependency>
                 <groupId>io.ddd4j</groupId>
@@ -32,6 +63,155 @@
                 <groupId>io.ddd4j</groupId>
                 <artifactId>ddd4j-web-javalin</artifactId>
                 <version>${ddd4j.version}</version>
+            </dependency>
+            <!-- Javalin auth -->
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-auth-license</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-auth-satoken</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-auth-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-auth-shiro</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <!-- Javalin data -->
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-data-crypto</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-data-external</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-data-logs</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-data-mybatis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-data-datascope</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <!-- Javalin mq -->
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-kafka</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-rabbitmq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-rocketmq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-mqtt</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-mqtt-mica</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-activemq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-disruptor</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-nats</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-ons</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-pulsar</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-redis-stream</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-sqs</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-mq-tdmq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <!-- Javalin extensions -->
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-extension-akka</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-extension-excel</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-extension-jackson</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-extension-monitor</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-extension-pf4j</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-extension-qlexpress</artifactId>
+                <version>${revision}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -3,13 +3,13 @@ package io.ddd4j.javalin.cache;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.cache.CacheKit;
+import io.ddd4j.cache.local.CaffeineCache;
 import io.ddd4j.core.cache.Cache;
 import io.ddd4j.core.cache.CacheConfig;
-import io.ddd4j.cache.local.CaffeineCache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * ddd4j-javalin-cache Guice 桥接集成测试。

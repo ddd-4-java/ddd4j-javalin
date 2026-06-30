@@ -13,15 +13,16 @@
     <artifactId>ddd4j-javalin-data</artifactId>
     <packaging>pom</packaging>
     <description>
-        ddd4j-javalin 数据层整合聚合：mybatis / crypto / logs 子模块。
+        ddd4j-javalin 数据层整合聚合：mybatis / crypto / logs / external / datascope 子模块。
         底层复用 io.ddd4j:ddd4j-data-* 纯 Java 实现，本层提供 Guice Module、Javalin Handler 桥接。
-        external / datascope 为 Spring 强耦合实现，Javalin 端暂不提供（按需自行适配）。
     </description>
 
     <modules>
         <module>ddd4j-javalin-data-mybatis</module>
         <module>ddd4j-javalin-data-crypto</module>
         <module>ddd4j-javalin-data-logs</module>
+        <module>ddd4j-javalin-data-external</module>
+        <module>ddd4j-javalin-data-datascope</module>
     </modules>
 
 </project>

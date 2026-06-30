@@ -4,8 +4,8 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.mq.publish.MQEventPublisher;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
 import io.ddd4j.mq.registry.MQBrokerType;
+import io.ddd4j.mq.spi.MQBrokerAdapter;
 import io.ddd4j.mq.sqs.spi.SqsMQBrokerAdapter;
 import org.junit.jupiter.api.Test;
 

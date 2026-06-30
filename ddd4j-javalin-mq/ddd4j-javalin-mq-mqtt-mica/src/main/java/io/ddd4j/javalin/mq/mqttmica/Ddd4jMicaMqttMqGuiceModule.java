@@ -2,11 +2,6 @@ package io.ddd4j.javalin.mq.mqttmica;
 
 import io.ddd4j.mq.config.Ddd4jMQProperties;
 import io.ddd4j.mq.mqtt.mica.config.Ddd4jMicaMqttProperties;
-import io.ddd4j.mq.mqtt.mica.consumer.MicaMqttMQConsumerEndpointRegistrar;
-import io.ddd4j.mq.mqtt.mica.publisher.MicaMqttMQEventPublisher;
-import io.ddd4j.mq.mqtt.mica.spi.MicaMqttMQBrokerAdapter;
-import io.ddd4j.mq.publish.MQEventPublisher;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
 import org.dromara.mica.mqtt.spring.client.MqttClientTemplate;
 
 /**

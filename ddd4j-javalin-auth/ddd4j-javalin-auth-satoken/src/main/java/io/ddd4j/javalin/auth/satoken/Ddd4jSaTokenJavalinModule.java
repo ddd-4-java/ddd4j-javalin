@@ -1,8 +1,6 @@
 package io.ddd4j.javalin.auth.satoken;
 
-import cn.dev33.satoken.exception.SaTokenException;
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import io.ddd4j.auth.satoken.subject.SaTokenSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
@@ -43,6 +41,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Ddd4jSaTokenJavalinModule extends AbstractModule {
 
+    /**
+     * 注册 Javalin 异常处理器：统一 Sa-Token 鉴权异常响应（对标 Spring @ControllerAdvice）。
+     *
+     * <p>Javalin 7.x 的异常处理 API：{@code app.unsafe.routes.exception(Class, ExceptionHandler)}。
+     * 返回 401 + JSON body（对齐 Spring 的 {@code SaTokenExceptionHandler} 响应结构）。
+     *
+     * @param app Javalin 应用实例（需在 start 前调用）
+     */
+    public static void registerExceptionHandler(Javalin app) {
+        SaTokenExceptionHandlerRegistrar.register(app);
+    }
+
     @Override
     protected void configure() {
         // 创建 SubjectProvider 实例并 eager 绑定（单例）
@@ -54,17 +64,5 @@ public class Ddd4jSaTokenJavalinModule extends AbstractModule {
         // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
         SubjectKit.register(provider);
         log.info("SaTokenSubjectProvider registered to SubjectKit (eager, at Injector creation)");
-    }
-
-    /**
-     * 注册 Javalin 异常处理器：统一 Sa-Token 鉴权异常响应（对标 Spring @ControllerAdvice）。
-     *
-     * <p>Javalin 7.x 的异常处理 API：{@code app.unsafe.routes.exception(Class, ExceptionHandler)}。
-     * 返回 401 + JSON body（对齐 Spring 的 {@code SaTokenExceptionHandler} 响应结构）。
-     *
-     * @param app Javalin 应用实例（需在 start 前调用）
-     */
-    public static void registerExceptionHandler(Javalin app) {
-        SaTokenExceptionHandlerRegistrar.register(app);
     }
 }

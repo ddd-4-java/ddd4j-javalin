@@ -7,14 +7,6 @@ import io.ddd4j.core.util.SubjectKit;
 import io.ddd4j.web.javalin.auth.shiro.ShiroExceptionHandlerRegistrar;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.LockedAccountException;
-import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.authz.AuthorizationException;
-import org.apache.shiro.authz.UnauthorizedException;
-
-import java.util.Map;
 
 /**
  * ddd4j-javalin + Apache Shiro Guice 整合模块。
@@ -49,19 +41,6 @@ import java.util.Map;
 @Slf4j
 public class Ddd4jShiroJavalinModule extends AbstractModule {
 
-    @Override
-    protected void configure() {
-        // 创建 SubjectProvider 实例并 eager 绑定（单例）
-        ShiroSubjectProvider provider = new ShiroSubjectProvider();
-        bind(SubjectProvider.class).toInstance(provider);
-
-        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
-        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
-        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
-        SubjectKit.register(provider);
-        log.info("ShiroSubjectProvider registered to SubjectKit (eager, at Injector creation)");
-    }
-
     /**
      * 注册 Javalin 异常处理器：统一 Shiro 鉴权异常响应（对标 Spring @ControllerAdvice ShiroExceptionHandler）。
      *
@@ -77,5 +56,18 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
      */
     public static void registerExceptionHandler(Javalin app) {
         ShiroExceptionHandlerRegistrar.register(app);
+    }
+
+    @Override
+    protected void configure() {
+        // 创建 SubjectProvider 实例并 eager 绑定（单例）
+        ShiroSubjectProvider provider = new ShiroSubjectProvider();
+        bind(SubjectProvider.class).toInstance(provider);
+
+        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
+        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
+        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
+        SubjectKit.register(provider);
+        log.info("ShiroSubjectProvider registered to SubjectKit (eager, at Injector creation)");
     }
 }

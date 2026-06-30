@@ -1,11 +1,6 @@
 package io.ddd4j.javalin.mq.nats;
 
 import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.nats.consumer.NatsMQConsumerEndpointRegistrar;
-import io.ddd4j.mq.nats.publisher.NatsMQEventPublisher;
-import io.ddd4j.mq.nats.spi.NatsMQBrokerAdapter;
-import io.ddd4j.mq.publish.MQEventPublisher;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
 import io.nats.client.Connection;
 
 /**

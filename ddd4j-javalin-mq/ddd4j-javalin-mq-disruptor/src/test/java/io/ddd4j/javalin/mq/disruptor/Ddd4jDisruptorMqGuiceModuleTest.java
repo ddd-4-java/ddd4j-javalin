@@ -8,8 +8,8 @@ import io.ddd4j.mq.publish.MQEventPublisher;
 import io.ddd4j.mq.spi.MQBrokerAdapter;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * ddd4j-javalin-mq-disruptor Guice 集成测试。

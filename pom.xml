@@ -19,12 +19,14 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>ddd4j-javalin-auth</module>
         <module>ddd4j-javalin-bom</module>
+        <module>ddd4j-javalin-dependencies</module>
+        <module>ddd4j-javalin-ddd</module>
         <module>ddd4j-javalin-cache</module>
         <module>ddd4j-javalin-data</module>
-        <module>ddd4j-javalin-dependencies</module>
+        <module>ddd4j-javalin-auth</module>
         <module>ddd4j-javalin-mq</module>
+        <module>ddd4j-javalin-extensions</module>
         <module>ddd4j-javalin-parent</module>
         <module>ddd4j-javalin-samples</module>
     </modules>

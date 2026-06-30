@@ -12,7 +12,8 @@
     <artifactId>ddd4j-javalin-mq-activemq</artifactId>
     <description>
         ddd4j-javalin MQ - activemq：Guice 桥接 ddd4j-mq-activemq 的 BrokerAdapter 装配。
-        业务方提供 spring-jms 的 JmsTemplate，Module 用轻量 ApplicationContext + JmsListenerEndpointRegistry 适配 ConsumerRegistrar。
+        业务方提供 spring-jms 的 JmsTemplate，Module 用轻量 ApplicationContext + JmsListenerEndpointRegistry 适配
+        ConsumerRegistrar。
     </description>
     <dependencies>
         <dependency>

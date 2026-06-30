@@ -13,11 +13,12 @@
     <artifactId>ddd4j-javalin-auth</artifactId>
     <packaging>pom</packaging>
     <description>
-        ddd4j-javalin 认证授权整合聚合：satoken / security / shiro 三鉴权与 Javalin + Guice 深度整合。
+        ddd4j-javalin 认证授权整合聚合：license / satoken / security / shiro 与 Javalin + Guice 深度整合。
         底层复用 io.ddd4j:ddd4j-auth-* 纯 Java 实现，本层提供 Guice Module、Javalin ExceptionHandler。
     </description>
 
     <modules>
+        <module>ddd4j-javalin-auth-license</module>
         <module>ddd4j-javalin-auth-satoken</module>
         <module>ddd4j-javalin-auth-security</module>
         <module>ddd4j-javalin-auth-shiro</module>

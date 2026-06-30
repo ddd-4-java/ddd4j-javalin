@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-dependencies</artifactId>
+        <version>${revision}</version>
+        <relativePath>../ddd4j-javalin-dependencies/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-extensions</artifactId>
+    <packaging>pom</packaging>
+    <description>Ddd4j Javalin 跨领域扩展聚合：对齐 ddd4j-boot-extensions，复用 ddd4j-extensions 通用实现。</description>
+
+    <modules>
+        <module>ddd4j-javalin-extension-akka</module>
+        <module>ddd4j-javalin-extension-excel</module>
+        <module>ddd4j-javalin-extension-jackson</module>
+        <module>ddd4j-javalin-extension-monitor</module>
+        <module>ddd4j-javalin-extension-pf4j</module>
+        <module>ddd4j-javalin-extension-qlexpress</module>
+    </modules>
+
+</project>

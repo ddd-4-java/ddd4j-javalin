@@ -60,7 +60,7 @@ public class Ddd4jMybatisJavalinModule extends Ddd4jMybatisGuiceModule {
      * <p>对标 Spring 的 {@code RepositoryBeanPostProcessor}：{@link #initRepositories(Injector)}
      * 会实例化 Repository，从 SqlSession 获取 Mapper 代理并通过 {@code setMapper} 注入。
      *
-     * @param repositoryImpl Repository 实现类（BaseRepositoryImpl 子类）
+     * @param repositoryImpl  Repository 实现类（BaseRepositoryImpl 子类）
      * @param mapperInterface 该 Repository 所需的 Mapper 接口
      * @return this（链式调用）
      */

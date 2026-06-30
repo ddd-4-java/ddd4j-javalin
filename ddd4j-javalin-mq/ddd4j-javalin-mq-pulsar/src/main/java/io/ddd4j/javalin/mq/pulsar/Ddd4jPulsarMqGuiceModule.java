@@ -1,12 +1,6 @@
 package io.ddd4j.javalin.mq.pulsar;
 
 import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.publish.MQEventPublisher;
-import io.ddd4j.mq.pulsar.consumer.PulsarConsumerEndpointRegistrar;
-import io.ddd4j.mq.pulsar.publisher.PulsarMQEventPublisher;
-import io.ddd4j.mq.pulsar.spi.PulsarMQBrokerAdapter;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-import org.springframework.context.ApplicationContext;
 import org.springframework.pulsar.core.PulsarTemplate;
 
 /**

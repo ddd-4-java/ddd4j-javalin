@@ -8,8 +8,7 @@ import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
 import io.ddd4j.web.javalin.auth.satoken.SaTokenExceptionHandlerRegistrar;
 import io.javalin.Javalin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ddd4j-javalin + sa-token Guice 整合模块。
@@ -41,9 +40,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
+@Slf4j
 public class Ddd4jSaTokenJavalinModule extends AbstractModule {
-
-    private static final Logger log = LoggerFactory.getLogger(Ddd4jSaTokenJavalinModule.class);
 
     @Override
     protected void configure() {

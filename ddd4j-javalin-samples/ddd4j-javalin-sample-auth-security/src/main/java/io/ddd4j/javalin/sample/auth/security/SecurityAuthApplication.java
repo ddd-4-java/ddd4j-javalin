@@ -3,7 +3,7 @@ package io.ddd4j.javalin.sample.auth.security;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.guice.Ddd4jGuiceModule;
-import io.ddd4j.javalin.guice.scan.DddAnnotationModule;
+import io.ddd4j.guice.scan.DddAnnotationModule;
 import io.javalin.Javalin;
 
 /**

@@ -6,14 +6,13 @@ import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
 import io.ddd4j.web.javalin.auth.shiro.ShiroExceptionHandlerRegistrar;
 import io.javalin.Javalin;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthorizedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -47,9 +46,8 @@ import java.util.Map;
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
+@Slf4j
 public class Ddd4jShiroJavalinModule extends AbstractModule {
-
-    private static final Logger log = LoggerFactory.getLogger(Ddd4jShiroJavalinModule.class);
 
     @Override
     protected void configure() {

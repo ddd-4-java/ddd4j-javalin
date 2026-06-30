@@ -6,8 +6,7 @@ import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
 import io.ddd4j.web.javalin.auth.security.SecurityExceptionHandlerRegistrar;
 import io.javalin.Javalin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,9 +52,8 @@ import java.util.Map;
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
+@Slf4j
 public class Ddd4jSecurityJavalinModule extends AbstractModule {
-
-    private static final Logger log = LoggerFactory.getLogger(Ddd4jSecurityJavalinModule.class);
 
     @Override
     protected void configure() {

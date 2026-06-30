@@ -20,11 +20,6 @@
         </dependency>
         <dependency>
             <groupId>io.ddd4j.javalin</groupId>
-            <artifactId>ddd4j-javalin-guice</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ddd4j.javalin</groupId>
             <artifactId>ddd4j-javalin-auth-security</artifactId>
             <version>${revision}</version>
         </dependency>

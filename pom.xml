@@ -19,7 +19,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>ddd4j-javalin-annotation</module>
         <!-- 核心层（对齐 ddd4j-core）：CQRS 视图管理 + Javalin Context Web 基类，复用 ddd4j-core 契约 -->
         <module>ddd4j-javalin-core</module>
         <!-- IoC 核心适配层（对齐 ddd4j-guice）：复用 ddd4j-guice 的 Ddd4jGuiceModule + DDD 注解自动扫描 -->

@@ -3,7 +3,7 @@ package io.ddd4j.javalin.sample.auth.shiro;
 import io.ddd4j.core.subject.AuthPrincipal;
 import io.ddd4j.core.subject.AuthRequest;
 import io.ddd4j.core.util.SubjectKit;
-import io.ddd4j.javalin.annotation.ddd.ApplicationService;
+import io.ddd4j.guice.annotation.ddd.ApplicationService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 

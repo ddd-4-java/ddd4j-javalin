@@ -1,6 +1,6 @@
 package io.ddd4j.javalin.guice.scan;
 
-import io.ddd4j.javalin.annotation.ddd.DomainService;
+import io.ddd4j.guice.annotation.ddd.DomainService;
 
 /**
  * 业务示例：领域服务。

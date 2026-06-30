@@ -31,16 +31,16 @@ import java.util.Set;
  *
  * <h3>扫描的注解</h3>
  * <ul>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.DomainService}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.DomainRepository}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.ApplicationService}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.QueryService}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.CommandExecutor}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.DomainEntity}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.DomainValueObject}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.DomainGateway}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.DomainAssembler}</li>
- *   <li>{@code io.ddd4j.javalin.annotation.ddd.DomainConverter}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.DomainService}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.DomainRepository}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.ApplicationService}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.QueryService}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.CommandExecutor}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.DomainEntity}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.DomainValueObject}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.DomainGateway}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.DomainAssembler}</li>
+ *   <li>{@code io.ddd4j.guice.annotation.ddd.DomainConverter}</li>
  * </ul>
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
@@ -51,19 +51,19 @@ public class DddAnnotationModule extends AbstractModule {
     private static final Logger logger = LoggerFactory.getLogger(DddAnnotationModule.class);
 
     /**
-     * DDD 注解的全限定名列表（来自 ddd4j-javalin-annotation）
+     * DDD 注解的全限定名列表（由 ddd4j-guice 提供）
      */
     private static final String[] DDD_ANNOTATION_NAMES = {
-            "io.ddd4j.javalin.annotation.ddd.DomainService",
-            "io.ddd4j.javalin.annotation.ddd.DomainRepository",
-            "io.ddd4j.javalin.annotation.ddd.ApplicationService",
-            "io.ddd4j.javalin.annotation.ddd.QueryService",
-            "io.ddd4j.javalin.annotation.ddd.CommandExecutor",
-            "io.ddd4j.javalin.annotation.ddd.DomainEntity",
-            "io.ddd4j.javalin.annotation.ddd.DomainValueObject",
-            "io.ddd4j.javalin.annotation.ddd.DomainGateway",
-            "io.ddd4j.javalin.annotation.ddd.DomainAssembler",
-            "io.ddd4j.javalin.annotation.ddd.DomainConverter"
+            "io.ddd4j.guice.annotation.ddd.DomainService",
+            "io.ddd4j.guice.annotation.ddd.DomainRepository",
+            "io.ddd4j.guice.annotation.ddd.ApplicationService",
+            "io.ddd4j.guice.annotation.ddd.QueryService",
+            "io.ddd4j.guice.annotation.ddd.CommandExecutor",
+            "io.ddd4j.guice.annotation.ddd.DomainEntity",
+            "io.ddd4j.guice.annotation.ddd.DomainValueObject",
+            "io.ddd4j.guice.annotation.ddd.DomainGateway",
+            "io.ddd4j.guice.annotation.ddd.DomainAssembler",
+            "io.ddd4j.guice.annotation.ddd.DomainConverter"
     };
 
     private final String[] basePackages;

@@ -13,11 +13,11 @@
     <description>ddd4j-javalin-auth + sa-token 集成示例：演示 SubjectKit 统一鉴权入口（Javalin + Guice）</description>
 
     <dependencies>
-        <!-- ddd4j-javalin 注解（DDD 注解 + Web 路由参数注解） -->
+        <!-- ddd4j-guice 提供 Javalin/Guice 聚合注解 -->
         <dependency>
-            <groupId>io.ddd4j.javalin</groupId>
-            <artifactId>ddd4j-javalin-annotation</artifactId>
-            <version>${revision}</version>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-guice</artifactId>
+            <version>${ddd4j.version}</version>
         </dependency>
         <!-- ddd4j-javalin Guice 扩展（含 DddAnnotationModule ClassGraph 扫描） -->
         <dependency>

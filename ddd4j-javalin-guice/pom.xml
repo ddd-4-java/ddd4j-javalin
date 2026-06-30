@@ -32,13 +32,6 @@
             <artifactId>ddd4j-guice</artifactId>
         </dependency>
 
-        <!-- ======== ddd4j-javalin 注解（DDD 构造型 + Web 参数注解，被 DddAnnotationModule 扫描）======== -->
-        <dependency>
-            <groupId>io.ddd4j.javalin</groupId>
-            <artifactId>ddd4j-javalin-annotation</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
         <!-- ======== ClassGraph：高性能类路径扫描（DddAnnotationModule 自动发现 DDD 注解类）======== -->
         <dependency>
             <groupId>io.github.classgraph</groupId>

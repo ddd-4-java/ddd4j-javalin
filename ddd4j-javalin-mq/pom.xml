@@ -19,6 +19,14 @@
         - disruptor / sqs / nats / ons / kafka / rocketmq / rabbitmq / activemq / pulsar / redis-stream / mqtt / mqtt-mica / tdmq（broker 桥接）
     </description>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-guice</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+    </dependencies>
+
     <modules>
         <module>ddd4j-javalin-mq-core</module>
         <module>ddd4j-javalin-mq-disruptor</module>

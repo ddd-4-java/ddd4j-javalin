@@ -12,7 +12,7 @@
     <artifactId>ddd4j-javalin-mq-rocketmq</artifactId>
     <description>
         ddd4j-javalin MQ - rocketmq：Guice 桥接 ddd4j-mq-rocketmq 的 BrokerAdapter 装配。
-        业务方提供 rocketmq-spring 的 RocketMQTemplate，Module 用轻量 ApplicationContext 适配器桥接 ConsumerRegistrar。
+        兼容历史模块坐标，实际复用 ddd4j-guice 的 RocketMQ Guice 桥接实现。
     </description>
     <dependencies>
         <dependency>
@@ -25,8 +25,13 @@
             <artifactId>ddd4j-mq-rocketmq</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-guice</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
 
-        <!-- ======== 测试：验证 Guice 装配 + 契约解析（用 mock RocketMQTemplate，无需真实 RocketMQ）======== -->
+        <!-- ======== 测试：验证 Guice 装配 + 契约解析（关闭自动启动，无需真实 RocketMQ）======== -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

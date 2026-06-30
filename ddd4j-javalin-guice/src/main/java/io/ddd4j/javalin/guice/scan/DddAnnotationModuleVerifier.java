@@ -2,7 +2,7 @@ package io.ddd4j.javalin.guice.scan;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.guice.core.Ddd4jGuiceModule;
+import io.ddd4j.guice.Ddd4jGuiceModule;
 
 /**
  * 独立验证器：验证 DddAnnotationModule 能用 ClassGraph 扫描 DDD 注解类并绑定到 Guice。

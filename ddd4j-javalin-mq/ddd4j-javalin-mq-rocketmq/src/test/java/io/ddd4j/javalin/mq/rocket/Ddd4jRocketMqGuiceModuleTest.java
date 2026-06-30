@@ -4,13 +4,12 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.mq.publish.MQEventPublisher;
 import io.ddd4j.mq.registry.MQBrokerType;
-import io.ddd4j.mq.rocketmq.spi.RocketMQBrokerAdapter;
+import io.ddd4j.mq.rocketmq.RocketMQBrokerAdapter;
+import io.ddd4j.mq.rocketmq.RocketMQProperties;
 import io.ddd4j.mq.spi.MQBrokerAdapter;
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 /**
  * ddd4j-javalin-mq-rocketmq Guice 集成测试。
@@ -28,17 +27,16 @@ class Ddd4jRocketMqGuiceModuleTest {
      */
     @Test
     void shouldResolveCoreContractsFromGuice() {
-        RocketMQTemplate mockTemplate = mock(RocketMQTemplate.class);
-        Injector injector = Guice.createInjector(new Ddd4jRocketMqGuiceModule(mockTemplate));
+        RocketMQProperties properties = testProperties();
+        Injector injector = Guice.createInjector(new Ddd4jRocketMqGuiceModule(properties));
 
-        // 核心契约可注入（证明 Guice 装配链路完整，含 LightweightApplicationContext 适配）
         MQEventPublisher publisher = injector.getInstance(MQEventPublisher.class);
         MQBrokerAdapter brokerAdapter = injector.getInstance(MQBrokerAdapter.class);
-        RocketMQTemplate template = injector.getInstance(RocketMQTemplate.class);
+        RocketMQProperties resolvedProperties = injector.getInstance(RocketMQProperties.class);
 
         assertNotNull(publisher, "MQEventPublisher 应可从 Guice 解析");
         assertNotNull(brokerAdapter, "MQBrokerAdapter 应可从 Guice 解析");
-        assertSame(mockTemplate, template, "RocketMQTemplate 应是业务方提供的同一实例");
+        assertSame(properties, resolvedProperties, "RocketMQProperties 应是业务方提供的同一实例");
     }
 
     /**
@@ -46,8 +44,7 @@ class Ddd4jRocketMqGuiceModuleTest {
      */
     @Test
     void shouldReportRocketBrokerType() {
-        RocketMQTemplate mockTemplate = mock(RocketMQTemplate.class);
-        Injector injector = Guice.createInjector(new Ddd4jRocketMqGuiceModule(mockTemplate));
+        Injector injector = Guice.createInjector(new Ddd4jRocketMqGuiceModule(testProperties()));
         MQBrokerAdapter brokerAdapter = injector.getInstance(MQBrokerAdapter.class);
 
         assertEquals(MQBrokerType.ROCKET, brokerAdapter.brokerType(),
@@ -61,13 +58,19 @@ class Ddd4jRocketMqGuiceModuleTest {
      */
     @Test
     void brokerAdapterShouldSupportRocketType() {
-        RocketMQTemplate mockTemplate = mock(RocketMQTemplate.class);
-        Injector injector = Guice.createInjector(new Ddd4jRocketMqGuiceModule(mockTemplate));
+        Injector injector = Guice.createInjector(new Ddd4jRocketMqGuiceModule(testProperties()));
         MQBrokerAdapter brokerAdapter = injector.getInstance(MQBrokerAdapter.class);
 
         assertTrue(brokerAdapter.supports(MQBrokerType.ROCKET),
                 "BrokerAdapter 应支持 ROCKET 类型");
         assertFalse(brokerAdapter.supports(MQBrokerType.KAFKA),
                 "BrokerAdapter 不应支持 KAFKA 类型");
+    }
+
+    private RocketMQProperties testProperties() {
+        RocketMQProperties properties = new RocketMQProperties();
+        properties.setAutoStartProducer(false);
+        properties.setAutoStartConsumers(false);
+        return properties;
     }
 }

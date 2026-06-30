@@ -5,18 +5,15 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.mq.config.Ddd4jMQProperties;
 import io.ddd4j.mq.publish.MQEventPublisher;
-import io.ddd4j.mq.rocket.consumer.RocketMQConsumerEndpointRegistrar;
-import io.ddd4j.mq.rocket.publisher.RocketMQEventPublisher;
-import io.ddd4j.mq.rocket.spi.RocketMQBrokerAdapter;
+import io.ddd4j.mq.rocketmq.consumer.RocketMQConsumerEndpointRegistrar;
+import io.ddd4j.mq.rocketmq.publisher.RocketMQEventPublisher;
+import io.ddd4j.mq.rocketmq.spi.RocketMQBrokerAdapter;
 import io.ddd4j.mq.spi.MQBrokerAdapter;
 import org.apache.rocketmq.spring.autoconfigure.RocketMQProperties;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * ddd4j-javalin MQ - rocketmq 的 Guice 集成模块。

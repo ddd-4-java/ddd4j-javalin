@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.mq.publish.MQEventPublisher;
 import io.ddd4j.mq.registry.MQBrokerType;
-import io.ddd4j.mq.rocket.spi.RocketMQBrokerAdapter;
+import io.ddd4j.mq.rocketmq.spi.RocketMQBrokerAdapter;
 import io.ddd4j.mq.spi.MQBrokerAdapter;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,5 @@
 package io.ddd4j.javalin.core.cqrs;
 
-import io.ddd4j.core.cqrs.projection.ProjectionPosition;
 import io.ddd4j.guice.cqrs.GuiceInMemoryProjectionPositionRepository;
 
 /**

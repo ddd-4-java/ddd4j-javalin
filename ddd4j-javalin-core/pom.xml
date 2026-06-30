@@ -12,54 +12,18 @@
 
     <artifactId>ddd4j-javalin-core</artifactId>
     <description>
-        ddd4j-javalin 核心层：对齐 ddd4j-core，提供 Javalin 特化的契约实现。
-        包含：
-        · cqrs —— 基于 ScheduledExecutorService 的 ViewManager（实现 ddd4j-core 的 CQRS 读侧 SPI）；
-        · web  —— 基于 Javalin Context 的纯净 Web 基类（去 Spring，复用 ddd4j-core 的 ApiRestResponse/I18nProvider）。
-        所有契约类一律引用 io.ddd4j.core.* / io.ddd4j.kit.*，禁止平行重定义。
+        ddd4j-javalin 核心兼容层：保留历史 Javalin CQRS 类型名，实际复用 ddd4j-guice 的通用 Guice/JDK 实现。
     </description>
 
     <dependencies>
-        <!-- ======== ddd4j 契约（唯一真相源）======== -->
-        <!-- ddd4j 核心：ApiRestResponse / DomainEventPublisher / I18nProvider / CQRS SPI（纯 Java，零框架依赖） -->
         <dependency>
             <groupId>io.ddd4j</groupId>
             <artifactId>ddd4j-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-web-javalin</artifactId>
-            <version>${ddd4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ddd4j</groupId>
             <artifactId>ddd4j-guice</artifactId>
             <version>${ddd4j.version}</version>
-        </dependency>
-
-        <!-- ======== Javalin 框架 ======== -->
-        <!-- Javalin 核心（Context / Javalin） -->
-        <dependency>
-            <groupId>io.javalin</groupId>
-            <artifactId>javalin</artifactId>
-        </dependency>
-
-        <!-- ======== IoC（仅编译期依赖 Guice 注解，运行期由 ddd4j-javalin-guice 提供实现）======== -->
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-        </dependency>
-
-        <!-- ======== 日志 ======== -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!-- ======== 工具 ======== -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
         </dependency>
 
         <!-- ======== Test ======== -->

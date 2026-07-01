@@ -12,7 +12,7 @@
     <artifactId>ddd4j-javalin-mq-rocketmq</artifactId>
     <description>
         ddd4j-javalin MQ - rocketmq：Guice 桥接 ddd4j-mq-rocketmq 的 BrokerAdapter 装配。
-        兼容历史模块坐标，实际复用 ddd4j-guice 的 RocketMQ Guice 桥接实现。
+        兼容历史模块坐标，实际复用 ddd4j-runtime-guice 的 RocketMQ Guice 桥接实现。
     </description>
     <dependencies>
         <dependency>
@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-guice</artifactId>
+            <artifactId>ddd4j-runtime-guice</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
 

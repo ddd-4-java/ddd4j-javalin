@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-guice</artifactId>
+            <artifactId>ddd4j-runtime-guice</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
         <dependency>

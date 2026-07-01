@@ -12,7 +12,7 @@
 
     <artifactId>ddd4j-javalin-ddd</artifactId>
     <description>
-        ddd4j-javalin DDD 基础设施入口：对齐 ddd4j-boot-ddd，复用 ddd4j-core、ddd4j-guice 与 fuinorg DDD/CQRS 轨道。
+        ddd4j-javalin DDD 基础设施入口：对齐 ddd4j-boot-ddd，复用 ddd4j-core、ddd4j-runtime-guice 与 fuinorg DDD/CQRS 轨道。
     </description>
 
     <dependencies>
@@ -43,7 +43,7 @@
         </dependency>
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-guice</artifactId>
+            <artifactId>ddd4j-runtime-guice</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
         <dependency>

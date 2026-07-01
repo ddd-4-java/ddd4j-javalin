@@ -56,7 +56,7 @@
             <!-- ddd4j Guice 适配（提供 3 个核心 SPI 的 Guice 实现 Ddd4jGuiceModule） -->
             <dependency>
                 <groupId>io.ddd4j</groupId>
-                <artifactId>ddd4j-guice</artifactId>
+                <artifactId>ddd4j-runtime-guice</artifactId>
                 <version>${ddd4j.version}</version>
             </dependency>
             <dependency>

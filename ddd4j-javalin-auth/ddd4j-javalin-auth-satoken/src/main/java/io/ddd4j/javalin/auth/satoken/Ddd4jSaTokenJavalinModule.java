@@ -1,6 +1,9 @@
 package io.ddd4j.javalin.auth.satoken;
 
 import com.google.inject.AbstractModule;
+import cn.dev33.satoken.strategy.SaAnnotationStrategy;
+import io.ddd4j.auth.satoken.handler.SaInternalCheckHandler;
+import io.ddd4j.auth.satoken.handler.SaMixCheckLoginHandler;
 import io.ddd4j.auth.satoken.subject.SaTokenSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
@@ -16,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * <ol>
  *   <li><b>SubjectProvider 注册</b>：绑定 {@link SaTokenSubjectProvider} 到 {@link SubjectProvider}
  *       （对标 Spring 的 {@code @Bean SubjectProvider saTokenSubjectProvider()}）</li>
+ *   <li><b>Sa-Token 注解处理器注册</b>：注册 ddd4j 扩展的混合登录和内部 API Key 注解处理器</li>
  *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link SubjectKit} 静态注册中心，
  *       保证 {@code SubjectKit.getSubject()} 全局可用（对标 Spring 的 {@code SubjectRegistrar}
  *       BeanPostProcessor，但用 eager 注册替代，无需 BeanPostProcessor）</li>
@@ -57,7 +61,14 @@ public class Ddd4jSaTokenJavalinModule extends AbstractModule {
     protected void configure() {
         // 创建 SubjectProvider 实例并 eager 绑定（单例）
         SaTokenSubjectProvider provider = new SaTokenSubjectProvider();
+        SaMixCheckLoginHandler mixCheckLoginHandler = new SaMixCheckLoginHandler();
+        SaInternalCheckHandler internalCheckHandler = new SaInternalCheckHandler();
         bind(SubjectProvider.class).toInstance(provider);
+        bind(SaMixCheckLoginHandler.class).toInstance(mixCheckLoginHandler);
+        bind(SaInternalCheckHandler.class).toInstance(internalCheckHandler);
+
+        SaAnnotationStrategy.instance.registerAnnotationHandler(mixCheckLoginHandler);
+        SaAnnotationStrategy.instance.registerAnnotationHandler(internalCheckHandler);
 
         // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
         // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，

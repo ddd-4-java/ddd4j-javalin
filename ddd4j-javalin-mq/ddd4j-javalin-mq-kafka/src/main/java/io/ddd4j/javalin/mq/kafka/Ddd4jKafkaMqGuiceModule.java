@@ -1,21 +1,84 @@
 package io.ddd4j.javalin.mq.kafka;
 
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
 import io.ddd4j.mq.config.Ddd4jMQProperties;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
+import io.ddd4j.mq.kafka.KafkaMQBrokerAdapter;
+import io.ddd4j.mq.kafka.KafkaMQProperties;
+import io.ddd4j.mq.publish.MQEventPublisher;
+import io.ddd4j.mq.serialization.MQEventSerialization;
+import io.ddd4j.mq.spi.MQBrokerAdapter;
+
+import java.util.Objects;
 
 /**
- * @deprecated use {@link io.ddd4j.guice.mq.kafka.Ddd4jKafkaMqGuiceModule} instead.
+ * Javalin Kafka MQ Guice module.
+ *
+ * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
-@Deprecated
-public class Ddd4jKafkaMqGuiceModule extends io.ddd4j.guice.mq.kafka.Ddd4jKafkaMqGuiceModule {
+public class Ddd4jKafkaMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
-    public Ddd4jKafkaMqGuiceModule(KafkaTemplate<String, String> kafkaTemplate, ConsumerFactory<String, String> consumerFactory) {
-        super(kafkaTemplate, consumerFactory);
+    private final KafkaMQProperties kafkaProperties;
+    private final KafkaMQBrokerAdapter brokerAdapter;
+
+    public Ddd4jKafkaMqGuiceModule() {
+        this(new KafkaMQProperties());
     }
 
-    public Ddd4jKafkaMqGuiceModule(KafkaTemplate<String, String> kafkaTemplate, ConsumerFactory<String, String> consumerFactory, Ddd4jMQProperties mqProperties) {
-        super(kafkaTemplate, consumerFactory, mqProperties);
+    public Ddd4jKafkaMqGuiceModule(KafkaMQProperties kafkaProperties) {
+        this(kafkaProperties, new Ddd4jMQProperties());
     }
 
+    public Ddd4jKafkaMqGuiceModule(KafkaMQProperties kafkaProperties, Ddd4jMQProperties mqProperties) {
+        this(kafkaProperties, mqProperties, null);
+    }
+
+    public Ddd4jKafkaMqGuiceModule(KafkaMQBrokerAdapter brokerAdapter) {
+        this(brokerAdapter, new Ddd4jMQProperties());
+    }
+
+    public Ddd4jKafkaMqGuiceModule(KafkaMQBrokerAdapter brokerAdapter, Ddd4jMQProperties mqProperties) {
+        super(mqProperties);
+        this.kafkaProperties = new KafkaMQProperties();
+        this.brokerAdapter = Objects.requireNonNull(brokerAdapter, "brokerAdapter");
+    }
+
+    private Ddd4jKafkaMqGuiceModule(
+            KafkaMQProperties kafkaProperties,
+            Ddd4jMQProperties mqProperties,
+            MQEventSerialization serialization) {
+        super(mqProperties, Objects.isNull(serialization)
+                ? new io.ddd4j.mq.serialization.JsonMQMessageSerialization()
+                : serialization);
+        this.kafkaProperties = Objects.requireNonNull(kafkaProperties, "kafkaProperties");
+        this.brokerAdapter = null;
+    }
+
+    @Override
+    protected void configure() {
+        super.configure();
+        bind(KafkaMQProperties.class).toInstance(kafkaProperties);
+    }
+
+    @Provides
+    @Singleton
+    public KafkaMQBrokerAdapter kafkaMQBrokerAdapter() {
+        if (Objects.nonNull(brokerAdapter)) {
+            return brokerAdapter;
+        }
+        return new KafkaMQBrokerAdapter(kafkaProperties, mqProperties(), serialization());
+    }
+
+    @Provides
+    @Singleton
+    public MQBrokerAdapter mqBrokerAdapter(KafkaMQBrokerAdapter kafkaMQBrokerAdapter) {
+        return kafkaMQBrokerAdapter;
+    }
+
+    @Provides
+    @Singleton
+    public MQEventPublisher mqEventPublisher(KafkaMQBrokerAdapter kafkaMQBrokerAdapter) {
+        return kafkaMQBrokerAdapter.createPublisher(mqProperties());
+    }
 }

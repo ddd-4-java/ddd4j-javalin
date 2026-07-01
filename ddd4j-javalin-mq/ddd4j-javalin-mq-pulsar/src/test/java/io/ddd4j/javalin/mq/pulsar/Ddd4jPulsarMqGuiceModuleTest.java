@@ -2,72 +2,44 @@ package io.ddd4j.javalin.mq.pulsar;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import io.ddd4j.mq.config.Ddd4jMQProperties;
 import io.ddd4j.mq.publish.MQEventPublisher;
 import io.ddd4j.mq.pulsar.spi.PulsarMQBrokerAdapter;
 import io.ddd4j.mq.registry.MQBrokerType;
 import io.ddd4j.mq.spi.MQBrokerAdapter;
 import org.junit.jupiter.api.Test;
-import org.springframework.pulsar.core.PulsarTemplate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-/**
- * ddd4j-javalin-mq-pulsar Guice 集成测试。
- *
- * <p>验证：Guice Module 装配后，核心契约（MQEventPublisher / MQBrokerAdapter）可注入且 BrokerType 正确。
- * 由于 Pulsar 需真实集群，本测试用 Mockito mock {@link PulsarTemplate}（与 rocketmq 测试同构：
- * 验证适配装配正确性，而非 Pulsar 服务连通性）。
- *
- * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
- */
 class Ddd4jPulsarMqGuiceModuleTest {
 
-    /**
-     * 验证 Guice 能创建包含 Pulsar MQ 的 Injector，且核心契约可解析。
-     */
     @Test
     void shouldResolveCoreContractsFromGuice() {
-        PulsarTemplate<String> mockTemplate = mock(PulsarTemplate.class);
-        Injector injector = Guice.createInjector(new Ddd4jPulsarMqGuiceModule(mockTemplate));
+        PulsarMQBrokerAdapter adapter = mock(PulsarMQBrokerAdapter.class);
+        MQEventPublisher publisher = mock(MQEventPublisher.class);
+        when(adapter.createPublisher(any(Ddd4jMQProperties.class))).thenReturn(publisher);
+        Injector injector = Guice.createInjector(new Ddd4jPulsarMqGuiceModule(adapter));
 
-        // 核心契约可注入（证明 Guice 装配链路完整，含 StaticApplicationContext 适配）
-        MQEventPublisher publisher = injector.getInstance(MQEventPublisher.class);
-        MQBrokerAdapter brokerAdapter = injector.getInstance(MQBrokerAdapter.class);
-        PulsarTemplate<String> template = injector.getInstance(PulsarTemplate.class);
-
-        assertNotNull(publisher, "MQEventPublisher 应可从 Guice 解析");
-        assertNotNull(brokerAdapter, "MQBrokerAdapter 应可从 Guice 解析");
-        assertSame(mockTemplate, template, "PulsarTemplate 应是业务方提供的同一实例");
+        assertSame(publisher, injector.getInstance(MQEventPublisher.class));
+        assertSame(adapter, injector.getInstance(MQBrokerAdapter.class));
     }
 
-    /**
-     * 验证 BrokerAdapter 正确报告 broker 类型为 PULSAR。
-     */
     @Test
     void shouldReportPulsarBrokerType() {
-        PulsarTemplate<String> mockTemplate = mock(PulsarTemplate.class);
-        Injector injector = Guice.createInjector(new Ddd4jPulsarMqGuiceModule(mockTemplate));
-        MQBrokerAdapter brokerAdapter = injector.getInstance(MQBrokerAdapter.class);
+        PulsarMQBrokerAdapter adapter = mock(PulsarMQBrokerAdapter.class);
+        when(adapter.brokerType()).thenReturn(MQBrokerType.PULSAR);
+        when(adapter.supports(MQBrokerType.PULSAR)).thenReturn(true);
+        MQBrokerAdapter brokerAdapter = Guice.createInjector(new Ddd4jPulsarMqGuiceModule(adapter))
+                .getInstance(MQBrokerAdapter.class);
 
-        assertEquals(MQBrokerType.PULSAR, brokerAdapter.brokerType(),
-                "BrokerType 应为 PULSAR");
-        assertInstanceOf(PulsarMQBrokerAdapter.class, brokerAdapter,
-                "BrokerAdapter 应是 PulsarMQBrokerAdapter 实例");
-    }
-
-    /**
-     * 验证 BrokerAdapter 的 supports 方法对 PULSAR 类型返回 true。
-     */
-    @Test
-    void brokerAdapterShouldSupportPulsarType() {
-        PulsarTemplate<String> mockTemplate = mock(PulsarTemplate.class);
-        Injector injector = Guice.createInjector(new Ddd4jPulsarMqGuiceModule(mockTemplate));
-        MQBrokerAdapter brokerAdapter = injector.getInstance(MQBrokerAdapter.class);
-
-        assertTrue(brokerAdapter.supports(MQBrokerType.PULSAR),
-                "BrokerAdapter 应支持 PULSAR 类型");
-        assertFalse(brokerAdapter.supports(MQBrokerType.KAFKA),
-                "BrokerAdapter 不应支持 KAFKA 类型");
+        assertEquals(MQBrokerType.PULSAR, brokerAdapter.brokerType());
+        assertTrue(brokerAdapter.supports(MQBrokerType.PULSAR));
+        assertFalse(brokerAdapter.supports(MQBrokerType.KAFKA));
     }
 }

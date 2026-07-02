@@ -3,7 +3,7 @@ package io.ddd4j.javalin.data.mybatis;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.core.contract.Page;
-import io.ddd4j.core.contract.TypeHandlerRegistry;
+import io.ddd4j.core.event.TypeHandlerRegistry;
 import io.ddd4j.data.mybatis.config.BaseDataProperties;
 import org.apache.ibatis.session.SqlSession;
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -89,8 +89,8 @@ class Ddd4jMybatisJavalinModuleTest {
         TestUserRepository.TestUserModel user = new TestUserRepository.TestUserModel();
         user.setUsername("alice");
         user.setEmail("alice@example.com");
-        boolean saved = repo.save(user);
-        assertTrue(saved, "save 应返回 true");
+        TestUserRepository.TestUserModel saved = repo.save(user);
+        assertNotNull(saved, "save 应返回保存后的聚合根");
         assertNotNull(user.getId(), "save 后 id 应被回填");
 
         // === READ ===
@@ -101,8 +101,8 @@ class Ddd4jMybatisJavalinModuleTest {
 
         // === UPDATE ===
         found.setEmail("alice@updated.com");
-        boolean updated = repo.update(found);
-        assertTrue(updated, "update 应返回 true");
+        TestUserRepository.TestUserModel updated = repo.update(found);
+        assertNotNull(updated, "update 应返回更新后的聚合根");
         TestUserRepository.TestUserModel updatedFound = repo.get(found.getId());
         assertEquals("alice@updated.com", updatedFound.getEmail(), "email 应已更新");
 

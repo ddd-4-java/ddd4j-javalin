@@ -2,7 +2,7 @@ package io.ddd4j.javalin.mq.disruptor;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.core.contract.MQEvent;
+import io.ddd4j.core.event.MQEvent;
 import io.ddd4j.mq.contract.MQDestination;
 import io.ddd4j.mq.publish.MQEventPublisher;
 import io.ddd4j.mq.spi.MQBrokerAdapter;

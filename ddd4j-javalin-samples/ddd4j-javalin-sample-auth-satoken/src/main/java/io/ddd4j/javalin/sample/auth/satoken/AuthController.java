@@ -1,7 +1,7 @@
 package io.ddd4j.javalin.sample.auth.satoken;
 
-import io.ddd4j.core.subject.AuthPrincipal;
-import io.ddd4j.core.subject.AuthRequest;
+import io.ddd4j.core.auth.AuthPrincipal;
+import io.ddd4j.core.auth.AuthRequest;
 import io.ddd4j.core.util.SubjectKit;
 import io.ddd4j.guice.annotation.ddd.ApplicationService;
 import io.javalin.Javalin;

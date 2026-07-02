@@ -26,6 +26,7 @@
         <module>ddd4j-javalin-sample-auth-security</module>
         <module>ddd4j-javalin-sample-auth-shiro</module>
         <module>ddd4j-javalin-sample-cqrs-person</module>
+        <module>ddd4j-javalin-sample-rich-model</module>
     </modules>
 
 </project>

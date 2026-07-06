@@ -3,7 +3,7 @@ package io.ddd4j.javalin.mq.core;
 import com.google.inject.AbstractModule;
 import io.ddd4j.mq.config.Ddd4jMQProperties;
 import io.ddd4j.mq.serialization.JsonMQMessageSerialization;
-import io.ddd4j.mq.serialization.MQEventSerialization;
+import io.ddd4j.mq.event.MQEventSerialization;
 import io.ddd4j.mq.serialization.MQMessageSerialization;
 
 import java.util.Objects;

@@ -7,7 +7,7 @@ import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
 import io.ddd4j.mq.config.Ddd4jMQProperties;
 import io.ddd4j.mq.ons.spi.OnsMQBrokerAdapter;
 import io.ddd4j.mq.ons.spi.OnsMQProperties;
-import io.ddd4j.mq.publish.MQEventPublisher;
+import io.ddd4j.mq.event.MQEventPublisher;
 import io.ddd4j.mq.spi.MQBrokerAdapter;
 
 import java.util.Objects;

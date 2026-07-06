@@ -3,7 +3,7 @@ package io.ddd4j.javalin.mq.rocket;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.publish.MQEventPublisher;
+import io.ddd4j.mq.event.MQEventPublisher;
 import io.ddd4j.mq.registry.MQBrokerType;
 import io.ddd4j.mq.rocketmq.RocketMQBrokerAdapter;
 import io.ddd4j.mq.spi.MQBrokerAdapter;

@@ -9,7 +9,7 @@ import io.ddd4j.mq.disruptor.consumer.DisruptorMQConsumerEndpointRegistrar;
 import io.ddd4j.mq.disruptor.core.DisruptorMQBus;
 import io.ddd4j.mq.disruptor.core.DisruptorMQEventDispatcher;
 import io.ddd4j.mq.disruptor.spi.DisruptorMQBrokerAdapter;
-import io.ddd4j.mq.publish.MQEventPublisher;
+import io.ddd4j.mq.event.MQEventPublisher;
 import io.ddd4j.mq.spi.MQBrokerAdapter;
 
 import java.util.Objects;

@@ -4,7 +4,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
 import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.publish.MQEventPublisher;
+import io.ddd4j.mq.event.MQEventPublisher;
 import io.ddd4j.mq.rabbit.RabbitMQBrokerAdapter;
 import io.ddd4j.mq.rabbit.RabbitMQProperties;
 import io.ddd4j.mq.spi.MQBrokerAdapter;

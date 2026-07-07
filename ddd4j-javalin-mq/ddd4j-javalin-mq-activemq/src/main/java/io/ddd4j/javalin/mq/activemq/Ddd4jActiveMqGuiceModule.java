@@ -3,7 +3,7 @@ package io.ddd4j.javalin.mq.activemq;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
-import io.ddd4j.mq.activemq.config.ActiveMQProperties;
+import io.ddd4j.mq.activemq.ActiveMQProperties;
 import io.ddd4j.mq.activemq.spi.ActiveMQBrokerAdapter;
 import io.ddd4j.mq.config.Ddd4jMQProperties;
 import io.ddd4j.mq.event.MQEventPublisher;

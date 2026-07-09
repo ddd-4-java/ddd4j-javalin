@@ -10,17 +10,17 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>ddd4j-javalin-data-mybatis</artifactId>
+    <artifactId>ddd4j-javalin-data-mybatisplus</artifactId>
     <description>
         ddd4j-javalin 数据层 - MyBatis 整合：
-        Guice Module 注册 BaseRepositoryImpl + MyBatis 类型处理器，桥接 ddd4j-data-mybatis 到 Javalin + Guice。
+        Guice Module 注册 BaseRepositoryImpl + MyBatis 类型处理器，桥接 ddd4j-data-mybatisplus 到 Javalin + Guice。
     </description>
 
     <dependencies>
         <!-- ddd4j 数据层 MyBatis 实现 -->
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-data-mybatis</artifactId>
+            <artifactId>ddd4j-data-mybatisplus</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
         <dependency>

@@ -4,7 +4,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.core.contract.Page;
 import io.ddd4j.core.event.TypeHandlerRegistry;
-import io.ddd4j.data.mybatis.config.BaseDataProperties;
 import org.apache.ibatis.session.SqlSession;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.jupiter.api.AfterAll;
@@ -16,7 +15,7 @@ import javax.sql.DataSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * ddd4j-javalin-data-mybatis Guice 集成测试。
+ * ddd4j-javalin-data-mybatisplus Guice 集成测试。
  *
  * <p>验证：Guice Module 装配后，BaseRepositoryImpl 子类可注入 Mapper 并执行完整 CRUD。
  * 这是"javalin 侧 data 适配真正可用"的端到端证据（H2 内存库 + 建表 + 增删改查）。
@@ -62,8 +61,6 @@ class Ddd4jMybatisJavalinModuleTest {
     @Test
     void shouldResolveCoreContracts() {
         assertNotNull(injector.getInstance(SqlSession.class), "SqlSession 应可注入");
-        assertNotNull(injector.getInstance(BaseDataProperties.class),
-                "BaseDataProperties 应可注入");
         assertNotNull(injector.getInstance(TypeHandlerRegistry.class),
                 "TypeHandlerRegistry 应可注入");
     }

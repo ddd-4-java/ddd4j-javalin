@@ -103,7 +103,7 @@
             </dependency>
             <dependency>
                 <groupId>io.ddd4j.javalin</groupId>
-                <artifactId>ddd4j-javalin-data-mybatis</artifactId>
+                <artifactId>ddd4j-javalin-data-mybatisplus</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

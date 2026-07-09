@@ -12,7 +12,6 @@ import javax.sql.DataSource;
  * <ul>
  *   <li>{@link SqlSessionFactory} —— 基于 {@link DataSource} 创建，注册 MyBatis-Plus 分页插件</li>
  *   <li>{@link SqlSession} —— 运行时获取 Mapper 代理（替代 Spring 的 MapperScanner）</li>
- *   <li>{@link BaseDataProperties} —— ddd4j 数据层配置</li>
  *   <li>{@link TypeHandlerRegistry} —— MyBatis 类型处理器注册表（绑定到 core SPI）</li>
  * </ul>
  *

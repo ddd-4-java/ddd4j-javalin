@@ -3,7 +3,9 @@ package io.ddd4j.javalin.cache;
 import io.ddd4j.cache.CacheKit;
 import io.ddd4j.core.cache.Cache;
 import io.ddd4j.core.cache.CacheConfig;
-import io.ddd4j.guice.cache.Ddd4jCacheGuiceModule;
+import io.ddd4j.cache.CacheKit;
+import io.ddd4j.core.cache.Cache;
+import io.ddd4j.core.cache.CacheConfig;
 
 import java.util.function.Function;
 
@@ -42,7 +44,7 @@ import java.util.function.Function;
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
 @Deprecated
-public class Ddd4jCacheJavalinModule extends Ddd4jCacheGuiceModule {
+public class Ddd4jCacheJavalinModule  {
 
     /**
      * 设置默认本地缓存类型（影响后续 {@link #build} 方法）。
@@ -51,7 +53,7 @@ public class Ddd4jCacheJavalinModule extends Ddd4jCacheGuiceModule {
      * @return this（链式调用）
      */
     public Ddd4jCacheJavalinModule setDefaultType(CacheKit.LocalCacheType defaultType) {
-        super.setDefaultType(defaultType);
+        CacheKit.setDefaultType(defaultType);
         return this;
     }
 
@@ -63,7 +65,7 @@ public class Ddd4jCacheJavalinModule extends Ddd4jCacheGuiceModule {
      * @return this（链式调用）
      */
     public Ddd4jCacheJavalinModule build(String biz, long expiredSeconds) {
-        super.build(biz, expiredSeconds);
+        CacheKit.build(biz, expiredSeconds);
         return this;
     }
 
@@ -75,7 +77,7 @@ public class Ddd4jCacheJavalinModule extends Ddd4jCacheGuiceModule {
      * @return this（链式调用）
      */
     public Ddd4jCacheJavalinModule build(String biz, Function<CacheConfig.Builder, CacheConfig.Builder> builder) {
-        super.build(biz, builder);
+        CacheKit.build(biz, builder);
         return this;
     }
 
@@ -87,7 +89,7 @@ public class Ddd4jCacheJavalinModule extends Ddd4jCacheGuiceModule {
      * @return this（链式调用）
      */
     public Ddd4jCacheJavalinModule register(String biz, Cache<? super String, ?> cache) {
-        super.register(biz, cache);
+        CacheKit.register(biz, cache);
         return this;
     }
 }

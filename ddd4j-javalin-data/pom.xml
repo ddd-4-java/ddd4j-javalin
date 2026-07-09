@@ -18,7 +18,9 @@
     </description>
 
     <modules>
-        <module>ddd4j-javalin-data-mybatis</module>
+        <module>ddd4j-javalin-data-mybatisplus</module>
+        <module>ddd4j-javalin-data-panache</module>
+        <module>ddd4j-javalin-data-jpa</module>
         <module>ddd4j-javalin-data-crypto</module>
         <module>ddd4j-javalin-data-logs</module>
         <module>ddd4j-javalin-data-external</module>

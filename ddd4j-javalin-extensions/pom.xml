@@ -21,6 +21,7 @@
         <module>ddd4j-javalin-extension-monitor</module>
         <module>ddd4j-javalin-extension-pf4j</module>
         <module>ddd4j-javalin-extension-qlexpress</module>
+        <module>ddd4j-javalin-extension-qrcode</module>
     </modules>
 
 </project>

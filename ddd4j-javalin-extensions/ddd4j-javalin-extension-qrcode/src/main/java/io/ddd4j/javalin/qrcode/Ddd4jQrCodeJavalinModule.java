@@ -6,7 +6,7 @@ import io.ddd4j.extension.qrcode.QrCodeService;
 import io.ddd4j.extension.qrcode.template.InMemoryQrCodeTemplateRegistry;
 import io.ddd4j.extension.qrcode.template.QrCodeTemplateBinder;
 import io.ddd4j.extension.qrcode.template.QrCodeTemplateRegistry;
-import io.github.hiwepy.zxing.QrCodes;
+import com.google.zxing.QrCodes;
 import io.javalin.Javalin;
 
 import java.util.Objects;

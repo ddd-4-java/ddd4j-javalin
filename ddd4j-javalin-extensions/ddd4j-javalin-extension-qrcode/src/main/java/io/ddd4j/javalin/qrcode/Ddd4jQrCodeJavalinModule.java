@@ -3,6 +3,9 @@ package io.ddd4j.javalin.qrcode;
 import com.google.inject.AbstractModule;
 import io.ddd4j.extension.qrcode.DefaultQrCodeService;
 import io.ddd4j.extension.qrcode.QrCodeService;
+import io.ddd4j.extension.qrcode.template.InMemoryQrCodeTemplateRegistry;
+import io.ddd4j.extension.qrcode.template.QrCodeTemplateBinder;
+import io.ddd4j.extension.qrcode.template.QrCodeTemplateRegistry;
 import io.github.hiwepy.zxing.QrCodes;
 import io.javalin.Javalin;
 
@@ -45,6 +48,8 @@ public class Ddd4jQrCodeJavalinModule extends AbstractModule implements AutoClos
     protected void configure() {
         bind(QrCodeModuleConfig.class).toInstance(config);
         bind(QrCodeService.class).toInstance(service);
+        bind(QrCodeTemplateRegistry.class).to(InMemoryQrCodeTemplateRegistry.class);
+        bind(QrCodeTemplateBinder.class);
     }
 
     @Override

@@ -2,9 +2,9 @@ package io.ddd4j.javalin.data.mybatis.it;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.core.event.TypeHandlerRegistry;
-import io.ddd4j.core.contract.Page;
 import io.ddd4j.javalin.data.mybatis.Ddd4jMybatisJavalinModule;
+import io.ddd4j.javalin.data.mybatis.TestUserMapper;
+import io.ddd4j.javalin.data.mybatis.TestUserRepository;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
 import io.ddd4j.javalin.testcontainers.database.MySqlTestContainerFixture;
 import org.apache.ibatis.session.SqlSession;
@@ -49,7 +49,11 @@ class Ddd4jMybatisJavalinMySqlIT {
     @BeforeAll
     static void setUp() throws Exception {
         MYSQL.start();
-        dataSource = MYSQL;
+        // Build a minimal DataSource that delegates to the MySQL driver's
+        // DriverManager using the Testcontainers-provided JDBC URL. Avoids the
+        // HikariCP dependency in this test scope.
+        dataSource = new SimpleDriverManagerDataSource(
+                MYSQL.getJdbcUrl(), MYSQL.getUsername(), MYSQL.getPassword());
 
         // Create the test table.
         try (java.sql.Connection conn = dataSource.getConnection();
@@ -61,9 +65,17 @@ class Ddd4jMybatisJavalinMySqlIT {
         }
 
         Ddd4jMybatisJavalinModule module = new Ddd4jMybatisJavalinModule(dataSource)
-                .bindRepository(TestUserRepository.class, TestUserMapper.class);
+                .addMapper(TestUserMapper.class);
         injector = Guice.createInjector(module);
-        module.initRepositories(injector);
+
+        // Wire the TestUserRepository manually against the SqlSession because
+        // Ddd4jMybatisJavalinModule is a thin bridge over the core
+        // ddd4j-data-mybatisplus (which exposes BaseRepositoryImpl).
+        SqlSession sqlSession = injector.getInstance(SqlSession.class);
+        TestUserRepository repo = new TestUserRepository(sqlSession, TestUserMapper.class);
+        // Stash the repo via a small Guice module so injector.getInstance resolves it.
+        injector = injector.createChildInjector(binder ->
+                binder.bind(TestUserRepository.class).toInstance(repo));
     }
 
     @AfterAll
@@ -77,7 +89,6 @@ class Ddd4jMybatisJavalinMySqlIT {
     @Test
     void shouldResolveCoreContracts() {
         assertNotNull(injector.getInstance(SqlSession.class), "SqlSession must be available");
-        assertNotNull(injector.getInstance(TypeHandlerRegistry.class), "TypeHandlerRegistry must be available");
     }
 
     @Test
@@ -95,7 +106,7 @@ class Ddd4jMybatisJavalinMySqlIT {
         assertNotNull(user.getId());
 
         // READ
-        TestUserRepository.TestUserModel found = repo.get(user.getId());
+        TestUserRepository.TestUserModel found = repo.selectById(user.getId());
         assertNotNull(found);
         assertEquals("alice", found.getUsername());
         assertEquals("alice@example.com", found.getEmail());
@@ -104,7 +115,7 @@ class Ddd4jMybatisJavalinMySqlIT {
         found.setEmail("alice@updated.com");
         TestUserRepository.TestUserModel updated = repo.update(found);
         assertNotNull(updated);
-        TestUserRepository.TestUserModel reloaded = repo.get(found.getId());
+        TestUserRepository.TestUserModel reloaded = repo.selectById(found.getId());
         assertEquals("alice@updated.com", reloaded.getEmail());
 
         // LIST
@@ -113,12 +124,12 @@ class Ddd4jMybatisJavalinMySqlIT {
         assertFalse(list.isEmpty());
 
         // PAGE
-        Page<TestUserRepository.TestUserModel> page = repo.page(query);
+        TestUserRepository.Page<TestUserRepository.TestUserModel> page = repo.page(query);
         assertNotNull(page);
-        assertTrue(page.getTotal() >= 1);
+        assertTrue(page.total() >= 1);
 
         // DELETE
         assertTrue(repo.delete(user.getId()));
-        assertNull(repo.get(user.getId()));
+        assertNull(repo.selectById(user.getId()));
     }
 }

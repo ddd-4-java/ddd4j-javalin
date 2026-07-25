@@ -17,6 +17,7 @@
     </description>
 
     <dependencies>
+        <!-- ddd4j 核心契约 -->
         <dependency>
             <groupId>io.ddd4j</groupId>
             <artifactId>ddd4j-core</artifactId>
@@ -27,14 +28,27 @@
             <artifactId>ddd4j-kit</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <!-- Guice DI -->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
+        <!-- JPA / Hibernate ORM (via jakarta.persistence) -->
         <dependency>
-            <groupId>io.ddd4j.javalin</groupId>
-            <artifactId>ddd4j-runtime-javalin</artifactId>
-            <version>${revision}</version>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+        <!-- Quarkus Panache ORM (runtime dependency for PanacheEntityBase) -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-orm-panache</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- MicroProfile Config (for IdGeneratorProducer) -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

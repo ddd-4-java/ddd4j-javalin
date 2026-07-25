@@ -3,80 +3,40 @@ package io.ddd4j.javalin.mq.disruptor;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.disruptor.config.DisruptorMQProperties;
-import io.ddd4j.mq.disruptor.consumer.DisruptorMQConsumerEndpointRegistrar;
-import io.ddd4j.mq.disruptor.core.DisruptorMQBus;
-import io.ddd4j.mq.disruptor.core.DisruptorMQEventDispatcher;
-import io.ddd4j.mq.disruptor.spi.DisruptorMQBrokerAdapter;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.disruptor.DisruptorMQClient;
+import io.ddd4j.mq.disruptor.DisruptorMQProperties;
 import java.util.Objects;
 
 /**
- * Javalin Disruptor MQ Guice module.
+ * Javalin Guice module wiring the ddd4j-mq DisruptorMQClient (DisruptorMQProperties) as a singleton
+ * {{@link MQClient}}.
  *
- * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * <p>Aligned with ddd4j-mq 2.0.x's single-MQClient-per-broker contract.
  */
 public class Ddd4jDisruptorMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
-    private final DisruptorMQProperties disruptorProperties;
-    private final DisruptorMQBrokerAdapter brokerAdapter;
+    private final DisruptorMQClient client;
 
-    public Ddd4jDisruptorMqGuiceModule() {
-        this(new DisruptorMQProperties());
+    public Ddd4jDisruptorMqGuiceModule(DisruptorMQClient client) {
+        this(client, new DisruptorMQProperties());
     }
 
-    public Ddd4jDisruptorMqGuiceModule(DisruptorMQProperties disruptorProperties) {
-        this(disruptorProperties, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jDisruptorMqGuiceModule(DisruptorMQProperties disruptorProperties, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.disruptorProperties = Objects.requireNonNull(disruptorProperties, "disruptorProperties");
-        this.brokerAdapter = null;
-    }
-
-    public Ddd4jDisruptorMqGuiceModule(DisruptorMQBrokerAdapter brokerAdapter) {
-        this(brokerAdapter, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jDisruptorMqGuiceModule(DisruptorMQBrokerAdapter brokerAdapter, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.disruptorProperties = new DisruptorMQProperties();
-        this.brokerAdapter = Objects.requireNonNull(brokerAdapter, "brokerAdapter");
+    public Ddd4jDisruptorMqGuiceModule(DisruptorMQClient client, DisruptorMQProperties properties) {
+        super(properties);
+        this.client = Objects.requireNonNull(client, "client");
     }
 
     @Override
     protected void configure() {
         super.configure();
-        bind(DisruptorMQProperties.class).toInstance(disruptorProperties);
+        bind(DisruptorMQProperties.class).toInstance((DisruptorMQProperties) mqProperties());
+        bind(DisruptorMQClient.class).toInstance(client);
     }
 
     @Provides
     @Singleton
-    public DisruptorMQBrokerAdapter disruptorMQBrokerAdapter() {
-        if (Objects.nonNull(brokerAdapter)) {
-            return brokerAdapter;
-        }
-        DisruptorMQEventDispatcher dispatcher = new DisruptorMQEventDispatcher();
-        DisruptorMQBus bus = new DisruptorMQBus(disruptorProperties, dispatcher);
-        return new DisruptorMQBrokerAdapter(
-                bus,
-                mqProperties(),
-                new DisruptorMQConsumerEndpointRegistrar(bus));
-    }
-
-    @Provides
-    @Singleton
-    public MQBrokerAdapter mqBrokerAdapter(DisruptorMQBrokerAdapter disruptorMQBrokerAdapter) {
-        return disruptorMQBrokerAdapter;
-    }
-
-    @Provides
-    @Singleton
-    public MQEventPublisher mqEventPublisher(DisruptorMQBrokerAdapter disruptorMQBrokerAdapter) {
-        return disruptorMQBrokerAdapter.createPublisher(mqProperties());
+    public MQClient mqClient() {
+        return client;
     }
 }

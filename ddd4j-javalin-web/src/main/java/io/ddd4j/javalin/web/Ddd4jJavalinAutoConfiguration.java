@@ -49,9 +49,6 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
         bind(WebRequestContextFactory.class).in(Singleton.class);
         bind(WebExceptionTranslator.class).to(DefaultWebExceptionTranslator.class).in(Singleton.class);
         bind(BearerSubjectAuthenticator.class).in(Singleton.class);
-        bind(PathWebAccessPolicy.class).in(Singleton.class);
-        bind(WebRequestLifecycle.class).in(Singleton.class);
-        bind(Ddd4jJavalinWeb.class).in(Singleton.class);
     }
 
     @Provides
@@ -74,6 +71,12 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     Ddd4jJavalinWeb ddd4jJavalinWeb(WebRequestContextFactory contextFactory,
                                      WebRequestLifecycle lifecycle,
                                      WebExceptionTranslator translator) {
+        // Guard so this @Provides is skipped when the web layer is disabled; otherwise
+        // Guice eagerly resolves all parameter types during injector creation.
+        if (!properties.isEnabled()) {
+            throw new com.google.inject.ProvisionException(
+                    "ddd4j.web.javalin.enabled=false; Ddd4jJavalinWeb is not available");
+        }
         return new Ddd4jJavalinWeb(contextFactory, lifecycle, translator, null);
     }
 

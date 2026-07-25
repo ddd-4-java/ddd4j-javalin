@@ -3,72 +3,40 @@ package io.ddd4j.javalin.mq.rocket;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.rocketmq.RocketMQBrokerAdapter;
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.rocketmq.RocketMQClient;
 import io.ddd4j.mq.rocketmq.RocketMQProperties;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-
 import java.util.Objects;
 
 /**
- * Javalin RocketMQ Guice module.
+ * Javalin Guice module wiring the ddd4j-mq RocketMQClient (RocketMQProperties) as a singleton
+ * {{@link MQClient}}.
  *
- * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * <p>Aligned with ddd4j-mq 2.0.x's single-MQClient-per-broker contract.
  */
 public class Ddd4jRocketMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
-    private final RocketMQProperties rocketProperties;
-    private final RocketMQBrokerAdapter brokerAdapter;
+    private final RocketMQClient client;
 
-    public Ddd4jRocketMqGuiceModule() {
-        this(new RocketMQProperties());
+    public Ddd4jRocketMqGuiceModule(RocketMQClient client) {
+        this(client, new RocketMQProperties());
     }
 
-    public Ddd4jRocketMqGuiceModule(RocketMQProperties rocketProperties) {
-        this(rocketProperties, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jRocketMqGuiceModule(RocketMQProperties rocketProperties, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.rocketProperties = Objects.requireNonNull(rocketProperties, "rocketProperties");
-        this.brokerAdapter = null;
-    }
-
-    public Ddd4jRocketMqGuiceModule(RocketMQBrokerAdapter brokerAdapter) {
-        this(brokerAdapter, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jRocketMqGuiceModule(RocketMQBrokerAdapter brokerAdapter, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.rocketProperties = new RocketMQProperties();
-        this.brokerAdapter = Objects.requireNonNull(brokerAdapter, "brokerAdapter");
+    public Ddd4jRocketMqGuiceModule(RocketMQClient client, RocketMQProperties properties) {
+        super(properties);
+        this.client = Objects.requireNonNull(client, "client");
     }
 
     @Override
     protected void configure() {
         super.configure();
-        bind(RocketMQProperties.class).toInstance(rocketProperties);
+        bind(RocketMQProperties.class).toInstance((RocketMQProperties) mqProperties());
+        bind(RocketMQClient.class).toInstance(client);
     }
 
     @Provides
     @Singleton
-    public RocketMQBrokerAdapter rocketMQBrokerAdapter() {
-        if (Objects.nonNull(brokerAdapter)) {
-            return brokerAdapter;
-        }
-        return new RocketMQBrokerAdapter(rocketProperties, mqProperties(), serialization());
-    }
-
-    @Provides
-    @Singleton
-    public MQBrokerAdapter mqBrokerAdapter(RocketMQBrokerAdapter rocketMQBrokerAdapter) {
-        return rocketMQBrokerAdapter;
-    }
-
-    @Provides
-    @Singleton
-    public MQEventPublisher mqEventPublisher(RocketMQBrokerAdapter rocketMQBrokerAdapter) {
-        return rocketMQBrokerAdapter.createPublisher(mqProperties());
+    public MQClient mqClient() {
+        return client;
     }
 }

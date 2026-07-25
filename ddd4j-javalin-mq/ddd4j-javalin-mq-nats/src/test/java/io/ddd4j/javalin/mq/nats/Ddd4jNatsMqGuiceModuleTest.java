@@ -2,44 +2,39 @@ package io.ddd4j.javalin.mq.nats;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.nats.spi.NatsMQBrokerAdapter;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.registry.MQBrokerType;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.MQProperties;
+import io.ddd4j.mq.io.ddd4j.mq.nats.NatsMQClient;
+import io.ddd4j.mq.io.ddd4j.mq.nats.NatsProperties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+/**
+ * ddd4j-javalin-mq-nats Guice integration test.
+ *
+ * <p>Verifies Guice assembly: the broker-specific {@NatsMQClient} and the generic
+ * {{@link MQClient}} contract are both resolvable, and the bound properties
+ * equal the constructor argument.
+ */
 class Ddd4jNatsMqGuiceModuleTest {
 
     @Test
-    void shouldResolveCoreContractsFromGuice() {
-        NatsMQBrokerAdapter adapter = mock(NatsMQBrokerAdapter.class);
-        MQEventPublisher publisher = mock(MQEventPublisher.class);
-        when(adapter.createPublisher(any(Ddd4jMQProperties.class))).thenReturn(publisher);
-        Injector injector = Guice.createInjector(new Ddd4jNatsMqGuiceModule(adapter));
+    void shouldResolveBrokerClientAndGenericContracts() {
+        NatsProperties props = new NatsProperties();
+        NatsMQClient client = new NatsMQClient(props);
+        Injector injector = Guice.createInjector(new Ddd4jNatsMqGuiceModule(client, props));
 
-        assertSame(publisher, injector.getInstance(MQEventPublisher.class));
-        assertSame(adapter, injector.getInstance(MQBrokerAdapter.class));
-    }
+        NatsMQClient resolvedClient = injector.getInstance(NatsMQClient.class);
+        MQClient resolvedMqClient = injector.getInstance(MQClient.class);
+        MQProperties resolvedProps = injector.getInstance(MQProperties.class);
 
-    @Test
-    void shouldReportNatsBrokerType() {
-        NatsMQBrokerAdapter adapter = mock(NatsMQBrokerAdapter.class);
-        when(adapter.brokerType()).thenReturn(MQBrokerType.NATS);
-        when(adapter.supports(MQBrokerType.NATS)).thenReturn(true);
-        MQBrokerAdapter brokerAdapter = Guice.createInjector(new Ddd4jNatsMqGuiceModule(adapter))
-                .getInstance(MQBrokerAdapter.class);
-
-        assertEquals(MQBrokerType.NATS, brokerAdapter.brokerType());
-        assertTrue(brokerAdapter.supports(MQBrokerType.NATS));
-        assertFalse(brokerAdapter.supports(MQBrokerType.DISRUPTOR));
+        assertNotNull(resolvedClient);
+        assertSame(client, resolvedClient);
+        assertSame(client, resolvedMqClient);
+        assertSame(props, resolvedProps);
+        assertEquals("nats", resolvedMqClient.impl());
     }
 }

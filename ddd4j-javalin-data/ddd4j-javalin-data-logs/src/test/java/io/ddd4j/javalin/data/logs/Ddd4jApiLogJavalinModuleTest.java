@@ -2,16 +2,18 @@ package io.ddd4j.javalin.data.logs;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.data.logs.ApiOperationLogAspect;
+import com.google.inject.Singleton;
 import io.ddd4j.data.logs.ApiOperationLogProvider;
 import io.ddd4j.data.logs.DefaultApiOperationLogProvider;
+import io.ddd4j.data.logs.aspect.ApiOperationLogAspect;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifies Guice assembly of {@link Ddd4jApiLogJavalinModule}: the {@code ApiOperationLogProvider}
- * is bound to its default implementation and the aspect is resolvable.
+ * Verifies Guice assembly of {@link Ddd4jApiLogJavalinModule}: the
+ * {@code ApiOperationLogProvider} is bound to its default implementation and the
+ * aspect is resolvable.
  */
 class Ddd4jApiLogJavalinModuleTest {
 

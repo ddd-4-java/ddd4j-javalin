@@ -3,89 +3,40 @@ package io.ddd4j.javalin.mq.sqs;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-import io.ddd4j.mq.sqs.spi.SqsBrokerAdapter;
-import io.ddd4j.mq.sqs.spi.SqsMQProperties;
-import software.amazon.awssdk.services.sqs.SqsClient;
-
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.sqs.SqsMQClient;
+import io.ddd4j.mq.sqs.SqsProperties;
 import java.util.Objects;
 
 /**
- * Javalin SQS Guice module.
+ * Javalin Guice module wiring the ddd4j-mq SqsMQClient (SqsProperties) as a singleton
+ * {{@link MQClient}}.
  *
- * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * <p>Aligned with ddd4j-mq 2.0.x's single-MQClient-per-broker contract.
  */
 public class Ddd4jSqsMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
-    private final SqsMQProperties sqsProperties;
-    private final SqsClient sqsClient;
-    private final SqsBrokerAdapter brokerAdapter;
+    private final SqsMQClient client;
 
-    public Ddd4jSqsMqGuiceModule() {
-        this(new SqsMQProperties());
+    public Ddd4jSqsMqGuiceModule(SqsMQClient client) {
+        this(client, new SqsProperties());
     }
 
-    public Ddd4jSqsMqGuiceModule(SqsMQProperties sqsProperties) {
-        this(sqsProperties, new Ddd4jMQProperties(), null);
-    }
-
-    public Ddd4jSqsMqGuiceModule(SqsMQProperties sqsProperties, Ddd4jMQProperties mqProperties) {
-        this(sqsProperties, mqProperties, null);
-    }
-
-    public Ddd4jSqsMqGuiceModule(SqsClient sqsClient, SqsMQProperties sqsProperties, Ddd4jMQProperties mqProperties) {
-        this(sqsProperties, mqProperties, Objects.requireNonNull(sqsClient, "sqsClient"));
-    }
-
-    private Ddd4jSqsMqGuiceModule(SqsMQProperties sqsProperties,
-                                  Ddd4jMQProperties mqProperties,
-                                  SqsClient sqsClient) {
-        super(mqProperties);
-        this.sqsProperties = Objects.requireNonNull(sqsProperties, "sqsProperties");
-        this.sqsClient = sqsClient;
-        this.brokerAdapter = null;
-    }
-
-    public Ddd4jSqsMqGuiceModule(SqsBrokerAdapter brokerAdapter) {
-        this(brokerAdapter, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jSqsMqGuiceModule(SqsBrokerAdapter brokerAdapter, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.sqsProperties = new SqsMQProperties();
-        this.sqsClient = null;
-        this.brokerAdapter = Objects.requireNonNull(brokerAdapter, "brokerAdapter");
+    public Ddd4jSqsMqGuiceModule(SqsMQClient client, SqsProperties properties) {
+        super(properties);
+        this.client = Objects.requireNonNull(client, "client");
     }
 
     @Override
     protected void configure() {
         super.configure();
-        bind(SqsMQProperties.class).toInstance(sqsProperties);
+        bind(SqsProperties.class).toInstance((SqsProperties) mqProperties());
+        bind(SqsMQClient.class).toInstance(client);
     }
 
     @Provides
     @Singleton
-    public SqsBrokerAdapter sqsBrokerAdapter() {
-        if (Objects.nonNull(brokerAdapter)) {
-            return brokerAdapter;
-        }
-        if (Objects.nonNull(sqsClient)) {
-            return new SqsBrokerAdapter(sqsClient, sqsProperties, mqProperties(), serialization());
-        }
-        return new SqsBrokerAdapter(sqsProperties, mqProperties(), serialization());
-    }
-
-    @Provides
-    @Singleton
-    public MQBrokerAdapter mqBrokerAdapter(SqsBrokerAdapter sqsBrokerAdapter) {
-        return sqsBrokerAdapter;
-    }
-
-    @Provides
-    @Singleton
-    public MQEventPublisher mqEventPublisher(SqsBrokerAdapter sqsBrokerAdapter) {
-        return sqsBrokerAdapter.createPublisher(mqProperties());
+    public MQClient mqClient() {
+        return client;
     }
 }

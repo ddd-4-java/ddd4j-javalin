@@ -1,10 +1,18 @@
 package io.ddd4j.javalin.web;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import io.ddd4j.guice.Ddd4jGuiceModule;
+import com.google.inject.Singleton;
+import io.ddd4j.core.ddd.event.DomainEventPublisher;
+import io.ddd4j.core.i18n.I18nProvider;
+import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.guice.DddAnnotationModule;
+import io.ddd4j.guice.context.GuiceContext;
+import io.ddd4j.guice.event.GuiceDomainEventPublisher;
+import io.ddd4j.guice.i18n.GuiceI18nProvider;
+import io.ddd4j.guice.subject.GuiceSubjectProvider;
 import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
 import io.javalin.Javalin;
 import org.junit.jupiter.api.AfterEach;
@@ -73,7 +81,9 @@ public abstract class JavalinTestFixture {
 
         Module webModule = new Ddd4jJavalinAutoConfiguration(properties);
         java.util.List<Module> head = new java.util.ArrayList<>();
-        head.add(new Ddd4jGuiceModule());
+        // The full Ddd4jGuiceModule binds DefaultProjectionService which lacks an
+        // @Inject constructor in ddd4j 2.0.x; provide the minimum SPIs manually.
+        head.add(new MinimalSpiModule());
         // Skip DddAnnotationModule when no base packages are supplied (avoid ClassGraph
         // NoOp errors when running fixture-only integration tests).
         String[] basePackages = basePackages();
@@ -127,5 +137,19 @@ public abstract class JavalinTestFixture {
     /** Run an assertion callback against the live {@link Injector}. */
     protected void withInjector(Consumer<Injector> assertion) {
         assertion.accept(injector);
+    }
+
+    /**
+     * Minimal SPI bindings for the Javalin web layer to start in isolation. We avoid the
+     * full {@code Ddd4jGuiceModule} because it transitively pulls in
+     * {@code DefaultProjectionService} which currently has no {@code @Inject}
+     * constructor (tracked upstream as ddd4j 2.0.x issue).
+     */
+    private static final class MinimalSpiModule extends AbstractModule {
+        @Override
+        protected void configure() {
+            bind(SubjectProvider.class).to(GuiceSubjectProvider.class).in(Singleton.class);
+            bind(I18nProvider.class).to(GuiceI18nProvider.class).in(Singleton.class);
+        }
     }
 }

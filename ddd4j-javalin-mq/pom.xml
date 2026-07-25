@@ -30,16 +30,6 @@
 
     <modules>
         <module>ddd4j-javalin-mq-core</module>
-        <!--
-            Broker-specific Guice modules are temporarily excluded from the build
-            because they reference stale ddd4j-mq SPI classes (e.g. MQBrokerAdapter,
-            MQEventPublisher, Ddd4jMQProperties, JsonMQMessageSerialization) that no
-            longer exist in ddd4j 2.0.x. The IT skeleton sources we added in this
-            round (src/test/java/.../it/*.java) remain on disk and can be enabled once
-            the ddd4j-mq SPI is restored or the broker modules are rewritten against
-            the new MQClient contract.
-        -->
-        <!--
         <module>ddd4j-javalin-mq-disruptor</module>
         <module>ddd4j-javalin-mq-sqs</module>
         <module>ddd4j-javalin-mq-nats</module>
@@ -53,7 +43,6 @@
         <module>ddd4j-javalin-mq-mqtt</module>
         <module>ddd4j-javalin-mq-mqtt-mica</module>
         <module>ddd4j-javalin-mq-tdmq</module>
-        -->
     </modules>
 
 </project>

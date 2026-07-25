@@ -1,88 +1,42 @@
 package io.ddd4j.javalin.mq.ons;
 
-import com.aliyun.openservices.ons.api.Producer;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.ons.spi.OnsMQBrokerAdapter;
-import io.ddd4j.mq.ons.spi.OnsMQProperties;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.ons.OnsMQClient;
+import io.ddd4j.mq.ons.OnsProperties;
 import java.util.Objects;
 
 /**
- * Javalin ONS Guice module.
+ * Javalin Guice module wiring the ddd4j-mq OnsMQClient (OnsProperties) as a singleton
+ * {{@link MQClient}}.
  *
- * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * <p>Aligned with ddd4j-mq 2.0.x's single-MQClient-per-broker contract.
  */
 public class Ddd4jOnsMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
-    private final OnsMQProperties onsProperties;
-    private final Producer producer;
-    private final OnsMQBrokerAdapter brokerAdapter;
+    private final OnsMQClient client;
 
-    public Ddd4jOnsMqGuiceModule(OnsMQProperties onsProperties) {
-        this(onsProperties, new Ddd4jMQProperties());
+    public Ddd4jOnsMqGuiceModule(OnsMQClient client) {
+        this(client, new OnsProperties());
     }
 
-    public Ddd4jOnsMqGuiceModule(OnsMQProperties onsProperties, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.onsProperties = Objects.requireNonNull(onsProperties, "onsProperties");
-        this.producer = null;
-        this.brokerAdapter = null;
-    }
-
-    public Ddd4jOnsMqGuiceModule(Producer producer, OnsMQProperties onsProperties) {
-        this(producer, onsProperties, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jOnsMqGuiceModule(Producer producer, OnsMQProperties onsProperties, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.onsProperties = Objects.requireNonNull(onsProperties, "onsProperties");
-        this.producer = Objects.requireNonNull(producer, "producer");
-        this.brokerAdapter = null;
-    }
-
-    public Ddd4jOnsMqGuiceModule(OnsMQBrokerAdapter brokerAdapter) {
-        this(brokerAdapter, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jOnsMqGuiceModule(OnsMQBrokerAdapter brokerAdapter, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.onsProperties = new OnsMQProperties();
-        this.producer = null;
-        this.brokerAdapter = Objects.requireNonNull(brokerAdapter, "brokerAdapter");
+    public Ddd4jOnsMqGuiceModule(OnsMQClient client, OnsProperties properties) {
+        super(properties);
+        this.client = Objects.requireNonNull(client, "client");
     }
 
     @Override
     protected void configure() {
         super.configure();
-        bind(OnsMQProperties.class).toInstance(onsProperties);
+        bind(OnsProperties.class).toInstance((OnsProperties) mqProperties());
+        bind(OnsMQClient.class).toInstance(client);
     }
 
     @Provides
     @Singleton
-    public OnsMQBrokerAdapter onsMQBrokerAdapter() {
-        if (Objects.nonNull(brokerAdapter)) {
-            return brokerAdapter;
-        }
-        if (Objects.nonNull(producer)) {
-            return new OnsMQBrokerAdapter(producer, onsProperties, mqProperties(), serialization());
-        }
-        return new OnsMQBrokerAdapter(onsProperties, mqProperties(), serialization());
-    }
-
-    @Provides
-    @Singleton
-    public MQBrokerAdapter mqBrokerAdapter(OnsMQBrokerAdapter onsMQBrokerAdapter) {
-        return onsMQBrokerAdapter;
-    }
-
-    @Provides
-    @Singleton
-    public MQEventPublisher mqEventPublisher(OnsMQBrokerAdapter onsMQBrokerAdapter) {
-        return onsMQBrokerAdapter.createPublisher(mqProperties());
+    public MQClient mqClient() {
+        return client;
     }
 }

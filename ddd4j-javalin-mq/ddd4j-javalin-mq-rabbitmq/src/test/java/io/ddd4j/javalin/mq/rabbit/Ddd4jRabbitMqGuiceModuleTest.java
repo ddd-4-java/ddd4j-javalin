@@ -2,44 +2,39 @@ package io.ddd4j.javalin.mq.rabbit;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.rabbitmq.RabbitMQBrokerAdapter;
-import io.ddd4j.mq.registry.MQBrokerType;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.MQProperties;
+import io.ddd4j.mq.io.ddd4j.mq.rabbitmq.RabbitMQClient;
+import io.ddd4j.mq.io.ddd4j.mq.rabbitmq.RabbitMQProperties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+/**
+ * ddd4j-javalin-mq-rabbitmq Guice integration test.
+ *
+ * <p>Verifies Guice assembly: the broker-specific {@RabbitMQClient} and the generic
+ * {{@link MQClient}} contract are both resolvable, and the bound properties
+ * equal the constructor argument.
+ */
 class Ddd4jRabbitMqGuiceModuleTest {
 
     @Test
-    void shouldResolveCoreContractsFromGuice() {
-        RabbitMQBrokerAdapter adapter = mock(RabbitMQBrokerAdapter.class);
-        MQEventPublisher publisher = mock(MQEventPublisher.class);
-        when(adapter.createPublisher(any(Ddd4jMQProperties.class))).thenReturn(publisher);
-        Injector injector = Guice.createInjector(new Ddd4jRabbitMqGuiceModule(adapter));
+    void shouldResolveBrokerClientAndGenericContracts() {
+        RabbitMQProperties props = new RabbitMQProperties();
+        RabbitMQClient client = new RabbitMQClient(props);
+        Injector injector = Guice.createInjector(new Ddd4jRabbitMqGuiceModule(client, props));
 
-        assertSame(publisher, injector.getInstance(MQEventPublisher.class));
-        assertSame(adapter, injector.getInstance(MQBrokerAdapter.class));
-    }
+        RabbitMQClient resolvedClient = injector.getInstance(RabbitMQClient.class);
+        MQClient resolvedMqClient = injector.getInstance(MQClient.class);
+        MQProperties resolvedProps = injector.getInstance(MQProperties.class);
 
-    @Test
-    void shouldReportRabbitBrokerType() {
-        RabbitMQBrokerAdapter adapter = mock(RabbitMQBrokerAdapter.class);
-        when(adapter.brokerType()).thenReturn(MQBrokerType.RABBIT);
-        when(adapter.supports(MQBrokerType.RABBIT)).thenReturn(true);
-        MQBrokerAdapter brokerAdapter = Guice.createInjector(new Ddd4jRabbitMqGuiceModule(adapter))
-                .getInstance(MQBrokerAdapter.class);
-
-        assertEquals(MQBrokerType.RABBIT, brokerAdapter.brokerType());
-        assertTrue(brokerAdapter.supports(MQBrokerType.RABBIT));
-        assertFalse(brokerAdapter.supports(MQBrokerType.KAFKA));
+        assertNotNull(resolvedClient);
+        assertSame(client, resolvedClient);
+        assertSame(client, resolvedMqClient);
+        assertSame(props, resolvedProps);
+        assertEquals("rabbit", resolvedMqClient.impl());
     }
 }

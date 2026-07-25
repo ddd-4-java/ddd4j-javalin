@@ -3,72 +3,40 @@ package io.ddd4j.javalin.mq.activemq;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.activemq.ActiveMQClient;
 import io.ddd4j.mq.activemq.ActiveMQProperties;
-import io.ddd4j.mq.activemq.spi.ActiveMQBrokerAdapter;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-
 import java.util.Objects;
 
 /**
- * Javalin ActiveMQ Guice module.
+ * Javalin Guice module wiring the ddd4j-mq ActiveMQClient (ActiveMQProperties) as a singleton
+ * {{@link MQClient}}.
  *
- * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * <p>Aligned with ddd4j-mq 2.0.x's single-MQClient-per-broker contract.
  */
 public class Ddd4jActiveMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
-    private final ActiveMQProperties activeMQProperties;
-    private final ActiveMQBrokerAdapter brokerAdapter;
+    private final ActiveMQClient client;
 
-    public Ddd4jActiveMqGuiceModule() {
-        this(new ActiveMQProperties());
+    public Ddd4jActiveMqGuiceModule(ActiveMQClient client) {
+        this(client, new ActiveMQProperties());
     }
 
-    public Ddd4jActiveMqGuiceModule(ActiveMQProperties activeMQProperties) {
-        this(activeMQProperties, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jActiveMqGuiceModule(ActiveMQProperties activeMQProperties, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.activeMQProperties = Objects.requireNonNull(activeMQProperties, "activeMQProperties");
-        this.brokerAdapter = null;
-    }
-
-    public Ddd4jActiveMqGuiceModule(ActiveMQBrokerAdapter brokerAdapter) {
-        this(brokerAdapter, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jActiveMqGuiceModule(ActiveMQBrokerAdapter brokerAdapter, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.activeMQProperties = new ActiveMQProperties();
-        this.brokerAdapter = Objects.requireNonNull(brokerAdapter, "brokerAdapter");
+    public Ddd4jActiveMqGuiceModule(ActiveMQClient client, ActiveMQProperties properties) {
+        super(properties);
+        this.client = Objects.requireNonNull(client, "client");
     }
 
     @Override
     protected void configure() {
         super.configure();
-        bind(ActiveMQProperties.class).toInstance(activeMQProperties);
+        bind(ActiveMQProperties.class).toInstance((ActiveMQProperties) mqProperties());
+        bind(ActiveMQClient.class).toInstance(client);
     }
 
     @Provides
     @Singleton
-    public ActiveMQBrokerAdapter activeMQBrokerAdapter() {
-        if (Objects.nonNull(brokerAdapter)) {
-            return brokerAdapter;
-        }
-        return new ActiveMQBrokerAdapter(activeMQProperties, mqProperties(), serialization());
-    }
-
-    @Provides
-    @Singleton
-    public MQBrokerAdapter mqBrokerAdapter(ActiveMQBrokerAdapter activeMQBrokerAdapter) {
-        return activeMQBrokerAdapter;
-    }
-
-    @Provides
-    @Singleton
-    public MQEventPublisher mqEventPublisher(ActiveMQBrokerAdapter activeMQBrokerAdapter) {
-        return activeMQBrokerAdapter.createPublisher(mqProperties());
+    public MQClient mqClient() {
+        return client;
     }
 }

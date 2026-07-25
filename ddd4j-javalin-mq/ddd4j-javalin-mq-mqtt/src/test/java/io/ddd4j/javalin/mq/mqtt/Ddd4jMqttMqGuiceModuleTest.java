@@ -2,44 +2,39 @@ package io.ddd4j.javalin.mq.mqtt;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.mqtt.spi.MqttMQBrokerAdapter;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.registry.MQBrokerType;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.MQProperties;
+import io.ddd4j.mq.io.ddd4j.mq.mqtt.MqttMQClient;
+import io.ddd4j.mq.io.ddd4j.mq.mqtt.MqttMQProperties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+/**
+ * ddd4j-javalin-mq-mqtt Guice integration test.
+ *
+ * <p>Verifies Guice assembly: the broker-specific {@MqttMQClient} and the generic
+ * {{@link MQClient}} contract are both resolvable, and the bound properties
+ * equal the constructor argument.
+ */
 class Ddd4jMqttMqGuiceModuleTest {
 
     @Test
-    void shouldResolveCoreContractsFromGuice() {
-        MqttMQBrokerAdapter adapter = mock(MqttMQBrokerAdapter.class);
-        MQEventPublisher publisher = mock(MQEventPublisher.class);
-        when(adapter.createPublisher(any(Ddd4jMQProperties.class))).thenReturn(publisher);
-        Injector injector = Guice.createInjector(new Ddd4jMqttMqGuiceModule(adapter));
+    void shouldResolveBrokerClientAndGenericContracts() {
+        MqttMQProperties props = new MqttMQProperties();
+        MqttMQClient client = new MqttMQClient(props);
+        Injector injector = Guice.createInjector(new Ddd4jMqttMqGuiceModule(client, props));
 
-        assertSame(publisher, injector.getInstance(MQEventPublisher.class));
-        assertSame(adapter, injector.getInstance(MQBrokerAdapter.class));
-    }
+        MqttMQClient resolvedClient = injector.getInstance(MqttMQClient.class);
+        MQClient resolvedMqClient = injector.getInstance(MQClient.class);
+        MQProperties resolvedProps = injector.getInstance(MQProperties.class);
 
-    @Test
-    void shouldReportMqttBrokerType() {
-        MqttMQBrokerAdapter adapter = mock(MqttMQBrokerAdapter.class);
-        when(adapter.brokerType()).thenReturn(MQBrokerType.MQTT);
-        when(adapter.supports(MQBrokerType.MQTT)).thenReturn(true);
-        MQBrokerAdapter brokerAdapter = Guice.createInjector(new Ddd4jMqttMqGuiceModule(adapter))
-                .getInstance(MQBrokerAdapter.class);
-
-        assertEquals(MQBrokerType.MQTT, brokerAdapter.brokerType());
-        assertTrue(brokerAdapter.supports(MQBrokerType.MQTT));
-        assertFalse(brokerAdapter.supports(MQBrokerType.REDIS_STREAM));
+        assertNotNull(resolvedClient);
+        assertSame(client, resolvedClient);
+        assertSame(client, resolvedMqClient);
+        assertSame(props, resolvedProps);
+        assertEquals("mqtt", resolvedMqClient.impl());
     }
 }

@@ -3,72 +3,40 @@ package io.ddd4j.javalin.mq.rabbit;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.rabbitmq.RabbitMQBrokerAdapter;
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.rabbitmq.RabbitMQClient;
 import io.ddd4j.mq.rabbitmq.RabbitMQProperties;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-
 import java.util.Objects;
 
 /**
- * Javalin RabbitMQ Guice module.
+ * Javalin Guice module wiring the ddd4j-mq RabbitMQClient (RabbitMQProperties) as a singleton
+ * {{@link MQClient}}.
  *
- * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * <p>Aligned with ddd4j-mq 2.0.x's single-MQClient-per-broker contract.
  */
 public class Ddd4jRabbitMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
-    private final RabbitMQProperties rabbitProperties;
-    private final RabbitMQBrokerAdapter brokerAdapter;
+    private final RabbitMQClient client;
 
-    public Ddd4jRabbitMqGuiceModule() {
-        this(new RabbitMQProperties());
+    public Ddd4jRabbitMqGuiceModule(RabbitMQClient client) {
+        this(client, new RabbitMQProperties());
     }
 
-    public Ddd4jRabbitMqGuiceModule(RabbitMQProperties rabbitProperties) {
-        this(rabbitProperties, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jRabbitMqGuiceModule(RabbitMQProperties rabbitProperties, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.rabbitProperties = Objects.requireNonNull(rabbitProperties, "rabbitProperties");
-        this.brokerAdapter = null;
-    }
-
-    public Ddd4jRabbitMqGuiceModule(RabbitMQBrokerAdapter brokerAdapter) {
-        this(brokerAdapter, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jRabbitMqGuiceModule(RabbitMQBrokerAdapter brokerAdapter, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.rabbitProperties = new RabbitMQProperties();
-        this.brokerAdapter = Objects.requireNonNull(brokerAdapter, "brokerAdapter");
+    public Ddd4jRabbitMqGuiceModule(RabbitMQClient client, RabbitMQProperties properties) {
+        super(properties);
+        this.client = Objects.requireNonNull(client, "client");
     }
 
     @Override
     protected void configure() {
         super.configure();
-        bind(RabbitMQProperties.class).toInstance(rabbitProperties);
+        bind(RabbitMQProperties.class).toInstance((RabbitMQProperties) mqProperties());
+        bind(RabbitMQClient.class).toInstance(client);
     }
 
     @Provides
     @Singleton
-    public RabbitMQBrokerAdapter rabbitMQBrokerAdapter() {
-        if (Objects.nonNull(brokerAdapter)) {
-            return brokerAdapter;
-        }
-        return new RabbitMQBrokerAdapter(rabbitProperties, mqProperties(), serialization(), null);
-    }
-
-    @Provides
-    @Singleton
-    public MQBrokerAdapter mqBrokerAdapter(RabbitMQBrokerAdapter rabbitMQBrokerAdapter) {
-        return rabbitMQBrokerAdapter;
-    }
-
-    @Provides
-    @Singleton
-    public MQEventPublisher mqEventPublisher(RabbitMQBrokerAdapter rabbitMQBrokerAdapter) {
-        return rabbitMQBrokerAdapter.createPublisher(mqProperties());
+    public MQClient mqClient() {
+        return client;
     }
 }

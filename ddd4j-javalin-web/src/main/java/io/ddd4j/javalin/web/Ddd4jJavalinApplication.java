@@ -1,10 +1,15 @@
 package io.ddd4j.javalin.web;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import io.ddd4j.guice.Ddd4jGuiceModule;
+import com.google.inject.Singleton;
+import io.ddd4j.core.i18n.I18nProvider;
+import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.guice.DddAnnotationModule;
+import io.ddd4j.guice.i18n.GuiceI18nProvider;
+import io.ddd4j.guice.subject.GuiceSubjectProvider;
 import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
@@ -79,7 +84,10 @@ public final class Ddd4jJavalinApplication {
                                         Module[] extraModules) {
         Module web = new Ddd4jJavalinAutoConfiguration(properties);
         java.util.List<Module> head = new java.util.ArrayList<>();
-        head.add(new Ddd4jGuiceModule());
+        // The full Ddd4jGuiceModule binds DefaultProjectionService which has no
+        // @Inject constructor in ddd4j 2.0.x. Provide the minimum SPIs manually;
+        // consumers may pass their own Ddd4jGuiceModule via extraModules to override.
+        head.add(new MinimalSpiModule());
         if (basePackages != null && !basePackages.isBlank()) {
             head.add(new DddAnnotationModule(basePackages));
         }
@@ -90,6 +98,18 @@ public final class Ddd4jJavalinApplication {
         }
         System.arraycopy(extraModules, 0, all, head.size(), extraModules.length);
         return all;
+    }
+
+    /**
+     * Minimal SPI bindings for the Javalin web layer to start in isolation. See the
+     * corresponding helper inside {@link JavalinTestFixture} for rationale.
+     */
+    private static final class MinimalSpiModule extends AbstractModule {
+        @Override
+        protected void configure() {
+            bind(SubjectProvider.class).to(GuiceSubjectProvider.class).in(Singleton.class);
+            bind(I18nProvider.class).to(GuiceI18nProvider.class).in(Singleton.class);
+        }
     }
 
     private static void applyCliOverrides(Ddd4jJavalinProperties properties, String[] args) {

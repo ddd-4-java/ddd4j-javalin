@@ -3,91 +3,40 @@ package io.ddd4j.javalin.mq.mqtt;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
-import io.ddd4j.mq.mqtt.spi.MqttMQBrokerAdapter;
-import io.ddd4j.mq.mqtt.spi.MqttMQProperties;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.mqtt.MqttMQClient;
+import io.ddd4j.mq.mqtt.MqttMQProperties;
 import java.util.Objects;
 
 /**
- * Javalin MQTT Guice module.
+ * Javalin Guice module wiring the ddd4j-mq MqttMQClient (MqttMQProperties) as a singleton
+ * {{@link MQClient}}.
  *
- * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * <p>Aligned with ddd4j-mq 2.0.x's single-MQClient-per-broker contract.
  */
 public class Ddd4jMqttMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
-    private final MqttMQProperties mqttProperties;
-    private final MqttClient mqttClient;
-    private final MqttMQBrokerAdapter brokerAdapter;
+    private final MqttMQClient client;
 
-    public Ddd4jMqttMqGuiceModule() {
-        this(new MqttMQProperties());
+    public Ddd4jMqttMqGuiceModule(MqttMQClient client) {
+        this(client, new MqttMQProperties());
     }
 
-    public Ddd4jMqttMqGuiceModule(MqttMQProperties mqttProperties) {
-        this(mqttProperties, new Ddd4jMQProperties(), null);
-    }
-
-    public Ddd4jMqttMqGuiceModule(MqttMQProperties mqttProperties, Ddd4jMQProperties mqProperties) {
-        this(mqttProperties, mqProperties, null);
-    }
-
-    public Ddd4jMqttMqGuiceModule(MqttClient mqttClient,
-                                  MqttMQProperties mqttProperties,
-                                  Ddd4jMQProperties mqProperties) {
-        this(mqttProperties, mqProperties, Objects.requireNonNull(mqttClient, "mqttClient"));
-    }
-
-    private Ddd4jMqttMqGuiceModule(MqttMQProperties mqttProperties,
-                                   Ddd4jMQProperties mqProperties,
-                                   MqttClient mqttClient) {
-        super(mqProperties);
-        this.mqttProperties = Objects.requireNonNull(mqttProperties, "mqttProperties");
-        this.mqttClient = mqttClient;
-        this.brokerAdapter = null;
-    }
-
-    public Ddd4jMqttMqGuiceModule(MqttMQBrokerAdapter brokerAdapter) {
-        this(brokerAdapter, new Ddd4jMQProperties());
-    }
-
-    public Ddd4jMqttMqGuiceModule(MqttMQBrokerAdapter brokerAdapter, Ddd4jMQProperties mqProperties) {
-        super(mqProperties);
-        this.mqttProperties = new MqttMQProperties();
-        this.mqttClient = null;
-        this.brokerAdapter = Objects.requireNonNull(brokerAdapter, "brokerAdapter");
+    public Ddd4jMqttMqGuiceModule(MqttMQClient client, MqttMQProperties properties) {
+        super(properties);
+        this.client = Objects.requireNonNull(client, "client");
     }
 
     @Override
     protected void configure() {
         super.configure();
-        bind(MqttMQProperties.class).toInstance(mqttProperties);
+        bind(MqttMQProperties.class).toInstance((MqttMQProperties) mqProperties());
+        bind(MqttMQClient.class).toInstance(client);
     }
 
     @Provides
     @Singleton
-    public MqttMQBrokerAdapter mqttMQBrokerAdapter() {
-        if (Objects.nonNull(brokerAdapter)) {
-            return brokerAdapter;
-        }
-        if (Objects.nonNull(mqttClient)) {
-            return new MqttMQBrokerAdapter(mqttClient, mqttProperties, mqProperties(), serialization());
-        }
-        return new MqttMQBrokerAdapter(mqttProperties, mqProperties(), serialization());
-    }
-
-    @Provides
-    @Singleton
-    public MQBrokerAdapter mqBrokerAdapter(MqttMQBrokerAdapter mqttMQBrokerAdapter) {
-        return mqttMQBrokerAdapter;
-    }
-
-    @Provides
-    @Singleton
-    public MQEventPublisher mqEventPublisher(MqttMQBrokerAdapter mqttMQBrokerAdapter) {
-        return mqttMQBrokerAdapter.createPublisher(mqProperties());
+    public MQClient mqClient() {
+        return client;
     }
 }

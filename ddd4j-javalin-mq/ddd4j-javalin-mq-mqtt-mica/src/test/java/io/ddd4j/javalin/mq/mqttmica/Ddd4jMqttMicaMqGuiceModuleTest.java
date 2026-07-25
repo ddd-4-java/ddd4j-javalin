@@ -1,11 +1,11 @@
-package io.ddd4j.javalin.mq.pulsar;
+package io.ddd4j.javalin.mq.mqttmica;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.MQProperties;
-import io.ddd4j.mq.io.ddd4j.mq.pulsar.PulsarMQClient;
-import io.ddd4j.mq.io.ddd4j.mq.pulsar.PulsarProperties;
+import io.ddd4j.mq.io.ddd4j.mq.mqttmica.MicaMqttMQClient;
+import io.ddd4j.mq.io.ddd4j.mq.mqttmica.MicaMqttProperties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,21 +13,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * ddd4j-javalin-mq-pulsar Guice integration test.
+ * ddd4j-javalin-mq-mqtt-mica Guice integration test.
  *
- * <p>Verifies Guice assembly: the broker-specific {@PulsarMQClient} and the generic
+ * <p>Verifies Guice assembly: the broker-specific {@MicaMqttMQClient} and the generic
  * {{@link MQClient}} contract are both resolvable, and the bound properties
  * equal the constructor argument.
  */
-class Ddd4jPulsarMqGuiceModuleTest {
+class Ddd4jMqttMicaMqGuiceModuleTest {
 
     @Test
     void shouldResolveBrokerClientAndGenericContracts() {
-        PulsarProperties props = new PulsarProperties();
-        PulsarMQClient client = new PulsarMQClient(props);
-        Injector injector = Guice.createInjector(new Ddd4jPulsarMqGuiceModule(client, props));
+        MicaMqttProperties props = new MicaMqttProperties();
+        MicaMqttMQClient client = new MicaMqttMQClient(props);
+        Injector injector = Guice.createInjector(new Ddd4jMqttMicaMqGuiceModule(client, props));
 
-        PulsarMQClient resolvedClient = injector.getInstance(PulsarMQClient.class);
+        MicaMqttMQClient resolvedClient = injector.getInstance(MicaMqttMQClient.class);
         MQClient resolvedMqClient = injector.getInstance(MQClient.class);
         MQProperties resolvedProps = injector.getInstance(MQProperties.class);
 
@@ -35,6 +35,6 @@ class Ddd4jPulsarMqGuiceModuleTest {
         assertSame(client, resolvedClient);
         assertSame(client, resolvedMqClient);
         assertSame(props, resolvedProps);
-        assertEquals("pulsar", resolvedMqClient.impl());
+        assertEquals("mqtt-mica", resolvedMqClient.impl());
     }
 }

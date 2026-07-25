@@ -1,0 +1,131 @@
+package io.ddd4j.javalin.web;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import io.ddd4j.guice.Ddd4jGuiceModule;
+import io.ddd4j.guice.DddAnnotationModule;
+import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
+import io.javalin.Javalin;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.net.http.HttpClient;
+import java.util.function.Consumer;
+
+/**
+ * JUnit 5 base class for ddd4j-javalin integration tests.
+ *
+ * <p>Provides:
+ * <ul>
+ *   <li>Random-port Javalin bootstrap via {@link Ddd4jJavalinApplication}</li>
+ *   <li>Reusable Java 11 {@link HttpClient}</li>
+ *   <li>Convenience URL builder: {@link #url(String)}</li>
+ *   <li>Hook for subclasses to add extra modules / routes via
+ *       {@link #configureModules()} and {@link #configureRoutes(Javalin)}</li>
+ * </ul>
+ *
+ * <p>Typical usage:
+ * <pre>{@code
+ * class MyFeatureIT extends JavalinTestFixture {
+ *     @Override protected String[] basePackages() { return new String[]{"io.example.app"}; }
+ *     @Override protected void configureRoutes(Javalin app) {
+ *         app.get("/hello", ctx -> ctx.result("hi"));
+ *     }
+ *     @Test void shouldCallHello() throws Exception {
+ *         HttpResponse<String> r = http(HttpRequest.newBuilder(url("/hello")).GET().build());
+ *         assertEquals("hi", r.body());
+ *     }
+ * }
+ * }</pre>
+ */
+public abstract class JavalinTestFixture {
+
+    protected Javalin app;
+    protected Injector injector;
+    protected HttpClient client;
+
+    /** Override to scan DDD annotations in extra packages. Default: empty (no scan). */
+    protected String[] basePackages() {
+        return new String[0];
+    }
+
+    /** Override to add extra Guice modules (auth, data, mq, …). Default: none. */
+    protected Module[] extraModules() {
+        return new Module[0];
+    }
+
+    /** Override to add extra routes after the ddd4j lifecycle hooks are installed. */
+    protected void configureRoutes(Javalin app) {
+        // no-op by default
+    }
+
+    /** Override to assert against the {@link Injector} post-creation. */
+    protected void afterInjector(Injector injector) {
+        // no-op by default
+    }
+
+    @BeforeEach
+    void startJavalin() {
+        Ddd4jJavalinProperties properties = new Ddd4jJavalinProperties();
+        properties.setPort(0);
+        properties.setHost("127.0.0.1");
+
+        Module webModule = new Ddd4jJavalinAutoConfiguration(properties);
+        java.util.List<Module> head = new java.util.ArrayList<>();
+        head.add(new Ddd4jGuiceModule());
+        // Skip DddAnnotationModule when no base packages are supplied (avoid ClassGraph
+        // NoOp errors when running fixture-only integration tests).
+        String[] basePackages = basePackages();
+        if (basePackages != null && basePackages.length > 0) {
+            head.add(new DddAnnotationModule(basePackages));
+        }
+        head.add(webModule);
+        Module[] extras = extraModules();
+        Module[] all = new Module[head.size() + extras.length];
+        for (int i = 0; i < head.size(); i++) {
+            all[i] = head.get(i);
+        }
+        System.arraycopy(extras, 0, all, head.size(), extras.length);
+
+        injector = Guice.createInjector(all);
+        afterInjector(injector);
+
+        Ddd4jJavalinWeb web = injector.getInstance(Ddd4jJavalinWeb.class);
+        app = Javalin.create(config -> web.configure(config));
+        // Default health endpoint for tests.
+        app.unsafe.routes.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
+        configureRoutes(app);
+        app.start();
+
+        client = HttpClient.newHttpClient();
+    }
+
+    @AfterEach
+    void stopJavalin() {
+        if (app != null) {
+            app.stop();
+        }
+    }
+
+    /** Build a URL to {@code path} on the running test server. */
+    protected java.net.URI url(String path) {
+        return java.net.URI.create("http://localhost:" + app.port() + path);
+    }
+
+    /** Convenience: send an HTTP request and return the response. */
+    protected java.net.http.HttpResponse<String> http(java.net.http.HttpRequest request) throws Exception {
+        return client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+    }
+
+    /** Convenience: send an HTTP request with a custom body handler. */
+    protected <T> java.net.http.HttpResponse<T> http(java.net.http.HttpRequest request,
+                                                     java.net.http.HttpResponse.BodyHandler<T> handler) throws Exception {
+        return client.send(request, handler);
+    }
+
+    /** Run an assertion callback against the live {@link Injector}. */
+    protected void withInjector(Consumer<Injector> assertion) {
+        assertion.accept(injector);
+    }
+}

@@ -3,6 +3,7 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>io.ddd4j.javalin</groupId>
         <artifactId>ddd4j-javalin-auth</artifactId>
@@ -11,14 +12,52 @@
     </parent>
 
     <artifactId>ddd4j-javalin-auth-license</artifactId>
-    <description>Ddd4j Javalin License Component：复用 ddd4j-auth-license 纯 Java 授权实现。</description>
+    <description>
+        ddd4j-javalin + ddd4j-extension-license 整合：
+        Guice Module 注册 LicenseVerify + LicenseProperties，installOnStart 控制证书安装。
+        对标 ddd4j-boot-auth-license / ddd4j-boot-extension-akka license 配置。
+    </description>
 
     <dependencies>
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-auth-license</artifactId>
+            <artifactId>ddd4j-extension-license</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <skipTests>false</skipTests>
+                    <argLine>-Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

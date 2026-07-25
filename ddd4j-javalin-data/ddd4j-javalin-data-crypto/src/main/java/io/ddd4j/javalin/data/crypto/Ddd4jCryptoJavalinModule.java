@@ -1,6 +1,6 @@
 package io.ddd4j.javalin.data.crypto;
 
-import io.ddd4j.guice.data.crypto.Ddd4jCryptoGuiceModule;
+import io.ddd4j.guice.Ddd4jCryptoGuiceModule;
 
 /**
  * ddd4j-javalin 加解密 Guice Module。

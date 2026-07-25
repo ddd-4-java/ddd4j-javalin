@@ -4,9 +4,9 @@ import com.google.inject.AbstractModule;
 import io.ddd4j.auth.shiro.subject.ShiroSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
-import io.ddd4j.web.javalin.auth.shiro.ShiroExceptionHandlerRegistrar;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.UnauthorizedException;
 
 /**
  * ddd4j-javalin + Apache Shiro Guice 整合模块。
@@ -55,7 +55,12 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        ShiroExceptionHandlerRegistrar.register(app);
+        app.unsafe.routes.exception(org.apache.shiro.authc.AuthenticationException.class, (exception, ctx) ->
+                ctx.status(401).json("{\"code\":\"NOT_AUTHENTICATED\",\"message\":\""
+                        + exception.getMessage() + "\"}"));
+        app.unsafe.routes.exception(UnauthorizedException.class, (exception, ctx) ->
+                ctx.status(403).json("{\"code\":\"UNAUTHORIZED\",\"message\":\""
+                        + exception.getMessage() + "\"}"));
     }
 
     @Override

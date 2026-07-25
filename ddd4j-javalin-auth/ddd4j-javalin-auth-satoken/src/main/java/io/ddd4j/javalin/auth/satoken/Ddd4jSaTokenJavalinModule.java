@@ -1,13 +1,15 @@
 package io.ddd4j.javalin.auth.satoken;
 
-import com.google.inject.AbstractModule;
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
+import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.strategy.SaAnnotationStrategy;
+import com.google.inject.AbstractModule;
 import io.ddd4j.auth.satoken.handler.SaInternalCheckHandler;
 import io.ddd4j.auth.satoken.handler.SaMixCheckLoginHandler;
 import io.ddd4j.auth.satoken.subject.SaTokenSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
-import io.ddd4j.web.javalin.auth.satoken.SaTokenExceptionHandlerRegistrar;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,7 +56,15 @@ public class Ddd4jSaTokenJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        SaTokenExceptionHandlerRegistrar.register(app);
+        app.unsafe.routes.exception(NotLoginException.class, (exception, ctx) ->
+                ctx.status(401).json("{\"code\":\"NOT_LOGIN\",\"message\":\""
+                        + exception.getMessage() + "\"}"));
+        app.unsafe.routes.exception(NotPermissionException.class, (exception, ctx) ->
+                ctx.status(403).json("{\"code\":\"NOT_PERMISSION\",\"message\":\""
+                        + exception.getMessage() + "\"}"));
+        app.unsafe.routes.exception(NotRoleException.class, (exception, ctx) ->
+                ctx.status(403).json("{\"code\":\"NOT_ROLE\",\"message\":\""
+                        + exception.getMessage() + "\"}"));
     }
 
     @Override

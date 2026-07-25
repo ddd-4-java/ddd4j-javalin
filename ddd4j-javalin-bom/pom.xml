@@ -24,6 +24,16 @@
             </dependency>
             <dependency>
                 <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-web</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-testcontainers</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
                 <artifactId>ddd4j-javalin-cache</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -104,6 +114,16 @@
             <dependency>
                 <groupId>io.ddd4j.javalin</groupId>
                 <artifactId>ddd4j-javalin-data-mybatisplus</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-data-jpa</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-data-panache</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

@@ -1,8 +1,8 @@
 package io.ddd4j.javalin.sample.cqrs.person;
 
 import com.google.inject.Inject;
-import io.ddd4j.core.cqrs.projection.ProjectionRunner;
-import io.ddd4j.core.cqrs.projection.ViewScheduler;
+import io.ddd4j.core.cqrs.readmodel.ProjectionRunner;
+import io.ddd4j.core.cqrs.readmodel.ViewScheduler;
 import io.ddd4j.sample.cqrs.person.domain.PersonEvent;
 import io.ddd4j.sample.cqrs.person.query.PersonListView;
 

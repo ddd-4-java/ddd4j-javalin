@@ -27,6 +27,7 @@
         <module>ddd4j-javalin-sample-auth-shiro</module>
         <module>ddd4j-javalin-sample-cqrs-person</module>
         <module>ddd4j-javalin-sample-rich-model</module>
+        <module>ddd4j-javalin-sample-mybatis-testcontainers</module>
     </modules>
 
 </project>

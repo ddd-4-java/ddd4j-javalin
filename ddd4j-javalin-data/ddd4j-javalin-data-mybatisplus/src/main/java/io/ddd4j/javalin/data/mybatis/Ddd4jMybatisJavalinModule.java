@@ -1,6 +1,6 @@
 package io.ddd4j.javalin.data.mybatis;
 
-import io.ddd4j.guice.data.mybatis.Ddd4jMybatisGuiceModule;
+import io.ddd4j.guice.Ddd4jMybatisGuiceModule;
 
 import javax.sql.DataSource;
 

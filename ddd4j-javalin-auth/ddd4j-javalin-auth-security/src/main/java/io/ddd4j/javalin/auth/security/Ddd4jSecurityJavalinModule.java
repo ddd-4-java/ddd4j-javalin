@@ -4,9 +4,11 @@ import com.google.inject.AbstractModule;
 import io.ddd4j.auth.security.subject.SecuritySubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.core.util.SubjectKit;
-import io.ddd4j.web.javalin.auth.security.SecurityExceptionHandlerRegistrar;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * ddd4j-javalin + Spring Security Guice 整合模块。
@@ -62,7 +64,15 @@ public class Ddd4jSecurityJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        SecurityExceptionHandlerRegistrar.register(app);
+        app.unsafe.routes.exception(BadCredentialsException.class, (exception, ctx) ->
+                ctx.status(401).json("{\"code\":\"BAD_CREDENTIALS\",\"message\":\""
+                        + exception.getMessage() + "\"}"));
+        app.unsafe.routes.exception(AuthenticationException.class, (exception, ctx) ->
+                ctx.status(401).json("{\"code\":\"NOT_AUTHENTICATED\",\"message\":\""
+                        + exception.getMessage() + "\"}"));
+        app.unsafe.routes.exception(AccessDeniedException.class, (exception, ctx) ->
+                ctx.status(403).json("{\"code\":\"ACCESS_DENIED\",\"message\":\""
+                        + exception.getMessage() + "\"}"));
     }
 
     @Override

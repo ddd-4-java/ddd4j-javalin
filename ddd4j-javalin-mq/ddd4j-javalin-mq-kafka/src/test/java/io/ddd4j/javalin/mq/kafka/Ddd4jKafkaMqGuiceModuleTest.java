@@ -4,8 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.MQProperties;
-import io.ddd4j.mq.io.ddd4j.mq.kafka.KafkaMQClient;
-import io.ddd4j.mq.io.ddd4j.mq.kafka.KafkaMQProperties;
+import io.ddd4j.mq.kafka.KafkaMQClient;
+import io.ddd4j.mq.kafka.KafkaMQProperties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +24,7 @@ class Ddd4jKafkaMqGuiceModuleTest {
     @Test
     void shouldResolveBrokerClientAndGenericContracts() {
         KafkaMQProperties props = new KafkaMQProperties();
-        KafkaMQClient client = new KafkaMQClient(props);
+        KafkaMQClient client = new KafkaMQClient(props, null);
         Injector injector = Guice.createInjector(new Ddd4jKafkaMqGuiceModule(client, props));
 
         KafkaMQClient resolvedClient = injector.getInstance(KafkaMQClient.class);

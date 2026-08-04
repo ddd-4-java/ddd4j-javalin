@@ -6,7 +6,6 @@ import io.ddd4j.extension.qrcode.QrCodeService;
 import io.ddd4j.extension.qrcode.template.InMemoryQrCodeTemplateRegistry;
 import io.ddd4j.extension.qrcode.template.QrCodeTemplateBinder;
 import io.ddd4j.extension.qrcode.template.QrCodeTemplateRegistry;
-import com.google.zxing.QrCodes;
 import io.javalin.Javalin;
 
 import java.util.Objects;
@@ -23,8 +22,7 @@ public class Ddd4jQrCodeJavalinModule extends AbstractModule implements AutoClos
     }
 
     public Ddd4jQrCodeJavalinModule(QrCodeModuleConfig config) {
-        this(config, new DefaultQrCodeService(QrCodes.encoder(), QrCodes.decoder(),
-                config.getConcurrency(), config.getMaxBatchSize()), true);
+        this(config, new DefaultQrCodeService(config.getConcurrency(), config.getMaxBatchSize()), true);
     }
 
     public Ddd4jQrCodeJavalinModule(QrCodeModuleConfig config, QrCodeService service) {

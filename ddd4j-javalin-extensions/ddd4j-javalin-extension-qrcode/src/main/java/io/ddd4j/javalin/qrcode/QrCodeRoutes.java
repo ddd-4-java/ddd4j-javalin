@@ -3,18 +3,17 @@ package io.ddd4j.javalin.qrcode;
 import io.ddd4j.extension.qrcode.QrCodeService;
 import io.ddd4j.extension.qrcode.command.DecodeQrCodeCommand;
 import io.ddd4j.extension.qrcode.command.GenerateQrCodeCommand;
+import io.ddd4j.extension.qrcode.model.QrCodeDecodeRequest;
+import io.ddd4j.extension.qrcode.model.QrCodeRequest;
 import io.ddd4j.extension.qrcode.result.QrCodeArtifact;
-import com.google.zxing.exception.QrCodeErrorCode;
-import com.google.zxing.exception.QrCodeException;
-import com.google.zxing.model.QrCodeDecodeRequest;
-import com.google.zxing.model.QrCodeImageFormat;
-import com.google.zxing.model.QrCodeRequest;
+import io.ddd4j.extension.qrcode.result.QrCodeScanResult;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.http.UploadedFile;
-import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,55 +34,52 @@ public class QrCodeRoutes {
         app.unsafe.routes.post(config.getBasePath() + "/render", this::render);
         app.unsafe.routes.post(config.getBasePath() + "/base64", this::base64);
         app.unsafe.routes.post(config.getBasePath() + "/decode", this::decode);
-        app.unsafe.routes.exception(QrCodeException.class, (exception, context) -> error(context,
-                status(exception.getErrorCode()), exception.getErrorCode().name(), exception.getMessage()));
         app.unsafe.routes.exception(IllegalArgumentException.class, (exception, context) -> error(context,
-                400, QrCodeErrorCode.QRCODE_INVALID_ARGUMENT.name(), exception.getMessage()));
+                400, "QRCODE_INVALID_ARGUMENT", exception.getMessage()));
     }
 
     private void render(Context context) {
         QrCodeArtifact artifact = generate(context);
-        context.contentType(artifact.getOutput().getFormat().getMimeType())
-                .result(artifact.getOutput().getBytes());
+        context.contentType("image/png").result(artifact.getOutput().getBytes());
     }
 
     private void base64(Context context) {
         QrCodeArtifact artifact = generate(context);
+        byte[] bytes = artifact.getOutput().getBytes();
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("format", artifact.getOutput().getFormat().name());
-        response.put("base64", artifact.getOutput().base64());
-        response.put("dataUri", artifact.getOutput().dataUri());
+        response.put("format", "PNG");
+        response.put("base64", Base64.getEncoder().encodeToString(bytes));
+        response.put("dataUri", "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes));
         context.json(response);
     }
 
     private QrCodeArtifact generate(Context context) {
-        String formatName = valueOrDefault(context.queryParam("format"), "PNG");
         int width = intOrDefault(context.queryParam("width"), 256);
         int height = intOrDefault(context.queryParam("height"), 256);
-        QrCodeRequest request = QrCodeRequest.builder(context.body())
-                .size(width, height)
-                .format(QrCodeImageFormat.valueOf(formatName.toUpperCase()))
+        QrCodeRequest request = QrCodeRequest.builder()
+                .content(context.body())
+                .width(width)
+                .height(height)
                 .build();
         return service.generate(GenerateQrCodeCommand.builder().request(request).build());
     }
 
-    private void decode(Context context) throws Exception {
+    private void decode(Context context) throws IOException {
         UploadedFile uploadedFile = context.uploadedFile("file");
         if (Objects.isNull(uploadedFile)) {
             throw new IllegalArgumentException("multipart field 'file' is required");
         }
         if (uploadedFile.size() > config.getMaxUploadBytes()) {
-            throw new QrCodeException(QrCodeErrorCode.QRCODE_IMAGE_TOO_LARGE,
-                    "QR code image exceeds configured upload limit");
+            throw new IllegalArgumentException("QR code image exceeds configured upload limit");
         }
+        byte[] bytes;
         try (InputStream inputStream = uploadedFile.content()) {
-            context.json(service.decode(DecodeQrCodeCommand.builder()
-                    .request(QrCodeDecodeRequest.from(inputStream)
-                            .multiple(true)
-                            .maxInputBytes(config.getMaxUploadBytes())
-                            .build())
-                    .build()));
+            bytes = inputStream.readAllBytes();
         }
+        QrCodeScanResult scanResult = service.decode(DecodeQrCodeCommand.builder()
+                .request(QrCodeDecodeRequest.from(bytes))
+                .build());
+        context.json(scanResult.getResults());
     }
 
     private void error(Context context, int status, String code, String message) {
@@ -91,25 +87,6 @@ public class QrCodeRoutes {
         response.put("code", code);
         response.put("message", message);
         context.status(status).json(response);
-    }
-
-    private int status(QrCodeErrorCode errorCode) {
-        if (errorCode == QrCodeErrorCode.QRCODE_IMAGE_TOO_LARGE) {
-            return 413;
-        }
-        if (errorCode == QrCodeErrorCode.QRCODE_UNSUPPORTED_FORMAT) {
-            return 415;
-        }
-        if (errorCode == QrCodeErrorCode.QRCODE_DECODE_NOT_FOUND
-                || errorCode == QrCodeErrorCode.QRCODE_CAPACITY_EXCEEDED
-                || errorCode == QrCodeErrorCode.QRCODE_SELF_CHECK_FAILED) {
-            return 422;
-        }
-        return errorCode == QrCodeErrorCode.QRCODE_INVALID_ARGUMENT ? 400 : 500;
-    }
-
-    private String valueOrDefault(String value, String defaultValue) {
-        return StringUtils.isBlank(value) ? defaultValue : value;
     }
 
     private int intOrDefault(String value, int defaultValue) {

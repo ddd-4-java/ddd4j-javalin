@@ -1,18 +1,21 @@
 package io.ddd4j.javalin.sample.mybatistc;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.zaxxer.hikari.HikariDataSource;
 import io.ddd4j.javalin.data.mybatis.Ddd4jMybatisJavalinModule;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
 import io.ddd4j.javalin.testcontainers.database.MySqlTestContainerFixture;
 import io.ddd4j.javalin.web.JavalinTestFixture;
+import org.apache.ibatis.session.SqlSession;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MySQLContainer;
 
-import javax.sql.DataSource;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Connection;
+import java.sql.Statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,17 +39,24 @@ class MybatisTestcontainersIT extends JavalinTestFixture {
     @SuppressWarnings("resource")
     private static final MySQLContainer<?> MYSQL = new MySqlTestContainerFixture().newContainer();
 
+    private HikariDataSource dataSource;
+
     @Override
     protected String[] basePackages() {
         return new String[]{"io.ddd4j.javalin.sample.mybatistc"};
     }
 
     @Override
-    protected com.google.inject.Module[] extraModules() {
+    protected Module[] extraModules() {
         MYSQL.start();
+        dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(MYSQL.getJdbcUrl());
+        dataSource.setUsername(MYSQL.getUsername());
+        dataSource.setPassword(MYSQL.getPassword());
+        dataSource.setMaximumPoolSize(3);
         // Create schema
-        try (java.sql.Connection conn = MYSQL.getConnection();
-             java.sql.Statement stmt = conn.createStatement()) {
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS sample_user (" +
                     "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                     "username VARCHAR(100), " +
@@ -54,9 +64,16 @@ class MybatisTestcontainersIT extends JavalinTestFixture {
         } catch (Exception e) {
             throw new IllegalStateException("Failed to create sample_user schema", e);
         }
-        Ddd4jMybatisJavalinModule mybatisModule = new Ddd4jMybatisJavalinModule(MYSQL)
-                .bindRepository(SampleUserRepository.class, SampleUserMapper.class);
-        return new com.google.inject.Module[]{mybatisModule};
+        Ddd4jMybatisJavalinModule mybatisModule = new Ddd4jMybatisJavalinModule(dataSource)
+                .addMapper(SampleUserMapper.class);
+        return new Module[]{mybatisModule};
+    }
+
+    @AfterEach
+    void tearDownDataSource() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+        }
     }
 
     @org.junit.jupiter.api.AfterAll
@@ -74,21 +91,11 @@ class MybatisTestcontainersIT extends JavalinTestFixture {
     }
 
     @Test
-    void shouldResolveRepositoryFromGuice() {
+    void shouldResolveMapperFromGuice() {
         withInjector(injector -> {
-            SampleUserRepository repo = injector.getInstance(SampleUserRepository.class);
-            assertThat(repo).isNotNull();
-            assertThat(repo.getMapper()).isNotNull();
+            SqlSession sqlSession = injector.getInstance(SqlSession.class);
+            assertThat(sqlSession).isNotNull();
+            assertThat(sqlSession.getMapper(SampleUserMapper.class)).isNotNull();
         });
-    }
-
-    /**
-     * Demonstrates the Guice wiring bridge used in {@link JavalinTestFixture}: when
-     * extra modules return non-null, the fixture's {@code Guice.createInjector(...)}
-     * call installs them after the web + DDD-annotation modules.
-     */
-    @SuppressWarnings("unused")
-    private static Injector debugInjector(com.google.inject.Module[] modules) {
-        return Guice.createInjector(modules);
     }
 }

@@ -37,6 +37,7 @@ ddd4j-javalin 是其中"Guice Runtime + Javalin 7 Web"的实现轨,目标是为�
 | **MQ 14 broker** | `ddd4j-boot-mq-*` | `ddd4j-javalin-mq-*` (Testcontainers IT) | ✅ |
 | **二维码** | `Ddd4jQrCodeBootAutoConfiguration` | `Ddd4jQrCodeJavalinModule` | ✅ |
 | **QLExpress 规则** | `Ddd4jQLExpressBootAutoConfiguration` | `Ddd4jQLExpressJavalinModule` | ✅ |
+| **文件上传校验（Validator）** | javalin 独有 | `ddd4j-javalin-extension-validation` | ✅ |
 | **akka / excel / jackson / monitor / pf4j** | 各 `Ddd4j*BootAutoConfiguration` | 占位 pom | ⚠️ 待补 |
 
 ## Testcontainers 集成测试镜像
@@ -88,6 +89,7 @@ ddd4j-javalin/
 ├── ddd4j-javalin-extensions/            # 扩展模块
 │   ├── ddd4j-javalin-extension-qrcode
 │   ├── ddd4j-javalin-extension-qlexpress # ★从空壳补完
+│   ├── ddd4j-javalin-extension-validation  # ★文件上传校验
 │   └── ddd4j-javalin-extension-{akka,excel,jackson,monitor,pf4j}   # 仍为空
 ├── ddd4j-javalin-parent                 # Sample parent
 └── ddd4j-javalin-samples/               # 示例

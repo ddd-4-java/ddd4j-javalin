@@ -16,25 +16,34 @@
     </description>
 
     <dependencies>
+        <!--
+            ddd4j-dependencies 自 14082fde (fix(build): remove unreleased adapter dependencies)
+            起不再管理 fuinorg DDD/CQRS 轨道版本，此处显式声明。
+        -->
         <dependency>
             <groupId>org.fuin.ddd4j</groupId>
             <artifactId>ddd-4-java-core</artifactId>
+            <version>0.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.fuin.ddd4j</groupId>
             <artifactId>ddd-4-java-jackson</artifactId>
+            <version>0.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.fuin.ddd4j</groupId>
             <artifactId>ddd-4-java-esc</artifactId>
+            <version>0.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.fuin.cqrs4j</groupId>
             <artifactId>cqrs-4-java-core</artifactId>
+            <version>0.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.fuin.cqrs4j</groupId>
             <artifactId>cqrs-4-java-jackson</artifactId>
+            <version>0.6.0</version>
         </dependency>
         <dependency>
             <groupId>io.ddd4j</groupId>
@@ -54,6 +63,7 @@
         <dependency>
             <groupId>org.fuin.esc</groupId>
             <artifactId>esc-mem</artifactId>
+            <version>0.7.0</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

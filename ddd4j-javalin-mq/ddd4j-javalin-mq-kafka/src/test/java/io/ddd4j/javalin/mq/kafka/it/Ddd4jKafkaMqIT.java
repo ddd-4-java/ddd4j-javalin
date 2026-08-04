@@ -2,40 +2,41 @@ package io.ddd4j.javalin.mq.kafka.it;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.core.context.BaseContext;
-import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
 import io.ddd4j.javalin.mq.kafka.Ddd4jKafkaMqGuiceModule;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
 import io.ddd4j.javalin.testcontainers.messaging.KafkaTestContainerFixture;
-import io.ddd4j.mq.config.Ddd4jMQProperties;
+import io.ddd4j.mq.MQClient;
+import io.ddd4j.mq.MQProperties;
+import io.ddd4j.mq.annotation.MQEventListener;
 import io.ddd4j.mq.event.MQEvent;
-import io.ddd4j.mq.event.MQEventPublisher;
-import io.ddd4j.mq.event.MQEventSerialization;
-import io.ddd4j.mq.kafka.KafkaMQBrokerAdapter;
+import io.ddd4j.mq.kafka.KafkaMQClient;
 import io.ddd4j.mq.kafka.KafkaMQProperties;
-import io.ddd4j.mq.serialization.JsonMQMessageSerialization;
-import io.ddd4j.mq.spi.MQBrokerAdapter;
+import io.ddd4j.mq.listener.MQListener;
+import io.ddd4j.mq.serialization.JsonMQEventSerialization;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.function.Consumer;
+import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.awaitility.Awaitility.await;
 
 /**
  * Integration test for {@link Ddd4jKafkaMqGuiceModule} against a real Kafka broker brought
- * up by Testcontainers.
- *
- * <p>Verifies the publish → broker → consumer wiring end-to-end without relying on the
- * existing Mockito-based unit test. Skipped unless {@code -Pjavalin-integration-tests} is
- * active and a Docker daemon is reachable.
+ * up by Testcontainers. Verifies the full publish → broker → consume round trip through
+ * the ddd4j {@link MQClient} pipeline (aligned with the other broker ITs).
  */
 @Tag("integration")
 @JunitJupiterTestContainers
 class Ddd4jKafkaMqIT {
+
+    private static final String TOPIC = "ddd4j.it.kafka";
+    private static final String TAG = "smoke";
 
     @SuppressWarnings("resource")
     private static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName
@@ -45,60 +46,71 @@ class Ddd4jKafkaMqIT {
     void shouldResolveCoreContractsFromGuice() {
         KAFKA.start();
         try {
-            KafkaMQProperties kafkaProps = new KafkaMQProperties();
-            kafkaProps.setBootstrapServers(KAFKA.getBootstrapServers());
-            Ddd4jMQProperties mqProps = new Ddd4jMQProperties();
+            KafkaMQProperties brokerProps = new KafkaMQProperties();
+            brokerProps.setBootstrapServers(KAFKA.getBootstrapServers());
+            MQProperties mqProps = new MQProperties();
             mqProps.setEnabled(true);
             mqProps.setBroker("kafka");
 
-            Injector injector = Guice.createInjector(new Ddd4jKafkaMqGuiceModule(kafkaProps, mqProps));
-            MQEventPublisher publisher = injector.getInstance(MQEventPublisher.class);
-            MQBrokerAdapter brokerAdapter = injector.getInstance(MQBrokerAdapter.class);
-            MQEventSerialization serialization = injector.getInstance(MQEventSerialization.class);
+            Injector injector = Guice.createInjector(new Ddd4jKafkaMqGuiceModule(
+                    new KafkaMQClient(brokerProps, null), brokerProps));
 
-            assertThat(publisher).isNotNull();
-            assertThat(brokerAdapter).isNotNull();
-            assertThat(serialization).isNotNull().isInstanceOf(JsonMQMessageSerialization.class);
-            assertThat(injector.getInstance(KafkaMQBrokerAdapter.class)).isNotNull();
+            assertThat(injector.getInstance(MQClient.class)).isNotNull();
+            assertThat(injector.getInstance(KafkaMQClient.class)).isNotNull();
+            assertThat(injector.getInstance(MQProperties.class)).isSameAs(brokerProps);
         } finally {
             KAFKA.stop();
         }
     }
 
     @Test
-    void shouldPublishEventThroughBaseContextWithoutError() {
+    void shouldPublishAndConsumeRoundTrip() throws Exception {
         KAFKA.start();
         try {
-            AbstractDdd4jMqGuiceModule module = new Ddd4jKafkaMqGuiceModule(
-                    new KafkaMQProperties() {{
-                        setBootstrapServers(KAFKA.getBootstrapServers());
-                    }},
-                    new Ddd4jMQProperties() {{
-                        setEnabled(true);
-                        setBroker("kafka");
-                        setPersist(false);
-                    }});
-            Injector injector = Guice.createInjector(module);
+            KafkaMQProperties brokerProps = new KafkaMQProperties();
+            brokerProps.setBootstrapServers(KAFKA.getBootstrapServers());
+            brokerProps.setAutoStartConsumers(true);
+            MQProperties mqProps = new MQProperties();
+            mqProps.setEnabled(true);
+            mqProps.setBroker("kafka");
+            mqProps.setPersist(false);
 
-            // Bring up the producer channel via BaseContext (mirrors MQClient#init).
-            @SuppressWarnings("unchecked")
-            java.util.Map<String, Consumer<MQEvent>> publishers =
-                    (java.util.Map<String, Consumer<MQEvent>>) BaseContext.get(MQEvent.MQ_EVENT_PUBLISHER);
-            if (publishers == null) {
-                publishers = new java.util.concurrent.ConcurrentHashMap<>();
-                BaseContext.inject(MQEvent.MQ_EVENT_PUBLISHER, publishers);
-            }
-            publishers.put("kafka", injector.getInstance(MQEventPublisher.class));
+            KafkaMQClient client = new KafkaMQClient(brokerProps, null);
+            Injector injector = Guice.createInjector(new Ddd4jKafkaMqGuiceModule(client, brokerProps));
+            MQClient mqClient = injector.getInstance(MQClient.class);
+
+            SmokeListener bean = new SmokeListener();
+            Method onSmoke = SmokeListener.class.getMethod("onSmoke", MQEvent.class);
+            MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
+            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
+
+            // Give the consumer time to finish initial partition assignment.
+            Thread.sleep(3000);
 
             MQEvent event = new MQEvent();
-            event.setMsgId("kafka-it-001");
-            event.setTopic("ddd4j.it.kafka");
-            event.setTag("smoke");
-            event.setPayload("{\"hello\":\"kafka\"}");
+            event.setMsgId("kafka-it-" + System.nanoTime());
+            event.setTopic(TOPIC);
+            event.setTag(TAG);
+            event.publish();
 
-            assertThatNoException().isThrownBy(() -> event.publish());
+            await().atMost(Duration.ofSeconds(30)).until(() -> bean.received.get() != null);
+            MQEvent received = bean.received.get();
+            assertThat(received.getMsgId()).isEqualTo(event.getMsgId());
+            assertThat(received.getTopic()).isEqualTo(TOPIC);
+            assertThat(received.getTag()).isEqualTo(TAG);
         } finally {
             KAFKA.stop();
+        }
+    }
+
+    /** Listener bean invoked by the ddd4j consume pipeline; records the delivered event. */
+    public static class SmokeListener {
+
+        final AtomicReference<MQEvent> received = new AtomicReference<>();
+
+        @MQEventListener(topic = TOPIC, tags = TAG, group = "it-kafka-consumer")
+        public void onSmoke(MQEvent event) {
+            received.set(event);
         }
     }
 }

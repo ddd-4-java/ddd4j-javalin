@@ -42,6 +42,11 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- Testcontainers Kafka IT -->
         <dependency>
             <groupId>io.ddd4j.javalin</groupId>

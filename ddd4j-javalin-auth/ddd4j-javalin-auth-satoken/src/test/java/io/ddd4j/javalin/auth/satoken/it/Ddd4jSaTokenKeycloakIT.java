@@ -33,7 +33,7 @@ class Ddd4jSaTokenKeycloakIT {
         KEYCLOAK.start();
         try {
             assertThat(KEYCLOAK.getAuthServerUrl()).startsWith("http://");
-            assertThat(KEYCLOAK.getRealm()).isNotBlank();
+            assertThat(KeycloakTestContainerFixture.DEFAULT_REALM).isNotBlank();
         } finally {
             KEYCLOAK.stop();
         }

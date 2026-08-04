@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../ddd4j-javalin-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-core</artifactId>
+    <description>
+        ddd4j-javalin 核心层统一装配入口（对标 ddd4j-boot-core）：
+
+        - Ddd4jCoreProperties：ddd4j.core.* 配置 POJO（enabled / domainEventsEnabled / projectionEnabled）
+        - Ddd4jCoreGuiceModule：聚合装配 Guice Module，install ddd4j-runtime-guice 的 Ddd4jGuiceModule，
+          并显式声明核心 SPI 绑定（DomainEventPublisher / SubjectProvider / I18nProvider）
+        - Ddd4jCoreAutoConfiguration：静态 install(Injector) 入口，"启动即注册 SPI"
+          （GuiceContext.setInjector + 投影位置仓储 SPI 注册）
+
+        Javalin 应用只需 install 本模块即可获得与 ddd4j-boot 一致的 ddd4j 核心能力。
+    </description>
+
+    <dependencies>
+        <!-- ddd4j 核心契约（纯 Java，零框架依赖） -->
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-core</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+        <!-- ddd4j runtime guice（提供 Ddd4jGuiceModule / Ddd4jGuiceRuntime / GuiceContext） -->
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-runtime-guice</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+        <!-- Guice -->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 跑单测 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <skipTests>false</skipTests>
+                    <argLine>-Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

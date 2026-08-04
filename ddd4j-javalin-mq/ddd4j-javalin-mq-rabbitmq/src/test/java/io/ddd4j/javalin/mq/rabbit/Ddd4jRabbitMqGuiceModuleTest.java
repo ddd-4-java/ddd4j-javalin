@@ -4,8 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.MQProperties;
-import io.ddd4j.mq.io.ddd4j.mq.rabbitmq.RabbitMQClient;
-import io.ddd4j.mq.io.ddd4j.mq.rabbitmq.RabbitMQProperties;
+import io.ddd4j.mq.rabbitmq.RabbitMQClient;
+import io.ddd4j.mq.rabbitmq.RabbitMQProperties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

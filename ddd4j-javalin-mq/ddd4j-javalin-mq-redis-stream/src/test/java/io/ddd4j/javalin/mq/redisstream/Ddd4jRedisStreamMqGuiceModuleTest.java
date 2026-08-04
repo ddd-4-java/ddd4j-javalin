@@ -4,8 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.MQProperties;
-import io.ddd4j.mq.io.ddd4j.mq.redisstream.RedisStreamMQClient;
-import io.ddd4j.mq.io.ddd4j.mq.redisstream.RedisStreamMQProperties;
+import io.ddd4j.mq.redisstream.RedisStreamMQClient;
+import io.ddd4j.mq.redisstream.RedisStreamMQProperties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +35,6 @@ class Ddd4jRedisStreamMqGuiceModuleTest {
         assertSame(client, resolvedClient);
         assertSame(client, resolvedMqClient);
         assertSame(props, resolvedProps);
-        assertEquals("redis", resolvedMqClient.impl());
+        assertEquals("redisStream", resolvedMqClient.impl());
     }
 }

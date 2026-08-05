@@ -7,7 +7,7 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Shared RabbitMQ container fixture.
  *
- * <p>Uses the official {@code rabbitmq:3-management} image with the default guest/guest
+ * <p>Uses the official {@code rabbitmq:3.13.7-management-alpine} image with the default guest/guest
  * credentials. The management UI is exposed on the secondary mapped port (15672) and can be
  * browsed manually during debugging.
  *
@@ -16,7 +16,7 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class RabbitMqTestContainerFixture extends AbstractTestContainerFixture<RabbitMQContainer> {
 
-    public static final String DEFAULT_IMAGE = "rabbitmq:3-management";
+    public static final String DEFAULT_IMAGE = "rabbitmq:3.13.7-management-alpine";
 
     @Override
     public RabbitMQContainer newContainer() {

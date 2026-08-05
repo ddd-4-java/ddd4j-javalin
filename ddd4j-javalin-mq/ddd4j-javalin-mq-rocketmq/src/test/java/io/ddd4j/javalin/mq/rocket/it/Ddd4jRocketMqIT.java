@@ -1,8 +1,5 @@
 package io.ddd4j.javalin.mq.rocket.it;
 
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.javalin.mq.rocket.Ddd4jRocketMqGuiceModule;
@@ -52,30 +49,14 @@ import static org.awaitility.Awaitility.await;
 @JunitJupiterTestContainers
 class Ddd4jRocketMqIT {
 
-    private static final String TOPIC = "ddd4j.it.rocket";
+    // RocketMQ topic 命名仅允许 ^[%|a-zA-Z0-9_-]+$，不允许 '.'。
+    private static final String TOPIC = "ddd4j_it_rocket";
     private static final String TAG = "smoke";
-    /**
-     * Fixed host port for the broker VIP channel (10911 - 2) so the client can reach the
-     * broker advertised as {@code 127.0.0.1}.
-     */
-    private static final int BROKER_VIP_HOST_PORT = RocketMqTestContainerFixture.BROKER_VIP_PORT;
-
+    // Fixture 统一负责单容器双进程启动（namesrv+broker）、固定 10911 映射与 JVM 堆收紧；
+    // IT 只覆盖等待超时（QEMU/arm64 首启镜像拉取可能较慢）。
     @SuppressWarnings("resource")
     private static final GenericContainer<?> ROCKETMQ = new RocketMqTestContainerFixture().newContainer()
-            // boot namesrv + broker in one container; advertise 127.0.0.1 so the host JVM can connect
-            .withCommand("sh", "-c",
-                    "echo 'brokerIP1=127.0.0.1' > /tmp/broker-it.conf; "
-                            + "sh mqnamesrv & "
-                            + "sleep 8; "
-                            + "sh mqbroker -n localhost:9876 -c /tmp/broker-it.conf & "
-                            + "wait")
-            .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3)))
-            // keep 9876 on a randomized host port, pin 10909 (VIP channel) to the same host port
-            .withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withPortBindings(
-                    new PortBinding(Ports.Binding.empty(),
-                            new ExposedPort(RocketMqTestContainerFixture.NAMESRV_PORT)),
-                    new PortBinding(Ports.Binding.bindPort(BROKER_VIP_HOST_PORT),
-                            new ExposedPort(RocketMqTestContainerFixture.BROKER_VIP_PORT))));
+            .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3)));
 
     @Test
     void shouldResolveCoreContractsFromGuice() {

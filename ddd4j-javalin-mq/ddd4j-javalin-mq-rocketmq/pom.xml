@@ -58,6 +58,14 @@
             <artifactId>rocketmq-client</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- testcontainers-bom 将 rocketmq-remoting 管理为 5.2.0，与 client 5.5.0 的
+             setScanAvailableNameSrv 不兼容；显式对齐 client 版本。 -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-remoting</artifactId>
+            <version>${rocketmq-client.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.ddd4j.javalin</groupId>
             <artifactId>ddd4j-javalin-testcontainers</artifactId>

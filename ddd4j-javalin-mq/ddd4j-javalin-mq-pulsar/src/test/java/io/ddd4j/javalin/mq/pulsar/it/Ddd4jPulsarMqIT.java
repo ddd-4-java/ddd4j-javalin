@@ -47,7 +47,12 @@ class Ddd4jPulsarMqIT {
             DockerImageName.parse("apachepulsar/pulsar:3.2.0"))
             .withExposedPorts(6650, 8080)
             .withCommand("bin/pulsar", "standalone")
-            .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3)));
+            // standalone 默认 JVM 大堆（-Xmx2g+direct 4g）在 Docker Desktop 上 OOMKilled：收紧内存
+            .withEnv("PULSAR_MEM", "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g")
+            // 端口监听早于 namespace 初始化，publish 会报 Namespace not found：
+            // 等 namespace 创建完成（standalone 无 "is up" 日志，namespace 创建即 broker 就绪）
+            .waitingFor(Wait.forLogMessage(".*Created namespace public/default.*", 1)
+                    .withStartupTimeout(Duration.ofMinutes(5)));
 
     @Test
     void shouldResolveCoreContractsFromGuice() {

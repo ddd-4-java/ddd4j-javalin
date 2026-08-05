@@ -53,6 +53,14 @@
             <artifactId>pulsar-client</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- 旧 ddd4j-dependencies 将 opentelemetry-api 管到 1.25，pulsar-client 3.2 需要
+             DoubleHistogramBuilder.setExplicitBucketBoundariesAdvice（1.31+）；对齐传递版本。 -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <version>1.54.1</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.ddd4j.javalin</groupId>
             <artifactId>ddd4j-javalin-testcontainers</artifactId>

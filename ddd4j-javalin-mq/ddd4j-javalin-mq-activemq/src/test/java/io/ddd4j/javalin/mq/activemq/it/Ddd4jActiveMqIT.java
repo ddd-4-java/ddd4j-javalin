@@ -47,6 +47,9 @@ class Ddd4jActiveMqIT {
             ActiveMQProperties brokerProps = new ActiveMQProperties();
             brokerProps.setBrokerUrl("tcp://" + ACTIVEMQ.getHost() + ":"
                     + ACTIVEMQ.getMappedPort(ActiveMqTestContainerFixture.OPENWIRE_PORT));
+            // Artemis 镜像默认启用 security，凭证 artemis/artemis
+            brokerProps.setUsername("artemis");
+            brokerProps.setPassword("artemis");
             MQProperties mqProps = new MQProperties();
             mqProps.setEnabled(true);
             mqProps.setBroker("activemq");
@@ -69,6 +72,9 @@ class Ddd4jActiveMqIT {
             ActiveMQProperties brokerProps = new ActiveMQProperties();
             brokerProps.setBrokerUrl("tcp://" + ACTIVEMQ.getHost() + ":"
                     + ACTIVEMQ.getMappedPort(ActiveMqTestContainerFixture.OPENWIRE_PORT));
+            // Artemis 镜像默认启用 security，凭证 artemis/artemis
+            brokerProps.setUsername("artemis");
+            brokerProps.setPassword("artemis");
             MQProperties mqProps = new MQProperties();
             mqProps.setEnabled(true);
             mqProps.setBroker("activemq");

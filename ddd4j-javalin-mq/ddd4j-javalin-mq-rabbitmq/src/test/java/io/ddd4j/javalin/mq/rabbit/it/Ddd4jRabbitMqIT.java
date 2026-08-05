@@ -78,7 +78,9 @@ class Ddd4jRabbitMqIT {
             MQProperties mqProps = new MQProperties();
             mqProps.setEnabled(true);
             mqProps.setBroker("rabbit");
-            mqProps.setPersist(false);
+            // RabbitMQClient 不自动声明 exchange：显式使用内置 topic exchange，
+            // 否则默认 ""（default exchange）无法 queueBind，消息会无队列可投。
+            mqProps.setExchange("amq.topic");
 
             RabbitMQClient client = new RabbitMQClient(brokerProps);
             Injector injector = Guice.createInjector(new Ddd4jRabbitMqGuiceModule(client, brokerProps));

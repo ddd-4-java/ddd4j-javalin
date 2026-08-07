@@ -21,14 +21,7 @@
             <groupId>io.ddd4j</groupId>
             <artifactId>ddd4j-mq-disruptor</artifactId>
             <version>${ddd4j.version}</version>
-        </dependency>
-        <!-- 集成测试：验证 Guice 适配能创建 Injector 并发布事件 -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+        </dependency></dependencies>
 
     <build>
         <plugins>

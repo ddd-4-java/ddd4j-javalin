@@ -27,22 +27,7 @@
         </dependency>
 
         <!-- ======== 测试：验证 Guice 装配 + 契约解析（用 mock PulsarTemplate，无需真实 Pulsar）======== -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- 真实 round-trip IT 依赖（版本由 ddd4j-dependencies BOM / pulsar-bom 管理） -->
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>

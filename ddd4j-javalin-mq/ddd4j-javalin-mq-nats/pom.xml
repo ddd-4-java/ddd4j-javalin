@@ -24,22 +24,7 @@
         </dependency>
 
         <!-- ======== 测试：验证 Guice 装配 + 契约解析（用 mock Connection，无需真实 NATS）======== -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- 真实 round-trip IT 依赖（assertj/awaitility 由 BOM 管理；jnats 与 ddd4j-mq-nats 对齐） -->
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>

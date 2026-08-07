@@ -75,9 +75,7 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- 标识为 test-scope 工具库，但允许 main 中暴露 fixture 类 -->
-    </dependencies>
+</dependencies>
 
     <build>
         <plugins>

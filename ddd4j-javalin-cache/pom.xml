@@ -28,14 +28,7 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
-
-        <!-- ======== 测试：验证 CacheKit 声明式配置 + put/get 闭环 ======== -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+</dependencies>
 
     <build>
         <plugins>

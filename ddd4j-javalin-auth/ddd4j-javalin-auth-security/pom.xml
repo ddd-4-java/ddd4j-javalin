@@ -47,19 +47,9 @@
 
         <!-- ======== 测试：验证 SubjectProvider 注入 + SubjectKit 注册 ======== -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.ddd4j.javalin</groupId>
             <artifactId>ddd4j-javalin-testcontainers</artifactId>
             <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

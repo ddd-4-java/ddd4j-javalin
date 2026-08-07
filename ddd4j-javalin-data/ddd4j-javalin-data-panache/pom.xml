@@ -33,11 +33,6 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
-        <!-- JPA / Hibernate ORM (via jakarta.persistence) -->
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-        </dependency>
         <!-- Quarkus Panache ORM (runtime dependency for PanacheEntityBase) -->
         <dependency>
             <groupId>io.quarkus</groupId>

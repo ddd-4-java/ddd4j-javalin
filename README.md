@@ -46,7 +46,7 @@ ddd4j-javalin 是其中"Guice Runtime + Javalin 7 Web"的实现轨,目标是为�
 |---|---|---|
 | RDBMS | `mysql:8.0` / `postgres:16-alpine` / `mariadb:11` | `ddd4j-javalin-testcontainers` |
 | NoSQL | `mongo:7` / `redis:7-alpine` | `ddd4j-javalin-testcontainers` |
-| MQ | `confluentinc/cp-kafka:7.5.0` / `rabbitmq:3-management` / `apache/activemq-classic:5.18.3` / `apache/rocketmq:5.1.0` / `apachepulsar/pulsar:3.2.0` / `nats:2-alpine` / `eclipse-mosquitto:2.0` / `localstack/localstack:3.4` | `ddd4j-javalin-testcontainers` |
+| MQ | `confluentinc/cp-kafka:7.5.0` / `rabbitmq:3.13.7-management-alpine` / `apache/activemq-artemis:2.39.0` / `apache/rocketmq:5.3.2` / `apachepulsar/pulsar:3.2.0` / `nats:2-alpine` / `eclipse-mosquitto:2.0` / `localstack/localstack:3.4` | `ddd4j-javalin-testcontainers` |
 | Auth | `quay.io/keycloak/keycloak:24.0` | `ddd4j-javalin-testcontainers` |
 | HTTP Mock | `wiremock/wiremock:3.5.0` | `ddd4j-javalin-testcontainers` |
 
@@ -94,6 +94,7 @@ ddd4j-javalin/
 ├── ddd4j-javalin-parent                 # Sample parent
 └── ddd4j-javalin-samples/               # 示例
     ├── ddd4j-javalin-sample-rich-model              # ★升级:用 Ddd4jJavalinApplication
+    ├── ddd4j-javalin-sample-order-outbox           # ★新增:InMemory + Postgres 双轨
     ├── ddd4j-javalin-sample-mybatis-testcontainers  # ★新增:Testcontainers 端到端
     ├── ddd4j-javalin-sample-auth-{satoken,security,shiro}
     ├── ddd4j-javalin-sample-cqrs-person
@@ -142,6 +143,21 @@ class MyIT extends JavalinTestFixture {
 - [docs/architecture.md](docs/architecture.md) — 架构与模块关系
 - [docs/javalin-flow.md](docs/javalin-flow.md) — 请求生命周期
 - [docs/testcontainers-guide.md](docs/testcontainers-guide.md) — 集成测试镜像与等待策略
+
+## 规划与历史（superpowers）
+
+按 SDD（Spec-Driven Development）流程，所有新需求的设计、计划、状态报告统一在 `docs/superpowers/`：
+
+- `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` —— 设计文档
+- `docs/superpowers/plans/YYYY-MM-DD-<topic>.md` —— 实施计划（checkbox 跟踪）
+- `docs/superpowers/reports/YYYY-MM-DD-status.md` —— 真实状态报告
+
+主要历史：
+- [`specs/2026-07-29-javalin-capability-matrix-design.md`](docs/superpowers/specs/2026-07-29-javalin-capability-matrix-design.md) — 能力矩阵对齐设计
+- [`plans/2026-07-29-javalin-capability-matrix.md`](docs/superpowers/plans/2026-07-29-javalin-capability-matrix.md) — 实施计划（4 阶段 + 容器级 IT 验收）
+- [`specs/2026-07-30-testcontainers-foundation-design.md`](docs/superpowers/specs/2026-07-30-testcontainers-foundation-design.md) — Testcontainers Fixture 设计
+- [`specs/2026-08-04-container-it-roundspec-design.md`](docs/superpowers/specs/2026-08-04-container-it-roundspec-design.md) — 容器级 IT 真实 round-trip 修复设计
+- [`reports/2026-08-05-status.md`](docs/superpowers/reports/2026-08-05-status.md) — 当前真实状态
 
 ## 许可证
 

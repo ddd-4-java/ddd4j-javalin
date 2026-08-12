@@ -4,13 +4,18 @@
 
 ## 示例清单
 
-| 示例                                  | 方向        | 说明 |
-|-------------------------------------|-----------|------|
-| `ddd4j-javalin-sample-rich-model`   | 普通充血模型   | 复用 `ddd4j-sample-rich-model`，通过 Guice 注入 `OrderApplicationService` 与内存 PO 仓储，Javalin 暴露订单 API |
-| `ddd4j-javalin-sample-cqrs-person`  | CQRS / ES | 编程式路由 + Guice 命令服务 + 增量投影 |
-| `ddd4j-javalin-sample-auth-satoken` | Auth      | Javalin + Sa-Token 示例 |
-| `ddd4j-javalin-sample-auth-security` | Auth      | Javalin + Spring Security 兼容示例 |
-| `ddd4j-javalin-sample-auth-shiro`   | Auth      | Javalin + Shiro 兼容示例 |
+| 示例                                            | 方向        | 说明 |
+|-----------------------------------------------|-----------|------|
+| `ddd4j-javalin-sample-rich-model`             | 普通充血模型   | 复用 `ddd4j-sample-rich-model`，通过 Guice 注入 `OrderApplicationService` 与内存 PO 仓储，Javalin 暴露订单 API |
+| `ddd4j-javalin-sample-cqrs-person`            | CQRS / ES | 编程式路由 + Guice 命令服务 + 增量投影 |
+| `ddd4j-javalin-sample-auth-satoken`           | Auth      | Javalin + Sa-Token 示例（Keycloak IT） |
+| `ddd4j-javalin-sample-auth-security`           | Auth      | Javalin + Spring Security 兼容示例（Keycloak IT） |
+| `ddd4j-javalin-sample-auth-shiro`             | Auth      | Javalin + Shiro 兼容示例（Keycloak IT） |
+| `ddd4j-javalin-sample-order-outbox`           | Outbox    | InMemory + Postgres 双轨；`TransactionalOutboxPublisher` 真实 round-trip（PostgresTestContainerFixture） |
+| `ddd4j-javalin-sample-mybatis-testcontainers` | Data      | Testcontainers MySQL + MyBatis-Plus 端到端 CRUD |
+| `ddd4j-javalin-sample-mq-disruptor`           | MQ        | 进程内 Disruptor RingBuffer 示例 |
+| `ddd4j-javalin-sample-mq-kafka`               | MQ        | Apache Kafka 示例 |
+| `ddd4j-javalin-sample-mq-rabbitmq`            | MQ        | RabbitMQ（AMQP 0-9-1）示例 |
 
 验证命令：
 

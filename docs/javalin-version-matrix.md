@@ -22,12 +22,27 @@
 | 活跃分支线 | ddd4j-javalin 版本 | Javalin 库 | ddd4j 核心 | 定位 |
 |---|---|---|---|---|
 | `feature/7.2.x` | `7.2.x-SNAPSHOT` | 7.2.3 | feature/3.0.x | **主战线**：承接全部最新成果（unsafe.routes API 形态） |
-| `feature/6.7.x` | `6.7.x-SNAPSHOT` | 6.7.0 | feature/2.0.x | 存量线：服务停留在 Jetty 11/Java 11 生态的用户（Javalin 6.x 末版含全部修复） |
+| `feature/6.7.x` | `6.7.x-SNAPSHOT` | 6.7.0 | feature/2.0.x | ⚠️ 阻塞（见下「6.7.x 线可行性探测」）：本地分支已建未推送，待路径决策 |
 
 **JDK 17 统一最低基线**（两线同规）：
 - 运行/CI/工具链统一 JDK 17；不做 JDK 8 兼容（Javalin 5.0 起已出局）。
 - `feature/6.7.x` 编译目标 `--release 11`（产物兼容面更广），但最低运行 JDK 仍为 17。
 - `feature/7.2.x` 编译与运行均为 17。
+
+## 6.7.x 线可行性探测（2026-08-16，架构智能体报告）
+
+**核心硬阻塞**：核心仓库任何分支/tag 均无 Javalin 5/6 基线的 `ddd4j-web-javalin`——m2 中 v1(1.0.x)=Javalin 4.6.8（`io.javalin.core` 包，6.7.0 无法加载）、v2/v3(2.0.x/3.0.x)=Javalin 7.2.2（`config.routes.*` API，Javalin 6 不存在）。`ddd4j-javalin-web` 依赖核心 `Ddd4jJavalinWeb`，直接降库版本会 NoSuchMethodError。
+
+**API 差异面**（本仓库）：`app.unsafe.routes.*` 共 51 处/14 文件 → Javalin 6 等价 `app.get/post/exception(...)` 实例方法（纯机械替换）；核心侧 `config.routes.*` → Javalin 6 需移到实例方法注册；Context 差异 `method()/status()/req` 三处。
+
+**三路径**：
+| 路径 | 可行性 | 工程量 | 依赖 |
+|---|---|---|---|
+| A. 等核心开 javalin6 基线分支 | 低（历史无存量） | 核心侧 2-3 天 | 核心团队承诺，不可控 |
+| B. ddd4j-javalin-web 自研 Javalin 6 装配（Ddd4jJavalinWeb6，v1 源码为模板） | 中（51 处机械替换 + 1 个装配类 + 6 文件适配） | 本仓库 3-5 天 | 无，但分叉核心 Web SPI 契约需手工同步 |
+| C. 放弃 6.7.x 线，7.2.x 统一覆盖 | 最高（零成本） | 0 | 代价：Jetty 11/Java 11 存量用户无覆盖 |
+
+**决策门**：是否存在真实的 Javalin 6 / Java 11 / Jetty 11 下游需求——无则选 C，有则选 B。
 
 ## 本项目选型与实测（2026-08-16，feature/7.2.x）
 

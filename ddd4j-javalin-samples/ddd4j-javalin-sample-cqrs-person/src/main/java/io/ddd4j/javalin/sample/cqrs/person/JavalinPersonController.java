@@ -33,10 +33,10 @@ public class JavalinPersonController {
     }
 
     public void register(Javalin app) {
-        app.unsafe.routes.post("/persons/create", this::create);
-        app.unsafe.routes.get("/persons", this::all);
-        app.unsafe.routes.get("/persons/{personId}", this::get);
-        app.unsafe.routes.delete("/persons/{personId}", this::delete);
+        app.post("/persons/create", this::create);
+        app.get("/persons", this::all);
+        app.get("/persons/{personId}", this::get);
+        app.delete("/persons/{personId}", this::delete);
     }
 
     public void create(Context ctx) {

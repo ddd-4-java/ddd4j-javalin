@@ -103,8 +103,9 @@ public abstract class JavalinTestFixture {
 
         Ddd4jJavalinWeb web = injector.getInstance(Ddd4jJavalinWeb.class);
         app = Javalin.create(config -> web.configure(config));
+        web.applyTo(app);
         // Default health endpoint for tests.
-        app.unsafe.routes.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
+        app.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
         configureRoutes(app);
         app.start();
 

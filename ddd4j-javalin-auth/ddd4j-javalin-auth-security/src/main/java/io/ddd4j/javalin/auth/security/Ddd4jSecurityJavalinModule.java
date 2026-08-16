@@ -53,7 +53,7 @@ public class Ddd4jSecurityJavalinModule extends AbstractModule {
      * 注册 Javalin 异常处理器：统一 Spring Security 鉴权异常响应
      * （对标 Spring @ControllerAdvice SecurityExceptionHandler）。
      *
-     * <p>Javalin 7.x 异常处理 API：{@code app.unsafe.routes.exception(Class, ExceptionHandler)}。
+     * <p>Javalin 6.x 异常处理 API：{@code app.exception(Class, ExceptionHandler)}。
      * 覆盖三类异常（对齐 Spring 的 SecurityExceptionHandler）：
      * <ul>
      *   <li>401：未认证（AuthenticationException / BadCredentialsException / AccountExpiredException）</li>
@@ -64,13 +64,13 @@ public class Ddd4jSecurityJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        app.unsafe.routes.exception(BadCredentialsException.class, (exception, ctx) ->
+        app.exception(BadCredentialsException.class, (exception, ctx) ->
                 ctx.status(401).json("{\"code\":\"BAD_CREDENTIALS\",\"message\":\""
                         + exception.getMessage() + "\"}"));
-        app.unsafe.routes.exception(AuthenticationException.class, (exception, ctx) ->
+        app.exception(AuthenticationException.class, (exception, ctx) ->
                 ctx.status(401).json("{\"code\":\"NOT_AUTHENTICATED\",\"message\":\""
                         + exception.getMessage() + "\"}"));
-        app.unsafe.routes.exception(AccessDeniedException.class, (exception, ctx) ->
+        app.exception(AccessDeniedException.class, (exception, ctx) ->
                 ctx.status(403).json("{\"code\":\"ACCESS_DENIED\",\"message\":\""
                         + exception.getMessage() + "\"}"));
     }

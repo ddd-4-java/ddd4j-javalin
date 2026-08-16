@@ -50,19 +50,19 @@ public class Ddd4jSaTokenJavalinModule extends AbstractModule {
     /**
      * 注册 Javalin 异常处理器：统一 Sa-Token 鉴权异常响应（对标 Spring @ControllerAdvice）。
      *
-     * <p>Javalin 7.x 的异常处理 API：{@code app.unsafe.routes.exception(Class, ExceptionHandler)}。
+     * <p>Javalin 6.x 的异常处理 API：{@code app.exception(Class, ExceptionHandler)}。
      * 返回 401 + JSON body（对齐 Spring 的 {@code SaTokenExceptionHandler} 响应结构）。
      *
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        app.unsafe.routes.exception(NotLoginException.class, (exception, ctx) ->
+        app.exception(NotLoginException.class, (exception, ctx) ->
                 ctx.status(401).json("{\"code\":\"NOT_LOGIN\",\"message\":\""
                         + exception.getMessage() + "\"}"));
-        app.unsafe.routes.exception(NotPermissionException.class, (exception, ctx) ->
+        app.exception(NotPermissionException.class, (exception, ctx) ->
                 ctx.status(403).json("{\"code\":\"NOT_PERMISSION\",\"message\":\""
                         + exception.getMessage() + "\"}"));
-        app.unsafe.routes.exception(NotRoleException.class, (exception, ctx) ->
+        app.exception(NotRoleException.class, (exception, ctx) ->
                 ctx.status(403).json("{\"code\":\"NOT_ROLE\",\"message\":\""
                         + exception.getMessage() + "\"}"));
     }

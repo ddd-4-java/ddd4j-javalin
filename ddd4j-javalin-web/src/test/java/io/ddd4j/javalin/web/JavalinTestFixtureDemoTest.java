@@ -31,7 +31,7 @@ class JavalinTestFixtureDemoTest extends JavalinTestFixture {
 
     @Override
     protected void configureRoutes(Javalin app) {
-        app.unsafe.routes.get("/demo/hello", ctx -> ctx.result("hello, ddd4j"));
+        app.get("/demo/hello", ctx -> ctx.result("hello, ddd4j"));
     }
 
     @Test

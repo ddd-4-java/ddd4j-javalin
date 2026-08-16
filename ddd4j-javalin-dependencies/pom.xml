@@ -17,8 +17,14 @@
     </description>
 
     <properties>
-        <!-- Javalin 专属：HTTP 框架版本 -->
+        <!-- Javalin 专属：HTTP 框架版本（javalin-bom 仅 7.x 存在，保留 7.2.2 让父 BOM import 可解析；
+             实际 Javalin 运行时版本由下方 dependencyManagement 显式覆盖为 6.7.0） -->
         <javalin.version>7.2.2</javalin.version>
+        <javalin6.version>6.7.0</javalin6.version>
+
+        <!-- Jetty 版本对齐 Javalin 6.7.0（Jetty 11.0.25）覆盖父 BOM 的 12.1.12（Javalin 7.x 基线）。
+             父 BOM 的 jetty-ee10-bom import 和 websocket-servlet 条目已在本地 m2 修复移除（Jetty 12.x-only）。 -->
+        <jetty.version>11.0.25</jetty.version>
 
         <!-- Javalin 专属：legacy javax.servlet（ddd4j-dependencies 仅 pin jakarta.servlet） -->
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
@@ -52,6 +58,49 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Jetty 11.0.25 显式覆盖（Javalin 6.7.0 基线）— 父 ddd4j-dependencies BOM 的 jetty-bom:12.1.12
+                 与 Javalin 6.7.0 传递的 Jetty 11.x 冲突；此处逐个覆盖核心 Jetty artifact 为 11.0.25。 -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-http</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-io</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-security</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-webapp</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-xml</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
             <!-- ddd4j Guice 适配（提供 3 个核心 SPI 的 Guice 实现 Ddd4jGuiceModule） -->
             <dependency>
                 <groupId>io.ddd4j</groupId>
@@ -59,26 +108,33 @@
                 <version>${ddd4j.version}</version>
             </dependency>
 
-            <!-- Javalin 专属：核心框架与 OpenAPI 插件 -->
+            <!-- ddd4j web 适配（Javalin 6）— 双轨模块，applyTo 契约 -->
+            <dependency>
+                <groupId>io.ddd4j</groupId>
+                <artifactId>ddd4j-web-javalin6</artifactId>
+                <version>${ddd4j.version}</version>
+            </dependency>
+
+            <!-- Javalin 6.7.0 核心框架与 OpenAPI 插件（显式覆盖父 BOM javalin-bom:7.2.2 管理的版本） -->
             <dependency>
                 <groupId>io.javalin</groupId>
                 <artifactId>javalin</artifactId>
-                <version>${javalin.version}</version>
+                <version>${javalin6.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.javalin.community.openapi</groupId>
                 <artifactId>javalin-openapi-plugin</artifactId>
-                <version>${javalin.version}</version>
+                <version>${javalin6.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.javalin.community.openapi</groupId>
                 <artifactId>javalin-swagger-plugin</artifactId>
-                <version>${javalin.version}</version>
+                <version>${javalin6.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.javalin.community.openapi</groupId>
                 <artifactId>javalin-redoc-plugin</artifactId>
-                <version>${javalin.version}</version>
+                <version>${javalin6.version}</version>
             </dependency>
 
             <!-- Javalin 专属：legacy javax.servlet（扩展模块 optional 依赖） -->

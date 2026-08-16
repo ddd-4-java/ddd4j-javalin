@@ -37,7 +37,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <revision>1.0.x.20260630-SNAPSHOT</revision>
+        <revision>6.7.x-SNAPSHOT</revision>
         <ddd4j.version>2.0.x.20260630-SNAPSHOT</ddd4j.version>
         <ddd4j-javalin.version>${revision}</ddd4j-javalin.version>
         <java.version>17</java.version>

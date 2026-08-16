@@ -19,9 +19,11 @@
 
 | 项 | 本项目 | 与官方基线一致性 |
 |---|---|---|
-| Javalin | 7.2.2 | ✅ Java 17 基线（全仓 `<java.version>17</java.version>`） |
-| Jetty（web 模块透传） | 12.1.12 | ✅ 由 `io.javalin:javalin:7.2.2` 传递，版本统一 |
-| Jetty（qrcode 模块） | ~~显式 pin 12.1.5~~ → 已删除，统一透传 12.1.12 | ✅ 修复了同模块 12.1.5/12.1.12 混版本 |
+| Javalin | **6.7.0**（已迁移，feature/6.7.x） | ✅ Java 11+ 基线（全仓 `<java.version>17</java.version>`，兼容） |
+| Jetty（web 模块透传） | 11.x（由 `io.javalin:javalin:6.7.0` 传递） | ✅ 由 Javalin 6.7.0 传递，版本统一 |
+| Jetty（qrcode 模块） | 统一透传 Javalin 6.7.0 传递版本 | ✅ 无显式 pin |
+| ddd4j web 适配 | `ddd4j-web-javalin6`（applyTo 契约） | ✅ 核心侧双轨模块，公开签名超集 |
+| 迁移状态 | **已迁移**（Javalin 6.7.0 + ddd4j-web-javalin6 + applyTo 契约） | 6.7.x 行已解阻塞 |
 
 ## 维护规则（强约束）
 

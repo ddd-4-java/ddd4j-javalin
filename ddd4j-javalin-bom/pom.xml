@@ -76,7 +76,7 @@
             </dependency>
             <dependency>
                 <groupId>io.ddd4j</groupId>
-                <artifactId>ddd4j-web-javalin</artifactId>
+                <artifactId>ddd4j-web-javalin6</artifactId>
                 <version>${ddd4j.version}</version>
             </dependency>
             <!-- Javalin auth -->

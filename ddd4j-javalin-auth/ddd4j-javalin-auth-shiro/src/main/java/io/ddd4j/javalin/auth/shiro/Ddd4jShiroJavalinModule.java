@@ -44,7 +44,7 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
     /**
      * 注册 Javalin 异常处理器：统一 Shiro 鉴权异常响应（对标 Spring @ControllerAdvice ShiroExceptionHandler）。
      *
-     * <p>Javalin 7.x 异常处理 API：{@code app.unsafe.routes.exception(Class, ExceptionHandler)}。
+     * <p>Javalin 6.x 异常处理 API：{@code app.exception(Class, ExceptionHandler)}。
      * 覆盖三类异常（对齐 Spring 的 ShiroExceptionHandler）：
      * <ul>
      *   <li>401：未认证（AuthenticationException / UnknownAccountException / IncorrectCredentialsException）</li>
@@ -55,10 +55,10 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
      * @param app Javalin 应用实例（需在 start 前调用）
      */
     public static void registerExceptionHandler(Javalin app) {
-        app.unsafe.routes.exception(org.apache.shiro.authc.AuthenticationException.class, (exception, ctx) ->
+        app.exception(org.apache.shiro.authc.AuthenticationException.class, (exception, ctx) ->
                 ctx.status(401).json("{\"code\":\"NOT_AUTHENTICATED\",\"message\":\""
                         + exception.getMessage() + "\"}"));
-        app.unsafe.routes.exception(UnauthorizedException.class, (exception, ctx) ->
+        app.exception(UnauthorizedException.class, (exception, ctx) ->
                 ctx.status(403).json("{\"code\":\"UNAUTHORIZED\",\"message\":\""
                         + exception.getMessage() + "\"}"));
     }

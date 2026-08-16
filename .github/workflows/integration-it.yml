@@ -1,4 +1,4 @@
-# Integration Tests for ddd4j-javalin MQ brokers (feature/6.3.x)
+# Integration Tests for ddd4j-javalin MQ brokers (feature/6.7.x)
 #
 # Each broker runs in an independent matrix job to avoid container OOM on a
 # single machine (lesson: running multiple Testcontainers brokers in parallel
@@ -19,7 +19,7 @@ name: Integration Tests
 on:
   workflow_dispatch:
   push:
-    branches: [feature/6.3.x]
+    branches: [feature/6.7.x]
     paths:
       - '.github/workflows/integration-it.yml'
   schedule:

@@ -69,6 +69,7 @@ public final class Ddd4jJavalinApplication {
 
         Ddd4jJavalinWeb web = injector.getInstance(Ddd4jJavalinWeb.class);
         Javalin app = Javalin.create((JavalinConfig config) -> web.configure(config));
+        web.applyTo(app);
         applyHealthEndpoint(app, properties);
         app.start(properties.getHost(), properties.getPort());
 
@@ -129,9 +130,9 @@ public final class Ddd4jJavalinApplication {
 
     private static void applyHealthEndpoint(Javalin app, Ddd4jJavalinProperties properties) {
         if (properties.isHealthEndpoint()) {
-            app.unsafe.routes.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
-            app.unsafe.routes.get("/health/readiness", ctx -> ctx.json("{\"status\":\"READY\"}"));
-            app.unsafe.routes.get("/health/liveness", ctx -> ctx.json("{\"status\":\"LIVE\"}"));
+            app.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
+            app.get("/health/readiness", ctx -> ctx.json("{\"status\":\"READY\"}"));
+            app.get("/health/liveness", ctx -> ctx.json("{\"status\":\"LIVE\"}"));
         }
     }
 }

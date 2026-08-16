@@ -16,7 +16,7 @@
         ddd4j-javalin Web 启动入口（对标 ddd4j-boot-web-webmvc / ddd4j-boot-web-webflux）：
 
         - Ddd4jJavalinProperties：ddd4j.web.javalin.* 配置 POJO
-        - Ddd4jJavalinAutoConfiguration：Guice Module，装配 ddd4j-web-javalin 的 Ddd4jJavalinWeb
+        - Ddd4jJavalinAutoConfiguration：Guice Module，装配 ddd4j-web-javalin6 的 Ddd4jJavalinWeb
         - Ddd4jJavalinApplication：静态 run(...) 一键启动入口
         - JavalinTestFixture：测试基类，app.start(0) + HttpClient round-trip
 
@@ -24,10 +24,10 @@
     </description>
 
     <dependencies>
-        <!-- ddd4j web 适配（Javalin 7） -->
+        <!-- ddd4j web 适配（Javalin 6，applyTo 契约） -->
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-web-javalin</artifactId>
+            <artifactId>ddd4j-web-javalin6</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
         <!-- ddd4j runtime guice（提供 Ddd4jGuiceModule） -->

@@ -9,7 +9,7 @@
     <parent>
         <groupId>io.ddd4j</groupId>
         <artifactId>ddd4j-parent</artifactId>
-        <version>2.0.x.20260630-SNAPSHOT</version>
+        <version>3.0.x.20260630-SNAPSHOT</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -38,7 +38,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <revision>7.2.x-SNAPSHOT</revision>
-        <ddd4j.version>2.0.x.20260630-SNAPSHOT</ddd4j.version>
+        <ddd4j.version>3.0.x.20260630-SNAPSHOT</ddd4j.version>
         <ddd4j-javalin.version>${revision}</ddd4j-javalin.version>
         <java.version>17</java.version>
         <!-- JaCoCo：quality profile 激活时经 jacoco.agent.argLine 拼入 surefire argLine

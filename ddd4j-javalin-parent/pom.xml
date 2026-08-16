@@ -18,6 +18,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- Quality gate plugin versions -->
+        <jacoco.version>0.8.12</jacoco.version>
+        <spotbugs.version>4.8.6.6</spotbugs.version>
+        <dependency-check.version>10.0.4</dependency-check.version>
+        <!-- Release profile plugin versions (override parent for newer releases) -->
+        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+        <gpg.skip>true</gpg.skip>
+        <!-- Default empty argLine so JaCoCo prepare-agent can inject its agent arg -->
+        <argLine></argLine>
     </properties>
 
     <dependencyManagement>
@@ -53,7 +63,7 @@
                     <configuration>
                         <skip>true</skip>
                         <skipTests>true</skipTests>
-                        <argLine>-Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                        <argLine>${jacoco.agent.argLine} -Xmx1024m -Dfile.encoding=UTF-8</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -163,7 +173,8 @@
                         <configuration>
                             <skip>false</skip>
                             <skipTests>false</skipTests>
-                            <argLine>-Xmx2048m -Dfile.encoding=UTF-8</argLine>
+                            <!-- jacoco.agent.argLine 由根聚合 pom quality-jacoco-agent profile 注入（默认空串） -->
+                            <argLine>${jacoco.agent.argLine} -Xmx2048m -Dfile.encoding=UTF-8</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -177,6 +188,156 @@
                                 <goals>
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- ================================================================== -->
+        <!-- Quality gate: JaCoCo + SpotBugs + OWASP dependency-check           -->
+        <!-- Activate: mvn -Pquality ...                                        -->
+        <!-- ================================================================== -->
+        <profile>
+            <id>quality</id>
+            <build>
+                <plugins>
+                    <!-- surefire argLine 注入移至根聚合 pom quality-jacoco-agent profile（property 拼接） -->
+
+                    <!-- JaCoCo code coverage:
+                         - prepare-agent bound to initialize (injects agent into ${argLine})
+                         - report bound to verify (generates HTML/XML/CSV reports)
+                         - No coverage check thresholds yet; 阈值待基线后启用 -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- SpotBugs static analysis:
+                         - effort Max, threshold Low for thorough analysis
+                         - check goal bound to verify phase
+                         - failOnError=false so build never fails on findings
+                         - 阈值待基线后启用，当前不阻断构建 -->
+                    <!-- SpotBugs static analysis:
+                         - effort Max, threshold Low, failOnError=false
+                         - 不绑定 verify：SpotBugs 4.8.6 对本项目部分字节码分析崩溃
+                           （ClassInfoAnalysisEngine，环境性），崩溃会中断 verify 流程
+                         - 手动执行：mvn -Pquality -pl <module> spotbugs:check -->
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <version>${spotbugs.version}</version>
+                        <configuration>
+                            <effort>Max</effort>
+                            <threshold>Low</threshold>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </plugin>
+
+                    <!-- OWASP dependency-check:
+                         - failBuildOnCVSS=11 means never fail (max CVSS is 10.0)
+                         - NVD_API_KEY env var optional but recommended (avoids rate limits)
+                         - Generates HTML + JSON reports
+                         - 插件较慢，建议 -pl 单模块使用，例如:
+                           mvn -Pquality -pl ddd4j-javalin-web verify -->
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <version>${dependency-check.version}</version>
+                        <configuration>
+                            <failBuildOnCVSS>11</failBuildOnCVSS>
+                            <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
+                            <formats>
+                                <format>HTML</format>
+                                <format>JSON</format>
+                            </formats>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>dependency-check</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- ================================================================== -->
+        <!-- Release profile: sources + javadoc + GPG signing                   -->
+        <!-- Activate: mvn -Prelease ...                                        -->
+        <!-- GPG signing skipped by default; pass -Dgpg.skip=false to enable    -->
+        <!-- ================================================================== -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven-source-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <configuration>
+                            <skip>${gpg.skip}</skip>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
                                 </goals>
                             </execution>
                         </executions>

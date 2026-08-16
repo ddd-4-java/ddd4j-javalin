@@ -2,7 +2,6 @@ package io.ddd4j.javalin.data.logs;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import io.ddd4j.data.logs.ApiOperationLogProvider;
 import io.ddd4j.data.logs.DefaultApiOperationLogProvider;
 import io.ddd4j.data.logs.aspect.ApiOperationLogAspect;
@@ -37,9 +36,9 @@ class Ddd4jApiLogJavalinModuleTest {
                     @Override
                     protected void configure() {
                         bind(ApiOperationLogProvider.class).toInstance(custom);
-                        bind(ApiOperationLogAspect.class).in(Singleton.class);
                     }
                 });
         assertThat(injector.getInstance(ApiOperationLogProvider.class)).isSameAs(custom);
+        assertThat(injector.getInstance(ApiOperationLogAspect.class)).isNotNull();
     }
 }

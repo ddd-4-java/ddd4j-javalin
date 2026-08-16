@@ -1,0 +1,100 @@
+# Integration Tests for ddd4j-javalin MQ brokers (feature/6.3.x)
+#
+# Each broker runs in an independent matrix job to avoid container OOM on a
+# single machine (lesson: running multiple Testcontainers brokers in parallel
+# causes OOM). Slowest brokers: Kafka ~5 min, SQS ~3 min.
+#
+# Excluded (all @Disabled in source, will not execute):
+#   - ddd4j-javalin-mq-mqtt-mica  (Ddd4jMicaMqttMqIT  @Disabled)
+#   - ddd4j-javalin-mq-ons        (Ddd4jOnsMqIT        @Disabled)
+#   - ddd4j-javalin-mq-tdmq       (Ddd4jTdmqMqIT       @Disabled)
+#
+# Triggered by:
+#   - workflow_dispatch (manual)
+#   - push that changes this workflow file itself
+#   - weekly schedule (Monday 02:00 UTC)
+
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/6.3.x]
+    paths:
+      - '.github/workflows/integration-it.yml'
+  schedule:
+    # Weekly on Monday at 02:00 UTC
+    - cron: '0 2 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: it-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration-test:
+    name: "IT: ${{ matrix.broker }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Each broker is an independent job — avoids container OOM from parallel brokers
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - broker: rocketmq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-rocketmq
+          - broker: kafka
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-kafka
+          - broker: activemq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-activemq
+          - broker: pulsar
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-pulsar
+          - broker: rabbitmq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-rabbitmq
+          - broker: nats
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-nats
+          - broker: sqs
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-sqs
+          - broker: redis-stream
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-redis-stream
+          - broker: mqtt
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt
+          - broker: order-outbox
+            module: ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox
+
+    steps:
+      # ── 1. Checkout ddd4j-javalin ──────────────────────────────────────
+      - name: Checkout ddd4j-javalin
+        uses: actions/checkout@v4
+
+      # ── 2. Checkout ddd4j core (private SNAPSHOT dependency) ──────────
+      - name: Checkout ddd4j core
+        uses: actions/checkout@v4
+        with:
+          repository: ddd-4-java/ddd4j
+          ref: feature/1.0.x
+          path: ddd4j-core
+
+      # ── 3. Setup JDK 17 + Maven cache ─────────────────────────────────
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      # ── 4. Install ddd4j core SNAPSHOT into local repo ────────────────
+      - name: Install ddd4j core SNAPSHOT
+        run: mvn -B -T 1C -f ddd4j-core/pom.xml install -DskipTests -Dmaven.test.skip=true
+
+      # ── 5. Run integration tests for this broker ──────────────────────
+      # ubuntu-latest has Docker pre-installed; Testcontainers works out of
+      # the box. -am builds required upstream modules (core, parent, etc.)
+      - name: "Run IT: ${{ matrix.broker }}"
+        run: >-
+          mvn -B verify
+          -Pjavalin-integration-tests
+          -pl ${{ matrix.module }}
+          -am

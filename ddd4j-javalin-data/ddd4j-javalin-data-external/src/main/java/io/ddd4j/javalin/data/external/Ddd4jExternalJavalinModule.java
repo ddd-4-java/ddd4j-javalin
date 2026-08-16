@@ -21,8 +21,7 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(ExternalProperties.class).in(Singleton.class);
-        bind(SequenceProperties.class).in(Singleton.class);
+        // Bindings provided by @Provides methods below
     }
 
     @Provides

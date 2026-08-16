@@ -101,3 +101,5 @@ docs/superpowers/
 | spec | [2026-08-04-container-it-roundspec-design.md](specs/2026-08-04-container-it-roundspec-design.md) | 容器级 IT 真实 round-trip 修复 |
 | plan | [2026-07-29-javalin-capability-matrix.md](plans/2026-07-29-javalin-capability-matrix.md) | 10 Task 实施计划 + 验收记录 |
 | report | [2026-08-05-status.md](reports/2026-08-05-status.md) | 当前真实状态 |
+| spec | [2026-08-16-production-readiness-design.md](specs/2026-08-16-production-readiness-design.md) | 生产就绪改进设计 |
+| plan | [2026-08-16-production-readiness.md](plans/2026-08-16-production-readiness.md) | 生产就绪实施计划 |

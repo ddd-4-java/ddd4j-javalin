@@ -41,6 +41,10 @@
         <ddd4j.version>2.0.x.20260630-SNAPSHOT</ddd4j.version>
         <ddd4j-javalin.version>${revision}</ddd4j-javalin.version>
         <java.version>17</java.version>
+        <!-- JaCoCo：quality profile 激活时经 jacoco.agent.argLine 拼入 surefire argLine
+             （继承链存在字面量 argLine，configuration 合并不可靠，property 拼接 100% 生效） -->
+        <jacoco.version>0.8.12</jacoco.version>
+        <jacoco.agent.argLine></jacoco.agent.argLine>
         <!-- Maven Plugin versions -->
         <maven.version>3.6.3</maven.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -348,7 +352,7 @@
                         <configuration>
                             <skip>false</skip>
                             <skipTests>false</skipTests>
-                            <argLine>-Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                            <argLine>${jacoco.agent.argLine} -Xmx1024m -Dfile.encoding=UTF-8</argLine>
                             <includes>
                                 <include>**/*Test.java</include>
                             </includes>
@@ -380,6 +384,23 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>quality-jacoco-agent</id>
+            <!-- 与 -Pquality 组合使用：注入 JaCoCo agent 到 surefire（经 property 拼接）。
+                 单独激活无副作用；agent 依赖声明保证 CI 首跑即下载 runtime jar。 -->
+            <properties>
+                <jacoco.agent.argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</jacoco.agent.argLine>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>org.jacoco.agent</artifactId>
+                    <version>${jacoco.version}</version>
+                    <classifier>runtime</classifier>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>disable-javadoc-doclint</id>

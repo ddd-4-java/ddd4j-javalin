@@ -1,6 +1,8 @@
 package io.ddd4j.javalin.data.logs;
 
+import cn.hutool.core.lang.Snowflake;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.data.logs.ApiOperationLogProvider;
 import io.ddd4j.data.logs.DefaultApiOperationLogProvider;
@@ -23,6 +25,17 @@ public class Ddd4jApiLogJavalinModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ApiOperationLogProvider.class).to(DefaultApiOperationLogProvider.class).in(Singleton.class);
-        bind(ApiOperationLogAspect.class).in(Singleton.class);
+    }
+
+    @Provides
+    @Singleton
+    Snowflake snowflake() {
+        return new Snowflake();
+    }
+
+    @Provides
+    @Singleton
+    ApiOperationLogAspect apiOperationLogAspect(Snowflake snowflake, ApiOperationLogProvider logProvider) {
+        return new ApiOperationLogAspect(snowflake, logProvider);
     }
 }

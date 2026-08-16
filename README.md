@@ -138,6 +138,24 @@ class MyIT extends JavalinTestFixture {
 - **6.3.x 轨**(本仓库)— 框架集成层,正在追赶 [`ddd4j-boot`](../ddd4j-boot) 的能力矩阵
 - 当前快照:`1.0.x.20260630-SNAPSHOT` / `ddd4j 2.0.x` / Java 17
 
+## 生产就绪状态
+
+当前阶段：**internal beta**（功能完成、56 模块单测全绿、10 个容器级 IT 中 9 个真实 round-trip 通过）。
+
+2026-08-16 实施了三项生产就绪改进：
+
+| 改进项 | 说明 | 状态 |
+|--------|------|------|
+| **CI workflows** | GitHub Actions 自动化 build + test + quality | 已实施（待推送验证） |
+| **Quality profile** | Jacoco 覆盖率（骨架就位，agent 注入点待修）+ OWASP 漏洞扫描 + SpotBugs 手动分析 | 部分实施 |
+| **Release profile + 文档** | GPG 签名发布配置 + 发布工程演练手册 | 已实施 |
+
+**剩余阻塞项**（首个正式版发布前必须解决）：
+1. 核心依赖 SNAPSHOT 收敛：`ddd4j-parent:2.0.x.*` 需先发布正式版
+2. 核心仓库远端分叉裁决：`feature/1.0.x` 的 javax/jakarta 方向冲突待用户决策
+
+详见 [RELEASE.md](RELEASE.md) 和 [生产就绪设计文档](docs/superpowers/specs/2026-08-16-production-readiness-design.md)。
+
 ## 详细文档
 
 - [docs/architecture.md](docs/architecture.md) — 架构与模块关系

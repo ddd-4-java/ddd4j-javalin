@@ -12,7 +12,7 @@
 
 ```bash
 # 启动 RabbitMQ（使用 Docker）
-docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13.7-management-alpine
 
 # 管理界面：http://localhost:15672（guest/guest）
 

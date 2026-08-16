@@ -55,3 +55,18 @@ Ddd4jJavalinAutoConfiguration config = new Ddd4jJavalinAutoConfiguration(propert
     }
 };
 ```
+
+## 聚合装配入口（ddd4j-javalin-core）
+
+对标 `ddd4j-boot-core` 的统一入口，`ddd4j-javalin-core` 提供 `Ddd4jCoreGuiceModule`（`ddd4j.core.*` 配置）+ `Ddd4jCoreAutoConfiguration`（静态 `install(Injector)` 注册投影 SPI），可将 web/data/auth/mq 各 Module 聚合到单一 Injector：
+
+```java
+Injector injector = Guice.createInjector(
+        new Ddd4jCoreGuiceModule(coreProperties),   // 聚合装配
+        new Ddd4jJavalinAutoConfiguration(webProperties),
+        new Ddd4jSaTokenJavalinModule(),
+        new Ddd4jMybatisJavalinModule(dataSource));
+Ddd4jCoreAutoConfiguration.install(injector);       // 注册投影 SPI
+```
+
+详见 [`docs/superpowers/specs/2026-07-29-javalin-capability-matrix-design.md`](superpowers/specs/2026-07-29-javalin-capability-matrix-design.md)。

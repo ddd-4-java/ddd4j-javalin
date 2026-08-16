@@ -10,6 +10,11 @@
                       │ depends on
 ┌─────────────────────▼───────────────────────────────────────┐
 │           ddd4j-javalin-* 适配层 (本仓库)                   │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ ddd4j-javalin-core (聚合装配)                        │  │
+│  │ Ddd4jCoreGuiceModule + Ddd4jCoreAutoConfiguration    │  │
+│  │ 对标 ddd4j-boot-core 统一入口                        │  │
+│  └──────────────────────────────────────────────────────┘  │
 │  ┌─────────┬─────────┬─────────┬──────────┬──────────────┐  │
 │  │  web    │  data   │  auth   │   mq     │ extensions   │  │
 │  │ Ddd4j   │ mybatis │ satoken │ 14broker │ qrcode       │  │

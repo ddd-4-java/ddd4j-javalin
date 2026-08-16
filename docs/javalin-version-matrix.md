@@ -22,7 +22,7 @@
 | 活跃分支线 | ddd4j-javalin 版本 | Javalin 库 | ddd4j 核心 | 定位 |
 |---|---|---|---|---|
 | `feature/7.2.x` | `7.2.x-SNAPSHOT` | 7.2.3 | feature/3.0.x | **主战线**：承接全部最新成果（unsafe.routes API 形态） |
-| `feature/6.7.x` | `6.7.x-SNAPSHOT` | 6.7.0 | feature/2.0.x | ⚠️ 阻塞（见下「6.7.x 线可行性探测」）：本地分支已建未推送，待路径决策 |
+| `feature/6.7.x` | `6.7.x-SNAPSHOT` | 6.7.0 | feature/2.0.x | ⚠️ 分支已就位（由 feature/6.3.x 改名，双 remote 已同步）；降级受核心阻塞（见下），待 B/C 路径决策。分支内容暂为 7 形态成果 |
 
 **JDK 17 统一最低基线**（两线同规）：
 - 运行/CI/工具链统一 JDK 17；不做 JDK 8 兼容（Javalin 5.0 起已出局）。

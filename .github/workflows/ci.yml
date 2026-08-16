@@ -1,4 +1,4 @@
-# CI: Unit tests & package verification for ddd4j-javalin (feature/6.3.x)
+# CI: Unit tests & package verification for ddd4j-javalin (feature/7.2.x)
 #
 # Design notes:
 # - ddd4j core dependency (io.ddd4j:ddd4j-*:2.0.x.20260630-SNAPSHOT) is NOT in any
@@ -13,9 +13,9 @@ name: CI
 
 on:
   push:
-    branches: [feature/6.3.x]
+    branches: [feature/7.2.x]
   pull_request:
-    branches: [feature/6.3.x]
+    branches: [feature/7.2.x]
 
 permissions:
   contents: read

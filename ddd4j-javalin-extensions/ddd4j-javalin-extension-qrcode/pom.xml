@@ -27,17 +27,6 @@
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
         </dependency>
-        <!-- ddd4j-dependencies still pins two Jetty artifacts to 9.4; Javalin 7 requires Jetty 12. -->
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>12.1.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <version>12.1.5</version>
-        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

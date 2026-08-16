@@ -159,6 +159,7 @@ class MyIT extends JavalinTestFixture {
 ## 详细文档
 
 - [docs/architecture.md](docs/architecture.md) — 架构与模块关系
+- [docs/javalin-version-matrix.md](docs/javalin-version-matrix.md) — Javalin 版本 × JDK 基线矩阵（选型依据与维护规则）
 - [docs/javalin-flow.md](docs/javalin-flow.md) — 请求生命周期
 - [docs/testcontainers-guide.md](docs/testcontainers-guide.md) — 集成测试镜像与等待策略
 

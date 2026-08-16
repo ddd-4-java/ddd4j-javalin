@@ -111,7 +111,7 @@
             <!-- ddd4j web 适配（Javalin 6）— 双轨模块，applyTo 契约 -->
             <dependency>
                 <groupId>io.ddd4j</groupId>
-                <artifactId>ddd4j-web-javalin6</artifactId>
+                <artifactId>ddd4j-web-javalin</artifactId>
                 <version>${ddd4j.version}</version>
             </dependency>
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
     <parent>
         <groupId>io.ddd4j.javalin</groupId>
         <artifactId>ddd4j-javalin-dependencies</artifactId>
@@ -14,15 +14,15 @@
     <packaging>pom</packaging>
     <description>Ddd4j Javalin 跨领域扩展聚合：对齐 ddd4j-boot-extensions，复用 ddd4j-extensions 通用实现。</description>
 
-    <modules>
-        <module>ddd4j-javalin-extension-akka</module>
-        <module>ddd4j-javalin-extension-excel</module>
-        <module>ddd4j-javalin-extension-jackson</module>
-        <module>ddd4j-javalin-extension-monitor</module>
-        <module>ddd4j-javalin-extension-pf4j</module>
-        <module>ddd4j-javalin-extension-qlexpress</module>
-        <module>ddd4j-javalin-extension-qrcode</module>
-        <module>ddd4j-javalin-extension-validation</module>
-    </modules>
+    <subprojects>
+        <subproject>ddd4j-javalin-extension-akka</subproject>
+        <subproject>ddd4j-javalin-extension-excel</subproject>
+        <subproject>ddd4j-javalin-extension-jackson</subproject>
+        <subproject>ddd4j-javalin-extension-monitor</subproject>
+        <subproject>ddd4j-javalin-extension-pf4j</subproject>
+        <subproject>ddd4j-javalin-extension-qlexpress</subproject>
+        <subproject>ddd4j-javalin-extension-qrcode</subproject>
+        <subproject>ddd4j-javalin-extension-validation</subproject>
+    </subprojects>
 
 </project>

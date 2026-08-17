@@ -1,6 +1,6 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.1.0</modelVersion>
 
     <parent>
         <groupId>io.ddd4j.javalin</groupId>
@@ -18,17 +18,17 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
-    <modules>
+    <subprojects>
         <!-- Auth 鉴权示例：演示 SubjectKit 统一鉴权入口（Javalin 编程式路由 + Guice）。
              原有的 sample-druid（io.javalin.sample 独立体系 + 不完整 JOOQ 生成代码 +
              引用已铲除的平行宇宙包）已移除，避免维护与 ddd4j 适配无关的腐烂示例。 -->
-        <module>ddd4j-javalin-sample-auth-satoken</module>
-        <module>ddd4j-javalin-sample-auth-security</module>
-        <module>ddd4j-javalin-sample-auth-shiro</module>
-        <module>ddd4j-javalin-sample-cqrs-person</module>
-        <module>ddd4j-javalin-sample-rich-model</module>
-        <module>ddd4j-javalin-sample-mybatis-testcontainers</module>
-        <module>ddd4j-javalin-sample-order-outbox</module>
-    </modules>
+        <subproject>ddd4j-javalin-sample-auth-satoken</subproject>
+        <subproject>ddd4j-javalin-sample-auth-security</subproject>
+        <subproject>ddd4j-javalin-sample-auth-shiro</subproject>
+        <subproject>ddd4j-javalin-sample-cqrs-person</subproject>
+        <subproject>ddd4j-javalin-sample-rich-model</subproject>
+        <subproject>ddd4j-javalin-sample-mybatis-testcontainers</subproject>
+        <subproject>ddd4j-javalin-sample-order-outbox</subproject>
+    </subprojects>
 
 </project>

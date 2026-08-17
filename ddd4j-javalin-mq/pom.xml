@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.1.0</modelVersion>
     <parent>
         <groupId>io.ddd4j.javalin</groupId>
         <artifactId>ddd4j-javalin-dependencies</artifactId>
@@ -28,21 +28,21 @@
         </dependency>
     </dependencies>
 
-    <modules>
-        <module>ddd4j-javalin-mq-core</module>
-        <module>ddd4j-javalin-mq-disruptor</module>
-        <module>ddd4j-javalin-mq-sqs</module>
-        <module>ddd4j-javalin-mq-nats</module>
-        <module>ddd4j-javalin-mq-ons</module>
-        <module>ddd4j-javalin-mq-kafka</module>
-        <module>ddd4j-javalin-mq-rocketmq</module>
-        <module>ddd4j-javalin-mq-rabbitmq</module>
-        <module>ddd4j-javalin-mq-activemq</module>
-        <module>ddd4j-javalin-mq-pulsar</module>
-        <module>ddd4j-javalin-mq-redis-stream</module>
-        <module>ddd4j-javalin-mq-mqtt</module>
-        <module>ddd4j-javalin-mq-mqtt-mica</module>
-        <module>ddd4j-javalin-mq-tdmq</module>
-    </modules>
+    <subprojects>
+        <subproject>ddd4j-javalin-mq-core</subproject>
+        <subproject>ddd4j-javalin-mq-disruptor</subproject>
+        <subproject>ddd4j-javalin-mq-sqs</subproject>
+        <subproject>ddd4j-javalin-mq-nats</subproject>
+        <subproject>ddd4j-javalin-mq-ons</subproject>
+        <subproject>ddd4j-javalin-mq-kafka</subproject>
+        <subproject>ddd4j-javalin-mq-rocketmq</subproject>
+        <subproject>ddd4j-javalin-mq-rabbitmq</subproject>
+        <subproject>ddd4j-javalin-mq-activemq</subproject>
+        <subproject>ddd4j-javalin-mq-pulsar</subproject>
+        <subproject>ddd4j-javalin-mq-redis-stream</subproject>
+        <subproject>ddd4j-javalin-mq-mqtt</subproject>
+        <subproject>ddd4j-javalin-mq-mqtt-mica</subproject>
+        <subproject>ddd4j-javalin-mq-tdmq</subproject>
+    </subprojects>
 
 </project>

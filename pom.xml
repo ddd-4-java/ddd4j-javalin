@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
     <!-- POM的模型版本 -->
-    <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.1.0</modelVersion>
 
     <!-- Inherit defaults from Ddd4j 2.0.x -->
     <parent>
@@ -18,26 +18,49 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>ddd4j-javalin-bom</module>
-        <module>ddd4j-javalin-dependencies</module>
-        <module>ddd4j-javalin-ddd</module>
-        <module>ddd4j-javalin-core</module>
-        <module>ddd4j-javalin-web</module>
-        <module>ddd4j-javalin-testcontainers</module>
-        <module>ddd4j-javalin-cache</module>
-        <module>ddd4j-javalin-data</module>
-        <module>ddd4j-javalin-auth</module>
-        <module>ddd4j-javalin-mq</module>
-        <module>ddd4j-javalin-extensions</module>
-        <module>ddd4j-javalin-parent</module>
-        <module>ddd4j-javalin-samples</module>
-    </modules>
+        <distributionManagement>
+        <repository>
+            <id>2624322-release-6F6h6R</id>
+            <url>https://packages.aliyun.com/6927b116e6c3e0425dbdf60d/maven/2624322-release-6f6h6r</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <snapshotRepository>
+            <id>2624322-snapshot-3EoOv3</id>
+            <url>https://packages.aliyun.com/6927b116e6c3e0425dbdf60d/maven/2624322-snapshot-3eoov3</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <subprojects>
+        <subproject>ddd4j-javalin-bom</subproject>
+        <subproject>ddd4j-javalin-dependencies</subproject>
+        <subproject>ddd4j-javalin-ddd</subproject>
+        <subproject>ddd4j-javalin-core</subproject>
+        <subproject>ddd4j-javalin-web</subproject>
+        <subproject>ddd4j-javalin-testcontainers</subproject>
+        <subproject>ddd4j-javalin-cache</subproject>
+        <subproject>ddd4j-javalin-data</subproject>
+        <subproject>ddd4j-javalin-auth</subproject>
+        <subproject>ddd4j-javalin-mq</subproject>
+        <subproject>ddd4j-javalin-extensions</subproject>
+        <subproject>ddd4j-javalin-parent</subproject>
+        <subproject>ddd4j-javalin-samples</subproject>
+    </subprojects>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <revision>7.2.x-SNAPSHOT</revision>
+        <revision>7.2.x.20260630-SNAPSHOT</revision>
         <ddd4j.version>3.0.x.20260630-SNAPSHOT</ddd4j.version>
         <ddd4j-javalin.version>${revision}</ddd4j-javalin.version>
         <java.version>17</java.version>

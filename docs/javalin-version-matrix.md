@@ -69,3 +69,17 @@
 - [Javalin 6.0.0 稳定版公告](https://javalin.io/news/javalin-6.0.0-stable.html)
 - [Javalin v6 归档文档](https://javalin.io/archive/docs/v6.X.html)
 - [6→7 迁移指南](https://javalin.io/migration-guide-javalin-6-to-7) / [5→6 迁移指南](https://javalin.io/migration-guide-javalin-5-to-6)
+
+
+## 工具链基线（2026-08-16 调查）
+
+| 维度 | 当前状态 |
+|---|---|
+| Maven | 3.9.16（CI 与本地） |
+| modelVersion | javalin 全仓 + 核心 1.0.x/2.0.x 子 pom 均 4.0.0；核心 2.0.x 的 web-javalin 与 3.0.x 根 pom 4.1.0 |
+| `<module>`/`<subproject>` 兼容性 | javalin 全仓用 `<module>`（Maven 3 形态）；核心 3.0.x 根 pom 已用 `<subprojects>`（Maven 4 形态） |
+
+**决策**：按"已主动声明 Maven 4 的 pom 才同步改 `<module>`→`<subproject>`"原则，本轮**零代码变更**（核心 3.0.x 已是正确形态，core 2.0.x 的 web-javalin 无 reactor 子模块不需要 `<modules>`，javalin 全仓仍以 Maven 3 为目标）。
+
+升级到 Maven 4 时需另开专项全量重构（涉及 javalin 6 个父 pom + core 87 个 4.0.0 pom）。
+

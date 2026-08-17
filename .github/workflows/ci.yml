@@ -2,8 +2,8 @@
 #
 # Design notes:
 # - ddd4j core dependency (io.ddd4j:ddd4j-*:2.0.x.20260630-SNAPSHOT) is NOT in any
-#   public Maven repository. We checkout ddd-4-java/ddd4j (feature/1.0.x) and
-#   install it into the local Maven cache before building this repo.
+#   public Maven repository; they resolve from the Aliyun private Maven repo,
+#   credentials/settings from the ddd-4-java org secret MAVEN_SETTINGS_XML.
 # - Root pom.xml has surefire <skip>true</skip> by default. We override with
 #   -DskipTests=false -Dsurefire.skip=false to actually run unit tests.
 # - The javalin-integration-tests profile is NOT activated here; only *Test.java
@@ -35,14 +35,6 @@ jobs:
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
 
-      # ── 2. Checkout ddd4j core (private SNAPSHOT dependency) ──────────
-      - name: Checkout ddd4j core
-        uses: actions/checkout@v4
-        with:
-          repository: ddd-4-java/ddd4j
-          ref: feature/1.0.x
-          path: ddd4j-core
-
       # ── 3. Setup JDK 17 + Maven cache ─────────────────────────────────
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -51,13 +43,17 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # ── 4. Install ddd4j core SNAPSHOT into local repo ────────────────
-      # Core repo is large; -T 1C parallelizes modules. -DskipTests avoids
-      # running core's own tests. If BOM/parent resolution fails, ensure the
-      # ddd4j-parent artifact is installed first (Maven reactor handles this
-      # automatically when building from the root pom).
-      - name: Install ddd4j core SNAPSHOT
-        run: mvn -B -T 1C -f ddd4j-core/pom.xml install -DskipTests -Dmaven.test.skip=true
+      # ── 4. Configure Maven settings (org secret) ─────────────────────
+      # ddd-4-java 组织 secret MAVEN_SETTINGS_XML：完整 settings.xml（阿里云私服
+      # 2624322-* 凭据 + 仓库）；secrets 不能用于 if 条件，经 env 传递判空
+      - name: Configure Maven settings (org secret)
+        env:
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        run: |
+          if [ -n "$MAVEN_SETTINGS_XML" ]; then
+            mkdir -p ~/.m2
+            printf '%s' "$MAVEN_SETTINGS_XML" > ~/.m2/settings.xml
+          fi
 
       # ── 5. Unit tests ─────────────────────────────────────────────────
       # Root pom disables surefire by default (<skip>true</skip>), so we

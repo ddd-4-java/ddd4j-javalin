@@ -69,25 +69,17 @@ jobs:
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
 
-      # ── 2. Checkout ddd4j core (private SNAPSHOT dependency) ──────────
-      - name: Checkout ddd4j core
-        uses: actions/checkout@v4
-        with:
-          repository: ddd-4-java/ddd4j
-          ref: feature/1.0.x
-          path: ddd4j-core
-
-      # ── 3. Setup JDK 17 + Maven cache ─────────────────────────────────
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
-
-      # ── 4. Install ddd4j core SNAPSHOT into local repo ────────────────
-      - name: Install ddd4j core SNAPSHOT
-        run: mvn -B -T 1C -f ddd4j-core/pom.xml install -DskipTests -Dmaven.test.skip=true
+      # ── 2. Configure Maven settings (org secret) ─────────────────────
+      # ddd-4-java 组织 secret MAVEN_SETTINGS_XML：完整 settings.xml（阿里云私服
+      # 2624322-* 凭据 + 仓库）；secrets 不能用于 if 条件，经 env 传递判空
+      - name: Configure Maven settings (org secret)
+        env:
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        run: |
+          if [ -n "$MAVEN_SETTINGS_XML" ]; then
+            mkdir -p ~/.m2
+            printf '%s' "$MAVEN_SETTINGS_XML" > ~/.m2/settings.xml
+          fi
 
       # ── 5. Run integration tests for this broker ──────────────────────
       # ubuntu-latest has Docker pre-installed; Testcontainers works out of

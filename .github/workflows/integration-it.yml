@@ -4,6 +4,10 @@
 # single machine (lesson: running multiple Testcontainers brokers in parallel
 # causes OOM). Slowest brokers: Kafka ~5 min, SQS ~3 min.
 #
+# This branch is Maven 4 (modelVersion 4.1.0 + <subprojects>): use ./mvnw
+# (wrapper pinned to apache-maven 4.0.0-rc-6). ddd4j core SNAPSHOTs resolve
+# from the Aliyun private repo via org secret MAVEN_SETTINGS_XML.
+#
 # Excluded (all @Disabled in source, will not execute):
 #   - ddd4j-javalin-mq-mqtt-mica  (Ddd4jMicaMqttMqIT  @Disabled)
 #   - ddd4j-javalin-mq-ons        (Ddd4jOnsMqIT        @Disabled)
@@ -69,15 +73,7 @@ jobs:
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
 
-      # ── 2. Checkout ddd4j core (private SNAPSHOT dependency) ──────────
-      - name: Checkout ddd4j core
-        uses: actions/checkout@v4
-        with:
-          repository: ddd-4-java/ddd4j
-          ref: feature/1.0.x
-          path: ddd4j-core
-
-      # ── 3. Setup JDK 17 + Maven cache ─────────────────────────────────
+      # ── 2. Setup JDK 17 + Maven cache ─────────────────────────────────
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -85,16 +81,18 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # ── 4. Install ddd4j core SNAPSHOT into local repo ────────────────
-      - name: Install ddd4j core SNAPSHOT
-        run: mvn -B -T 1C -f ddd4j-core/pom.xml install -DskipTests -Dmaven.test.skip=true
+      # ── 3. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
+      - name: Write Maven settings from org secret
+        run: |
+          mkdir -p "$HOME/.m2"
+          printf '%s' "${{ secrets.MAVEN_SETTINGS_XML }}" > "$HOME/.m2/settings.xml"
 
-      # ── 5. Run integration tests for this broker ──────────────────────
+      # ── 4. Run integration tests for this broker ──────────────────────
       # ubuntu-latest has Docker pre-installed; Testcontainers works out of
       # the box. -am builds required upstream modules (core, parent, etc.)
       - name: "Run IT: ${{ matrix.broker }}"
         run: >-
-          mvn -B verify
+          ./mvnw -B verify
           -Pjavalin-integration-tests
           -pl ${{ matrix.module }}
           -am

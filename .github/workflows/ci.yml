@@ -1,9 +1,11 @@
 # CI: Unit tests & package verification for ddd4j-javalin (feature/7.2.x)
 #
 # Design notes:
-# - ddd4j core dependency (io.ddd4j:ddd4j-*:2.0.x.20260630-SNAPSHOT) is NOT in any
-#   public Maven repository. We checkout ddd-4-java/ddd4j (feature/1.0.x) and
-#   install it into the local Maven cache before building this repo.
+# - This branch is Maven 4 (modelVersion 4.1.0 + <subprojects>): use ./mvnw
+#   (wrapper pinned to apache-maven 4.0.0-rc-6).
+# - ddd4j core dependencies (io.ddd4j:*:3.0.x.20260630-SNAPSHOT) resolve from
+#   the Aliyun private Maven repository; credentials/settings come from the
+#   org secret MAVEN_SETTINGS_XML (written to ~/.m2/settings.xml).
 # - Root pom.xml has surefire <skip>true</skip> by default. We override with
 #   -DskipTests=false -Dsurefire.skip=false to actually run unit tests.
 # - The javalin-integration-tests profile is NOT activated here; only *Test.java
@@ -35,15 +37,7 @@ jobs:
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
 
-      # ── 2. Checkout ddd4j core (private SNAPSHOT dependency) ──────────
-      - name: Checkout ddd4j core
-        uses: actions/checkout@v4
-        with:
-          repository: ddd-4-java/ddd4j
-          ref: feature/1.0.x
-          path: ddd4j-core
-
-      # ── 3. Setup JDK 17 + Maven cache ─────────────────────────────────
+      # ── 2. Setup JDK 17 + Maven cache ─────────────────────────────────
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -51,20 +45,20 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # ── 4. Install ddd4j core SNAPSHOT into local repo ────────────────
-      # Core repo is large; -T 1C parallelizes modules. -DskipTests avoids
-      # running core's own tests. If BOM/parent resolution fails, ensure the
-      # ddd4j-parent artifact is installed first (Maven reactor handles this
-      # automatically when building from the root pom).
-      - name: Install ddd4j core SNAPSHOT
-        run: mvn -B -T 1C -f ddd4j-core/pom.xml install -DskipTests -Dmaven.test.skip=true
+      # ── 3. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
+      # Contains the Aliyun packages repository + credentials needed to
+      # resolve io.ddd4j:* SNAPSHOT artifacts.
+      - name: Write Maven settings from org secret
+        run: |
+          mkdir -p "$HOME/.m2"
+          printf '%s' "${{ secrets.MAVEN_SETTINGS_XML }}" > "$HOME/.m2/settings.xml"
 
-      # ── 5. Unit tests ─────────────────────────────────────────────────
+      # ── 4. Unit tests (Maven 4 via wrapper) ───────────────────────────
       # Root pom disables surefire by default (<skip>true</skip>), so we
       # must explicitly re-enable it.
       - name: Run unit tests
-        run: mvn -B test -DskipTests=false -Dsurefire.skip=false
+        run: ./mvnw -B test -DskipTests=false -Dsurefire.skip=false
 
-      # ── 6. Package verification (no tests) ────────────────────────────
+      # ── 5. Package verification (no tests) ────────────────────────────
       - name: Verify packaging
-        run: mvn -B package -DskipTests -DskipITs
+        run: ./mvnw -B package -DskipTests -DskipITs

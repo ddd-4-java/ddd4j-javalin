@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>ddd4j-javalin-ddd</artifactId>
+    <packaging>pom</packaging>
     <description>
         ddd4j-javalin DDD 基础设施入口：对齐 ddd4j-boot-ddd，复用 ddd4j-core、ddd4j-runtime-guice 与 fuinorg DDD/CQRS 轨道。
     </description>

@@ -37,7 +37,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <revision>6.7.x-SNAPSHOT</revision>
+        <revision>6.7.x.20260630-SNAPSHOT</revision>
         <ddd4j.version>2.0.x.20260630-SNAPSHOT</ddd4j.version>
         <ddd4j-javalin.version>${revision}</ddd4j-javalin.version>
         <java.version>17</java.version>
@@ -71,6 +71,30 @@
         <maven-surefire-plugin.version>3.5.0</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>2624322-release-6F6h6R</id>
+            <url>https://packages.aliyun.com/6927b116e6c3e0425dbdf60d/maven/2624322-release-6f6h6r</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <snapshotRepository>
+            <id>2624322-snapshot-3EoOv3</id>
+            <url>https://packages.aliyun.com/6927b116e6c3e0425dbdf60d/maven/2624322-snapshot-3eoov3</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </snapshotRepository>
+    </distributionManagement>
+
 
     <!--开源协议采用Apache 2.0协议-->
     <licenses>

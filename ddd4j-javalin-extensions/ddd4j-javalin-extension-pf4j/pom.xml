@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>ddd4j-javalin-extension-pf4j</artifactId>
+    <packaging>pom</packaging>
     <description>Ddd4j Javalin PF4J extension：复用 ddd4j-extension-pf4j 通用实现。</description>
 
     <dependencies>

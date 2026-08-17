@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>ddd4j-javalin-extension-excel</artifactId>
+    <packaging>pom</packaging>
     <description>Ddd4j Javalin Excel extension：复用 ddd4j-extension-excel 通用实现。</description>
 
     <dependencies>

@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>ddd4j-javalin-extension-akka</artifactId>
+    <packaging>pom</packaging>
     <description>Ddd4j Javalin Akka extension：复用 ddd4j-extension-akka 通用实现。</description>
 
     <dependencies>

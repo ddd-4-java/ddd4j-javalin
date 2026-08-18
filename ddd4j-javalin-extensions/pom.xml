@@ -15,11 +15,8 @@
     <description>Ddd4j Javalin 跨领域扩展聚合：对齐 ddd4j-boot-extensions，复用 ddd4j-extensions 通用实现。</description>
 
     <subprojects>
-        <subproject>ddd4j-javalin-extension-akka</subproject>
         <subproject>ddd4j-javalin-extension-excel</subproject>
-        <subproject>ddd4j-javalin-extension-jackson</subproject>
         <subproject>ddd4j-javalin-extension-monitor</subproject>
-        <subproject>ddd4j-javalin-extension-pf4j</subproject>
         <subproject>ddd4j-javalin-extension-qlexpress</subproject>
         <subproject>ddd4j-javalin-extension-qrcode</subproject>
         <subproject>ddd4j-javalin-extension-validation</subproject>

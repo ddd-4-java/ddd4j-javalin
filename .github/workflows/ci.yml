@@ -85,11 +85,11 @@ jobs:
 
       # ── 6. Unit tests ─────────────────────────────────────────────────
       - name: Run unit tests
-        run: mvn -B test -DskipTests=false -Dsurefire.skip=false
+        run: mvn -B -U test -DskipTests=false -Dsurefire.skip=false
 
       # ── 7. Package verification ───────────────────────────────────────
       - name: Verify packaging
-        run: mvn -B package -DskipTests -DskipITs
+        run: mvn -B -U package -DskipTests -DskipITs
 
       # ── 8. Post-success summary ──────────────────────────────────────
       - name: Post-success summary

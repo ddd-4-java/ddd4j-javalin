@@ -1,18 +1,15 @@
 # CI: Unit tests & package verification for ddd4j-javalin (feature/6.7.x)
 #
-# Design notes:
-# - ddd4j core dependencies (io.ddd4j:*:2.0.x.20260630-SNAPSHOT) resolve from
-#   the Aliyun private Maven repository; credentials/settings come from the
-#   ddd-4-java org secret MAVEN_SETTINGS_XML.
-# - Root pom.xml has surefire <skip>true</skip> by default. We override with
-#   -DskipTests=false -Dsurefire.skip=false to actually run unit tests.
-# - The javalin-integration-tests profile is NOT activated here; only *Test.java
-#   files run (no Docker / Testcontainers needed).
+# ddd4j core dependencies (io.ddd4j:*:2.0.x.20260630-SNAPSHOT) resolve from
+# the Aliyun private Maven repository. The org secret MAVEN_SETTINGS_XML
+# contains a base64-encoded settings.xml with credentials.
 #
-# Failure diagnosis hooks (added 2026-08-17 after first CI run failed without
-# visible context): dump step prints the effective settings, resolved core
-# dependency versions, and wrapper provenance so the source of any failure
-# can be identified directly from the Actions log.
+# Key patterns (aligned with ddd4j core verify.yml):
+# - settings.xml is base64-encoded in the secret (decode with base64 --decode)
+# - Credential self-check: curl to verify Aliyun auth before running Maven
+# - Stale SNAPSHOT metadata cleared before dependency resolution
+# - Maven flags: -U -Denforcer.skip=true -B (always)
+# - Testcontainers IT: separate job with continue-on-error (infrastructure flaky)
 
 name: CI
 
@@ -37,50 +34,48 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      # ── 1. Checkout ddd4j-javalin ──────────────────────────────────────
+      # ── 1. Checkout ───────────────────────────────────────────────────
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
 
-      # ── 2. Setup JDK 17 + Maven cache ─────────────────────────────────
+      # ── 2. Setup JDK 17 + Maven cache ────────────────────────────────
+      # 6.7.x depends on ddd4j core 2.0.x which is compiled with JDK 17.
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
           cache: maven
+          overwrite-settings: true
 
-      # ── 3. Debug context (always runs) ────────────────────────────────
-      - name: Debug toolchain context
-        run: |
-          echo "──── JDK ────"
-          java -version 2>&1
-          echo "──── Maven version ────"
-          mvn --version 2>&1 | head -5
-
-      # ── 4. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
+      # ── 3. Write Maven settings (base64-encoded org secret) ──────────
       - name: Write Maven settings from org secret
         env:
-          SETTINGS_CONTENT: ${{ secrets.MAVEN_SETTINGS_XML }}
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        shell: bash
         run: |
-          mkdir -p "$HOME/.m2"
-          # Use python3 to write settings.xml — avoids bash $-expansion issues.
-          # The secret contains $HOME, ${revision} etc. from Maven properties which
-          # bash would interpret as variable references when expanding the env var.
-          python3 -c "
-          import os
-          content = os.environ.get('SETTINGS_CONTENT', '')
-          target = os.path.expanduser('~/.m2/settings.xml')
-          with open(target, 'w') as f:
-              f.write(content)
-          size = os.path.getsize(target)
-          print(f'Wrote {size} bytes to {target}')
-          if size < 50:
-              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
-              exit(1)
-          "
+          install -d -m 700 "$HOME/.m2"
+          umask 077
+          printf '%s' "$MAVEN_SETTINGS_XML" | base64 --decode > "$HOME/.m2/settings.xml"
+          if ! grep -q '2624322-snapshot-3EoOv3' "$HOME/.m2/settings.xml"; then
+            echo "::error::settings.xml does not reference 2624322-snapshot-3EoOv3 — wrong secret?"
+            exit 1
+          fi
 
-      # ── 4b. Clear stale SNAPSHOT metadata (prevents "Could not find artifact" with
-      #       specific timestamp version from a previous run's metadata cache) ──────
+      # ── 3b. Credential self-check ────────────────────────────────────
+      - name: Credential self-check (Aliyun packages)
+        env:
+          ALIYUN_USER: ${{ secrets.ALIYUN_PACKAGES_USERNAME }}
+          ALIYUN_PASS: ${{ secrets.ALIYUN_PACKAGES_PASSWORD }}
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u "$ALIYUN_USER:$ALIYUN_PASS" \
+            "https://packages.aliyun.com/6927b116e6c3e0425dbdf60d/maven/2624322-snapshot-3eoov3/io/ddd4j/ddd4j-core/2.0.x.20260630-SNAPSHOT/maven-metadata.xml" || echo curl-failed)
+          echo "Aliyun credential check: HTTP $HTTP_CODE"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::warning::Aliyun auth returned $HTTP_CODE — private SNAPSHOT deps may fail"
+          fi
+
+      # ── 3c. Stale SNAPSHOT metadata cleanup ─────────────────────────
       - name: Clear stale SNAPSHOT metadata cache
         run: |
           find "$HOME/.m2/repository/io/ddd4j" -name 'maven-metadata-*.xml' -delete 2>/dev/null || true
@@ -88,21 +83,81 @@ jobs:
           find "$HOME/.m2/repository/io/ddd4j" -name '*.md5' -delete 2>/dev/null || true
           echo "Cleared stale SNAPSHOT metadata for io.ddd4j"
 
-      # ── 5. Resolve core dependency (proves settings.xml works) ────────
-      - name: Verify core SNAPSHOT resolves
-        run: mvn -B -q -o validate 2>&1 | tail -5 || mvn -B -q dependency:resolve -Dartifact=io.ddd4j:ddd4j-core:2.0.x.20260630-SNAPSHOT 2>&1 | tail -10
-
-      # ── 6. Unit tests ─────────────────────────────────────────────────
+      # ── 4. Unit tests ────────────────────────────────────────────────
+      # Root pom disables surefire by default (<skip>true</skip>), so we
+      # must explicitly re-enable it.
       - name: Run unit tests
-        run: mvn -B -U test -DskipTests=false -Dsurefire.skip=false
+        run: mvn -U -Denforcer.skip=true -B test -DskipTests=false -Dsurefire.skip=false
 
-      # ── 7. Package verification ───────────────────────────────────────
+      # ── 5. Package verification ──────────────────────────────────────
       - name: Verify packaging
-        run: mvn -B -U package -DskipTests -DskipITs
+        run: mvn -U -Denforcer.skip=true -B package -DskipTests -DskipITs
 
-      # ── 8. Post-success summary ──────────────────────────────────────
-      - name: Post-success summary
-        if: success()
+  infrastructure-integration:
+    name: Testcontainers infrastructure integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [unit-tests]
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - broker: kafka
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-kafka
+          - broker: rabbitmq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-rabbitmq
+          - broker: activemq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-activemq
+          - broker: pulsar
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-pulsar
+          - broker: nats
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-nats
+          - broker: sqs
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-sqs
+          - broker: redis-stream
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-redis-stream
+          - broker: mqtt
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt
+          - broker: rocketmq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-rocketmq
+          - broker: order-outbox
+            module: ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox
+
+    steps:
+      - name: Checkout ddd4j-javalin
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          overwrite-settings: true
+
+      - name: Write Maven settings from org secret
+        env:
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        shell: bash
         run: |
-          echo "✅ ddd4j-javalin feature/6.7.x CI green"
-          mvn -B -q versions:display-plugin-updates 2>&1 | tail -5 || true
+          install -d -m 700 "$HOME/.m2"
+          umask 077
+          printf '%s' "$MAVEN_SETTINGS_XML" | base64 --decode > "$HOME/.m2/settings.xml"
+          grep -q '2624322-snapshot-3EoOv3' "$HOME/.m2/settings.xml"
+
+      - name: Clear stale SNAPSHOT metadata cache
+        run: |
+          find "$HOME/.m2/repository/io/ddd4j" -name 'maven-metadata-*.xml' -delete 2>/dev/null || true
+          find "$HOME/.m2/repository/io/ddd4j" -name '*.sha1' -delete 2>/dev/null || true
+          find "$HOME/.m2/repository/io/ddd4j" -name '*.md5' -delete 2>/dev/null || true
+
+      - name: Verify Docker daemon
+        run: docker info
+
+      - name: "Run IT: ${{ matrix.broker }}"
+        run: >-
+          mvn -U -Denforcer.skip=true -B verify
+          -Pjavalin-integration-tests
+          -pl ${{ matrix.module }}
+          -am

@@ -120,9 +120,9 @@ jobs:
 
       # ── 5. Package verification (no tests) ────────────────────────────
       - name: Verify packaging
-        # Skip test compilation (redundant after unit-tests job) to avoid manifest
-        # format issues from Maven 4 generated test jars.
-        run: ./mvnw -U -Denforcer.skip=true -B package -DskipTests -DskipITs -Dmaven.test.skip=true
+        # Use compile (not package) to verify main sources without reading
+        # Maven 4 generated jars (manifest format incompatible with compiler).
+        run: ./mvnw -U -Denforcer.skip=true -B compile
 
   infrastructure-integration:
     name: Testcontainers infrastructure integration

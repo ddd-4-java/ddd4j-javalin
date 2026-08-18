@@ -67,6 +67,14 @@ jobs:
               exit(1)
           "
 
+      # ── 3b. Clear stale SNAPSHOT metadata cache ─────────────────────
+      - name: Clear stale SNAPSHOT metadata cache
+        run: |
+          find "$HOME/.m2/repository/io/ddd4j" -name 'maven-metadata-*.xml' -delete 2>/dev/null || true
+          find "$HOME/.m2/repository/io/ddd4j" -name '*.sha1' -delete 2>/dev/null || true
+          find "$HOME/.m2/repository/io/ddd4j" -name '*.md5' -delete 2>/dev/null || true
+          echo "Cleared stale SNAPSHOT metadata for io.ddd4j"
+
       # ── 4. Unit tests (Maven 4 via wrapper) ───────────────────────────
       # Root pom disables surefire by default (<skip>true</skip>), so we
       # must explicitly re-enable it.

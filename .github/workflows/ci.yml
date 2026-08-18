@@ -59,18 +59,18 @@ jobs:
 
       # ── 4. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
       - name: Write Maven settings from org secret
-        env:
-          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
         run: |
           mkdir -p "$HOME/.m2"
-          if [ -z "$MAVEN_SETTINGS_XML" ]; then
-            echo "::error::secrets.MAVEN_SETTINGS_XML is empty — org secret not configured for this repo. Add MAVEN_SETTINGS_XML in ddd-4-java org settings → Actions → Secrets."
+          # Use single-quoted heredoc to prevent bash from interpreting $-characters
+          # inside the secret value as variable references (causes "bad substitution").
+          cat <<'SETTINGS_EOF' > "$HOME/.m2/settings.xml"
+${{ secrets.MAVEN_SETTINGS_XML }}
+SETTINGS_EOF
+          BYTES=$(wc -c < "$HOME/.m2/settings.xml")
+          echo "Wrote $BYTES bytes to settings.xml"
+          if [ "$BYTES" -lt 50 ]; then
+            echo "::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small: $BYTES bytes)"
             exit 1
-          fi
-          printf '%s' "$MAVEN_SETTINGS_XML" > "$HOME/.m2/settings.xml"
-          echo "Wrote $(wc -c < "$HOME/.m2/settings.xml") bytes to ~/.m2/settings.xml"
-          if ! grep -q 'packages.aliyun.com' "$HOME/.m2/settings.xml"; then
-            echo "::warning::settings.xml does not reference packages.aliyun.com — wrong secret?"
           fi
 
       # ── 5. Resolve core dependency (proves settings.xml works) ────────

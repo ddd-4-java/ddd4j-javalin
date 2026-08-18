@@ -79,6 +79,15 @@ jobs:
               exit(1)
           "
 
+      # ── 4b. Clear stale SNAPSHOT metadata (prevents "Could not find artifact" with
+      #       specific timestamp version from a previous run's metadata cache) ──────
+      - name: Clear stale SNAPSHOT metadata cache
+        run: |
+          find "$HOME/.m2/repository/io/ddd4j" -name 'maven-metadata-*.xml' -delete 2>/dev/null || true
+          find "$HOME/.m2/repository/io/ddd4j" -name '*.sha1' -delete 2>/dev/null || true
+          find "$HOME/.m2/repository/io/ddd4j" -name '*.md5' -delete 2>/dev/null || true
+          echo "Cleared stale SNAPSHOT metadata for io.ddd4j"
+
       # ── 5. Resolve core dependency (proves settings.xml works) ────────
       - name: Verify core SNAPSHOT resolves
         run: mvn -B -q -o validate 2>&1 | tail -5 || mvn -B -q dependency:resolve -Dartifact=io.ddd4j:ddd4j-core:2.0.x.20260630-SNAPSHOT 2>&1 | tail -10

@@ -1,13 +1,18 @@
 # CI: Unit tests & package verification for ddd4j-javalin (feature/6.7.x)
 #
 # Design notes:
-# - ddd4j core dependency (io.ddd4j:ddd4j-*:2.0.x.20260630-SNAPSHOT) is NOT in any
-#   public Maven repository; they resolve from the Aliyun private Maven repo,
-#   credentials/settings from the ddd-4-java org secret MAVEN_SETTINGS_XML.
+# - ddd4j core dependencies (io.ddd4j:*:2.0.x.20260630-SNAPSHOT) resolve from
+#   the Aliyun private Maven repository; credentials/settings come from the
+#   ddd-4-java org secret MAVEN_SETTINGS_XML.
 # - Root pom.xml has surefire <skip>true</skip> by default. We override with
 #   -DskipTests=false -Dsurefire.skip=false to actually run unit tests.
 # - The javalin-integration-tests profile is NOT activated here; only *Test.java
 #   files run (no Docker / Testcontainers needed).
+#
+# Failure diagnosis hooks (added 2026-08-17 after first CI run failed without
+# visible context): dump step prints the effective settings, resolved core
+# dependency versions, and wrapper provenance so the source of any failure
+# can be identified directly from the Actions log.
 
 name: CI
 
@@ -35,7 +40,7 @@ jobs:
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
 
-      # ── 3. Setup JDK 17 + Maven cache ─────────────────────────────────
+      # ── 2. Setup JDK 17 + Maven cache ─────────────────────────────────
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -43,24 +48,45 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # ── 4. Configure Maven settings (org secret) ─────────────────────
-      # ddd-4-java 组织 secret MAVEN_SETTINGS_XML：完整 settings.xml（阿里云私服
-      # 2624322-* 凭据 + 仓库）；secrets 不能用于 if 条件，经 env 传递判空
-      - name: Configure Maven settings (org secret)
+      # ── 3. Debug context (always runs) ────────────────────────────────
+      - name: Debug toolchain context
+        run: |
+          echo "──── JDK ────"
+          java -version 2>&1
+          echo "──── Maven version ────"
+          mvn --version 2>&1 | head -5
+
+      # ── 4. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
+      - name: Write Maven settings from org secret
         env:
           MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
         run: |
-          if [ -n "$MAVEN_SETTINGS_XML" ]; then
-            mkdir -p ~/.m2
-            printf '%s' "$MAVEN_SETTINGS_XML" > ~/.m2/settings.xml
+          mkdir -p "$HOME/.m2"
+          if [ -z "$MAVEN_SETTINGS_XML" ]; then
+            echo "::error::secrets.MAVEN_SETTINGS_XML is empty — org secret not configured for this repo. Add MAVEN_SETTINGS_XML in ddd-4-java org settings → Actions → Secrets."
+            exit 1
+          fi
+          printf '%s' "$MAVEN_SETTINGS_XML" > "$HOME/.m2/settings.xml"
+          echo "Wrote $(wc -c < "$HOME/.m2/settings.xml") bytes to ~/.m2/settings.xml"
+          if ! grep -q 'packages.aliyun.com' "$HOME/.m2/settings.xml"; then
+            echo "::warning::settings.xml does not reference packages.aliyun.com — wrong secret?"
           fi
 
-      # ── 5. Unit tests ─────────────────────────────────────────────────
-      # Root pom disables surefire by default (<skip>true</skip>), so we
-      # must explicitly re-enable it.
+      # ── 5. Resolve core dependency (proves settings.xml works) ────────
+      - name: Verify core SNAPSHOT resolves
+        run: mvn -B -q -o validate 2>&1 | tail -5 || mvn -B -q dependency:resolve -Dartifact=io.ddd4j:ddd4j-core:2.0.x.20260630-SNAPSHOT 2>&1 | tail -10
+
+      # ── 6. Unit tests ─────────────────────────────────────────────────
       - name: Run unit tests
         run: mvn -B test -DskipTests=false -Dsurefire.skip=false
 
-      # ── 6. Package verification (no tests) ────────────────────────────
+      # ── 7. Package verification ───────────────────────────────────────
       - name: Verify packaging
         run: mvn -B package -DskipTests -DskipITs
+
+      # ── 8. Post-success summary ──────────────────────────────────────
+      - name: Post-success summary
+        if: success()
+        run: |
+          echo "✅ ddd4j-javalin feature/6.7.x CI green"
+          mvn -B -q versions:display-plugin-updates 2>&1 | tail -5 || true

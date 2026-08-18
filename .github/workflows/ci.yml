@@ -90,12 +90,17 @@ jobs:
       # ── 3c. Stale SNAPSHOT metadata cleanup ─────────────────────────
       - name: Clear stale SNAPSHOT metadata cache
         run: |
+          # Clear ALL io.ddd4j cached artifacts (prevents stale SNAPSHOT metadata and
+          # version conflicts between 6.7.x/7.2.x branches sharing the same cache).
           find "$HOME/.m2/repository/io/ddd4j" -name '.lastUpdated' -delete 2>/dev/null || true
           find "$HOME/.m2/repository/io/ddd4j" -name 'maven-metadata-*.xml' -delete 2>/dev/null || true
           find "$HOME/.m2/repository/io/ddd4j" -name '*.sha1' -delete 2>/dev/null || true
           find "$HOME/.m2/repository/io/ddd4j" -name '*.md5' -delete 2>/dev/null || true
           find "$HOME/.m2/repository/io/ddd4j" -name '_remote.repositories' -delete 2>/dev/null || true
-          echo "Cleared stale SNAPSHOT metadata and failure cache for io.ddd4j"
+          # Also clear Javalin artifact cache to prevent version mismatch between branches
+          find "$HOME/.m2/repository/io/javalin" -type f -delete 2>/dev/null || true
+          echo "Cleared stale cache for io.ddd4j + io.javalin"
+
 
       # ── 4. Unit tests ────────────────────────────────────────────────
       # Root pom disables surefire by default (<skip>true</skip>), so we

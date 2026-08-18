@@ -71,8 +71,8 @@ jobs:
       # Root pom disables surefire by default (<skip>true</skip>), so we
       # must explicitly re-enable it.
       - name: Run unit tests
-        run: ./mvnw -B test -DskipTests=false -Dsurefire.skip=false
+        run: ./mvnw -B -U test -DskipTests=false -Dsurefire.skip=false
 
       # ── 5. Package verification (no tests) ────────────────────────────
       - name: Verify packaging
-        run: ./mvnw -B package -DskipTests -DskipITs
+        run: ./mvnw -B -U package -DskipTests -DskipITs

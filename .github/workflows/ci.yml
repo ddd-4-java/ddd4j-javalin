@@ -51,9 +51,9 @@ jobs:
           cache: maven
           overwrite-settings: true
 
-      # ── 3. Write Maven settings (base64-encoded org secret) ──────────
-      # The MAVEN_SETTINGS_XML secret is base64-encoded to avoid shell
-      # expansion issues with $-characters in Maven properties.
+      # ── 3. Write Maven settings (org secret) ─────────────────────────
+      # The MAVEN_SETTINGS_XML secret contains raw XML settings.xml.
+      # Use python3 to write to avoid bash $-expansion of Maven properties.
       - name: Write Maven settings from org secret
         env:
           MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
@@ -61,12 +61,21 @@ jobs:
         run: |
           install -d -m 700 "$HOME/.m2"
           umask 077
-          printf '%s' "$MAVEN_SETTINGS_XML" | base64 --decode > "$HOME/.m2/settings.xml"
-          # Verify settings contains the Aliyun repo config
-          if ! grep -q '2624322-snapshot-3EoOv3' "$HOME/.m2/settings.xml"; then
-            echo "::error::settings.xml does not reference 2624322-snapshot-3EoOv3 — wrong secret?"
-            exit 1
-          fi
+          python3 -c "
+          import os
+          content = os.environ.get('MAVEN_SETTINGS_XML', '')
+          target = os.path.expanduser('~/.m2/settings.xml')
+          with open(target, 'w') as f:
+              f.write(content)
+          size = os.path.getsize(target)
+          print(f'Wrote {size} bytes to {target}')
+          if size < 50:
+              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
+              exit(1)
+          if '2624322-snapshot-3EoOv3' not in content:
+              print('::error::settings.xml does not reference 2624322-snapshot-3EoOv3')
+              exit(1)
+          "
 
       # ── 3b. Credential self-check ─────────────────────────────────────
       # Proves the Aliyun credentials are valid before running Maven.
@@ -154,8 +163,17 @@ jobs:
         run: |
           install -d -m 700 "$HOME/.m2"
           umask 077
-          printf '%s' "$MAVEN_SETTINGS_XML" | base64 --decode > "$HOME/.m2/settings.xml"
-          grep -q '2624322-snapshot-3EoOv3' "$HOME/.m2/settings.xml"
+          python3 -c "
+          import os
+          content = os.environ.get('MAVEN_SETTINGS_XML', '')
+          target = os.path.expanduser('~/.m2/settings.xml')
+          with open(target, 'w') as f:
+              f.write(content)
+          if '2624322-snapshot-3EoOv3' not in content:
+              print('::error::settings.xml missing Aliyun config')
+              exit(1)
+          print('Settings written OK')
+          "
 
       - name: Clear stale SNAPSHOT metadata cache
         run: |

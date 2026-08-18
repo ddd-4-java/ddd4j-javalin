@@ -97,10 +97,15 @@ jobs:
       # pointing to deleted timestamped SNAPSHOT versions.
       - name: Clear stale SNAPSHOT metadata cache
         run: |
+          # Clear ALL cached failure markers from previous runs.
+          # Maven caches 404/timeout results in .lastUpdated files; -U won't retry
+          # if the cache says the artifact failed recently.
+          find "$HOME/.m2/repository/io/ddd4j" -name '.lastUpdated' -delete 2>/dev/null || true
           find "$HOME/.m2/repository/io/ddd4j" -name 'maven-metadata-*.xml' -delete 2>/dev/null || true
           find "$HOME/.m2/repository/io/ddd4j" -name '*.sha1' -delete 2>/dev/null || true
           find "$HOME/.m2/repository/io/ddd4j" -name '*.md5' -delete 2>/dev/null || true
-          echo "Cleared stale SNAPSHOT metadata for io.ddd4j"
+          find "$HOME/.m2/repository/io/ddd4j" -name '_remote.repositories' -delete 2>/dev/null || true
+          echo "Cleared stale SNAPSHOT metadata and failure cache for io.ddd4j"
 
       # ── 4. Unit tests (Maven 4 via wrapper) ───────────────────────────
       # Root pom disables surefire by default (<skip>true</skip>), so we

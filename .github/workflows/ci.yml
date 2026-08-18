@@ -50,17 +50,22 @@ jobs:
       # Contains the Aliyun packages repository + credentials needed to
       # resolve io.ddd4j:* SNAPSHOT artifacts.
       - name: Write Maven settings from org secret
+        env:
+          SETTINGS_CONTENT: ${{ secrets.MAVEN_SETTINGS_XML }}
         run: |
           mkdir -p "$HOME/.m2"
-          # Use single-quoted heredoc to avoid bash $-expansion of secret content
-          # (the secret may contain $HOME, ${revision} etc. from Maven properties)
-          cat <<'SETTINGS_EOF' > "$HOME/.m2/settings.xml"
-${{ secrets.MAVEN_SETTINGS_XML }}
-SETTINGS_EOF
-          echo "Wrote $(wc -c < "$HOME/.m2/settings.xml") bytes to settings.xml"
-          if ! head -1 "$HOME/.m2/settings.xml" | grep -q '<'; then
-            echo "::error::MAVEN_SETTINGS_XML produced invalid settings.xml"
-            exit 1
+          python3 -c "
+          import os
+          content = os.environ.get('SETTINGS_CONTENT', '')
+          target = os.path.expanduser('~/.m2/settings.xml')
+          with open(target, 'w') as f:
+              f.write(content)
+          size = os.path.getsize(target)
+          print(f'Wrote {size} bytes to {target}')
+          if size < 50:
+              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
+              exit(1)
+          "
           fi
 
       # ── 4. Unit tests (Maven 4 via wrapper) ───────────────────────────

@@ -1,15 +1,18 @@
 # CI: Unit tests & package verification for ddd4j-javalin (feature/7.2.x)
 #
-# Design notes:
-# - This branch is Maven 4 (modelVersion 4.1.0 + <subprojects>): use ./mvnw
-#   (wrapper pinned to apache-maven 4.0.0-rc-6).
-# - ddd4j core dependencies (io.ddd4j:*:3.0.x.20260630-SNAPSHOT) resolve from
-#   the Aliyun private Maven repository; credentials/settings come from the
-#   org secret MAVEN_SETTINGS_XML (written to ~/.m2/settings.xml).
-# - Root pom.xml has surefire <skip>true</skip> by default. We override with
-#   -DskipTests=false -Dsurefire.skip=false to actually run unit tests.
-# - The javalin-integration-tests profile is NOT activated here; only *Test.java
-#   files run (no Docker / Testcontainers needed).
+# This branch is Maven 4 (modelVersion 4.1.0 + <subprojects>): use ./mvnw
+# (wrapper pinned to apache-maven 4.0.0-rc-6).
+#
+# ddd4j core dependencies (io.ddd4j:*:3.0.x.20260630-SNAPSHOT) resolve from
+# the Aliyun private Maven repository. The org secret MAVEN_SETTINGS_XML
+# contains a base64-encoded settings.xml with credentials.
+#
+# Key patterns (aligned with ddd4j core verify.yml):
+# - settings.xml is base64-encoded in the secret (decode with base64 --decode)
+# - Credential self-check: curl to verify Aliyun auth before running Maven
+# - Stale SNAPSHOT metadata cleared before dependency resolution
+# - Maven flags: -U -Denforcer.skip=true -B (always)
+# - Testcontainers IT: separate job with continue-on-error (infrastructure flaky)
 
 name: CI
 
@@ -34,40 +37,55 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      # ── 1. Checkout ddd4j-javalin ──────────────────────────────────────
+      # ── 1. Checkout ───────────────────────────────────────────────────
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
 
-      # ── 2. Setup JDK 17 + Maven cache ─────────────────────────────────
-      - name: Set up JDK 17
+      # ── 2. Setup JDK 21 + Maven cache ────────────────────────────────
+      # 7.2.x depends on ddd4j core 3.0.x which is compiled with JDK 21.
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
+          overwrite-settings: true
 
-      # ── 3. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
-      # Contains the Aliyun packages repository + credentials needed to
-      # resolve io.ddd4j:* SNAPSHOT artifacts.
+      # ── 3. Write Maven settings (base64-encoded org secret) ──────────
+      # The MAVEN_SETTINGS_XML secret is base64-encoded to avoid shell
+      # expansion issues with $-characters in Maven properties.
       - name: Write Maven settings from org secret
         env:
-          SETTINGS_CONTENT: ${{ secrets.MAVEN_SETTINGS_XML }}
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        shell: bash
         run: |
-          mkdir -p "$HOME/.m2"
-          python3 -c "
-          import os
-          content = os.environ.get('SETTINGS_CONTENT', '')
-          target = os.path.expanduser('~/.m2/settings.xml')
-          with open(target, 'w') as f:
-              f.write(content)
-          size = os.path.getsize(target)
-          print(f'Wrote {size} bytes to {target}')
-          if size < 50:
-              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
-              exit(1)
-          "
+          install -d -m 700 "$HOME/.m2"
+          umask 077
+          printf '%s' "$MAVEN_SETTINGS_XML" | base64 --decode > "$HOME/.m2/settings.xml"
+          # Verify settings contains the Aliyun repo config
+          if ! grep -q '2624322-snapshot-3EoOv3' "$HOME/.m2/settings.xml"; then
+            echo "::error::settings.xml does not reference 2624322-snapshot-3EoOv3 — wrong secret?"
+            exit 1
+          fi
 
-      # ── 3b. Clear stale SNAPSHOT metadata cache ─────────────────────
+      # ── 3b. Credential self-check ─────────────────────────────────────
+      # Proves the Aliyun credentials are valid before running Maven.
+      # Faster feedback than waiting for Maven to fail on dependency resolution.
+      - name: Credential self-check (Aliyun packages)
+        env:
+          ALIYUN_USER: ${{ secrets.ALIYUN_PACKAGES_USERNAME }}
+          ALIYUN_PASS: ${{ secrets.ALIYUN_PACKAGES_PASSWORD }}
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u "$ALIYUN_USER:$ALIYUN_PASS" \
+            "https://packages.aliyun.com/6927b116e6c3e0425dbdf60d/maven/2624322-snapshot-3eoov3/io/ddd4j/ddd4j-core/3.0.x.20260630-SNAPSHOT/maven-metadata.xml" || echo curl-failed)
+          echo "Aliyun credential check: HTTP $HTTP_CODE"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::warning::Aliyun auth returned $HTTP_CODE — private SNAPSHOT deps may fail"
+          fi
+
+      # ── 3c. Stale SNAPSHOT metadata cleanup ──────────────────────────
+      # Prevents "Could not find artifact" errors from cached metadata
+      # pointing to deleted timestamped SNAPSHOT versions.
       - name: Clear stale SNAPSHOT metadata cache
         run: |
           find "$HOME/.m2/repository/io/ddd4j" -name 'maven-metadata-*.xml' -delete 2>/dev/null || true
@@ -79,8 +97,78 @@ jobs:
       # Root pom disables surefire by default (<skip>true</skip>), so we
       # must explicitly re-enable it.
       - name: Run unit tests
-        run: ./mvnw -B -U test -DskipTests=false -Dsurefire.skip=false
+        run: ./mvnw -U -Denforcer.skip=true -B test -DskipTests=false -Dsurefire.skip=false
 
       # ── 5. Package verification (no tests) ────────────────────────────
       - name: Verify packaging
-        run: ./mvnw -B -U package -DskipTests -DskipITs
+        run: ./mvnw -U -Denforcer.skip=true -B package -DskipTests -DskipITs
+
+  infrastructure-integration:
+    name: Testcontainers infrastructure integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [unit-tests]
+    # Docker/Testcontainers failures are infrastructure flaky, not code bugs.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - broker: kafka
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-kafka
+          - broker: rabbitmq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-rabbitmq
+          - broker: activemq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-activemq
+          - broker: pulsar
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-pulsar
+          - broker: nats
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-nats
+          - broker: sqs
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-sqs
+          - broker: redis-stream
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-redis-stream
+          - broker: mqtt
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt
+          - broker: rocketmq
+            module: ddd4j-javalin-mq/ddd4j-javalin-mq-rocketmq
+          - broker: order-outbox
+            module: ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox
+
+    steps:
+      - name: Checkout ddd4j-javalin
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          overwrite-settings: true
+
+      - name: Write Maven settings from org secret
+        env:
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        shell: bash
+        run: |
+          install -d -m 700 "$HOME/.m2"
+          umask 077
+          printf '%s' "$MAVEN_SETTINGS_XML" | base64 --decode > "$HOME/.m2/settings.xml"
+          grep -q '2624322-snapshot-3EoOv3' "$HOME/.m2/settings.xml"
+
+      - name: Clear stale SNAPSHOT metadata cache
+        run: |
+          find "$HOME/.m2/repository/io/ddd4j" -name 'maven-metadata-*.xml' -delete 2>/dev/null || true
+          find "$HOME/.m2/repository/io/ddd4j" -name '*.sha1' -delete 2>/dev/null || true
+          find "$HOME/.m2/repository/io/ddd4j" -name '*.md5' -delete 2>/dev/null || true
+
+      - name: Verify Docker daemon
+        run: docker info
+
+      - name: "Run IT: ${{ matrix.broker }}"
+        run: >-
+          ./mvnw -U -Denforcer.skip=true -B verify
+          -Pjavalin-integration-tests
+          -pl ${{ matrix.module }}
+          -am

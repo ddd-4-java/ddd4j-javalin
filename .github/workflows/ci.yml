@@ -59,19 +59,25 @@ jobs:
 
       # ── 4. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
       - name: Write Maven settings from org secret
+        env:
+          SETTINGS_CONTENT: ${{ secrets.MAVEN_SETTINGS_XML }}
         run: |
           mkdir -p "$HOME/.m2"
-          # Use single-quoted heredoc to prevent bash from interpreting $-characters
-          # inside the secret value as variable references (causes "bad substitution").
-          cat <<'SETTINGS_EOF' > "$HOME/.m2/settings.xml"
-${{ secrets.MAVEN_SETTINGS_XML }}
-SETTINGS_EOF
-          BYTES=$(wc -c < "$HOME/.m2/settings.xml")
-          echo "Wrote $BYTES bytes to settings.xml"
-          if [ "$BYTES" -lt 50 ]; then
-            echo "::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small: $BYTES bytes)"
-            exit 1
-          fi
+          # Use python3 to write settings.xml — avoids bash $-expansion issues.
+          # The secret contains $HOME, ${revision} etc. from Maven properties which
+          # bash would interpret as variable references when expanding the env var.
+          python3 -c "
+          import os
+          content = os.environ.get('SETTINGS_CONTENT', '')
+          target = os.path.expanduser('~/.m2/settings.xml')
+          with open(target, 'w') as f:
+              f.write(content)
+          size = os.path.getsize(target)
+          print(f'Wrote {size} bytes to {target}')
+          if size < 50:
+              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
+              exit(1)
+          "
 
       # ── 5. Resolve core dependency (proves settings.xml works) ────────
       - name: Verify core SNAPSHOT resolves

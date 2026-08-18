@@ -66,7 +66,6 @@ jobs:
               print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
               exit(1)
           "
-          fi
 
       # ── 4. Unit tests (Maven 4 via wrapper) ───────────────────────────
       # Root pom disables surefire by default (<skip>true</skip>), so we

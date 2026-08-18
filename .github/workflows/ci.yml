@@ -17,6 +17,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [feature/6.7.x]
   pull_request:

@@ -120,8 +120,9 @@ jobs:
 
       # ── 5. Package verification (no tests) ────────────────────────────
       - name: Verify packaging
-        # Use clean to avoid stale manifest artifacts from the test step
-        run: ./mvnw -U -Denforcer.skip=true -B clean package -DskipTests -DskipITs
+        # Skip test compilation (redundant after unit-tests job) to avoid manifest
+        # format issues from Maven 4 generated test jars.
+        run: ./mvnw -U -Denforcer.skip=true -B package -DskipTests -DskipITs -Dmaven.test.skip=true
 
   infrastructure-integration:
     name: Testcontainers infrastructure integration

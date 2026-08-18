@@ -120,7 +120,8 @@ jobs:
 
       # ── 5. Package verification (no tests) ────────────────────────────
       - name: Verify packaging
-        run: ./mvnw -U -Denforcer.skip=true -B package -DskipTests -DskipITs
+        # Use clean to avoid stale manifest artifacts from the test step
+        run: ./mvnw -U -Denforcer.skip=true -B clean package -DskipTests -DskipITs
 
   infrastructure-integration:
     name: Testcontainers infrastructure integration

@@ -173,8 +173,9 @@
                         <configuration>
                             <skip>false</skip>
                             <skipTests>false</skipTests>
-                            <!-- jacoco.agent.argLine 由根聚合 pom quality-jacoco-agent profile 注入（默认空串） -->
-                            <argLine>${jacoco.agent.argLine} -Xmx2048m -Dfile.encoding=UTF-8</argLine>
+                            <!-- jacoco agent 路径直接写入 argLine，与 quality-jacoco-agent profile 的
+                                 ${argLine} 属性解耦，确保 integration-tests 独立激活时也有 jacoco -->
+                            <argLine>-javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec -Xmx2048m -Dfile.encoding=UTF-8</argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -202,9 +203,26 @@
         <!-- ================================================================== -->
         <profile>
             <id>quality</id>
+            <!-- jacoco agent argLine 直接作为 property 注入，surefire 的 ${argLine} 可直接引用；
+                 必须在 parent pom（而非根聚合 pom）中定义，否则子模块不继承 -->
+            <properties>
+                <argLine>-javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
+            </properties>
             <build>
                 <plugins>
-                    <!-- surefire argLine 注入移至根聚合 pom quality-jacoco-agent profile（property 拼接） -->
+                    <!-- surefire argLine 注入：Maven 4 三层 pom 链下 execution-level 配置覆盖
+                         plugin-level，property 注入路径全部被吞，jacoco agent 无法可靠注入。
+                         直接设字面量 argLine（无 jacoco agent），宁可不覆盖也不能让错误配置生效。
+                         覆盖待 Maven 4 明确 plugin configuration merge 行为后再修。 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <skipTests>false</skipTests>
+                            <argLine>-Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                        </configuration>
+                    </plugin>
 
                     <!-- JaCoCo code coverage:
                          - prepare-agent bound to initialize (injects agent into ${argLine})

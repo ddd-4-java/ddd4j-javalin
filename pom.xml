@@ -413,7 +413,8 @@
             <!-- 与 -Pquality 组合使用：注入 JaCoCo agent 到 surefire（经 property 拼接）。
                  单独激活无副作用；agent 依赖声明保证 CI 首跑即下载 runtime jar。 -->
             <properties>
-                <jacoco.agent.argLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</jacoco.agent.argLine>
+                <argLine>-javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
+                <jacoco.agent.argLine>-javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</jacoco.agent.argLine>
             </properties>
             <dependencies>
                 <dependency>

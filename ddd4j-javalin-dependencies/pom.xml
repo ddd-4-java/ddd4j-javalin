@@ -102,6 +102,14 @@
                 <artifactId>jetty-xml</artifactId>
                 <version>${jetty11.version}</version>
             </dependency>
+            <!-- 核心 BOM 把 websocket-servlet 提升到 12.1.8（不存在，Jetty 12.1.x 中
+                 websocket-servlet 已迁移到 ee10 命名空间）。6.7.x 用 Jetty 11，
+                 显式降回 11.0.25 与传递依赖 websocket-jetty-server 对齐。 -->
+            <dependency>
+                <groupId>org.eclipse.jetty.websocket</groupId>
+                <artifactId>websocket-servlet</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
 
             <!-- ddd4j Guice 适配（提供 3 个核心 SPI 的 Guice 实现 Ddd4jGuiceModule） -->
             <dependency>

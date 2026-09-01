@@ -1,48 +1,34 @@
 package io.ddd4j.javalin.mq.sqs.it;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Module;
 import io.ddd4j.javalin.mq.sqs.Ddd4jSqsMqGuiceModule;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
-import io.ddd4j.mq.MQClient;
-import io.ddd4j.mq.MQProperties;
-import io.ddd4j.mq.annotation.MQEventListener;
-import io.ddd4j.mq.event.MQEvent;
+import io.ddd4j.javalin.testcontainers.messaging.AbstractMqIntegrationTest;
 import io.ddd4j.mq.listener.MQListener;
-import io.ddd4j.mq.serialization.JsonMQEventSerialization;
 import io.ddd4j.mq.sqs.SqsMQClient;
 import io.ddd4j.mq.sqs.SqsProperties;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 /**
  * Integration test for {@link Ddd4jSqsMqGuiceModule} against LocalStack (AWS SQS emulator,
  * {@code localstack/localstack:3.4}) brought up by Testcontainers, using the AWS SDK v2
- * {@code software.amazon.awssdk:sqs} client.
+ * {@code software.amazon.awssdk:sqs} client. 公共骨架继承自 {@link AbstractMqIntegrationTest}。
  *
- * <p>Verifies a real publish → queue → consume round trip through {@link SqsMQClient}:
- * create a queue, point the ddd4j listener at its URL, publish a {@link MQEvent} and assert
- * the message comes back with the same message id (carried as an SQS message attribute).
+ * <p>SQS 差异：SQS 没有 topic 概念——{@link #adaptListenerTopic} 中先建队列，
+ * 再把 listener 的 topic 改写为 queue URL；message id 以 SQS message attribute 传递。
  */
 @Tag("integration")
 @JunitJupiterTestContainers
-class Ddd4jSqsMqIT {
-
-    private static final String QUEUE_NAME = "ddd4j-it-queue";
-    private static final String TAG = "smoke";
+class Ddd4jSqsMqIT extends AbstractMqIntegrationTest<SqsProperties, SqsMQClient> {
 
     @SuppressWarnings("resource")
     private static final GenericContainer<?> LOCALSTACK = new GenericContainer<>(
@@ -51,71 +37,24 @@ class Ddd4jSqsMqIT {
             .withExposedPorts(4566)
             .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
 
-    @Test
-    void shouldResolveCoreContractsFromGuice() {
-        LOCALSTACK.start();
-        try {
-            SqsProperties brokerProps = sqsProperties();
-            MQProperties mqProps = new MQProperties();
-            mqProps.setEnabled(true);
-            mqProps.setBroker("sqs");
-
-            Injector injector = Guice.createInjector(new Ddd4jSqsMqGuiceModule(
-                    new SqsMQClient(brokerProps), brokerProps));
-
-            assertThat(injector.getInstance(MQClient.class)).isNotNull();
-            assertThat(injector.getInstance(SqsMQClient.class)).isNotNull();
-            assertThat(injector.getInstance(MQProperties.class)).isSameAs(brokerProps);
-        } finally {
-            LOCALSTACK.stop();
-        }
+    @Override
+    protected String brokerName() {
+        return "sqs";
     }
 
-    @Test
-    void shouldPublishAndConsumeRoundTrip() throws Exception {
-        LOCALSTACK.start();
-        try {
-            SqsProperties brokerProps = sqsProperties();
-            MQProperties mqProps = new MQProperties();
-            mqProps.setEnabled(true);
-            mqProps.setBroker("sqs");
-            mqProps.setPersist(false);
-
-            String queueUrl;
-            try (SqsClient sqs = brokerProps.client()) {
-                queueUrl = sqs.createQueue(CreateQueueRequest.builder()
-                        .queueName(QUEUE_NAME).build()).queueUrl();
-            }
-            assertThat(queueUrl).startsWith("http://");
-
-            SqsMQClient client = new SqsMQClient(brokerProps);
-            Injector injector = Guice.createInjector(new Ddd4jSqsMqGuiceModule(client, brokerProps));
-            MQClient mqClient = injector.getInstance(MQClient.class);
-
-            SmokeListener bean = new SmokeListener();
-            Method onSmoke = SmokeListener.class.getMethod("onSmoke", MQEvent.class);
-            MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
-            // SQS has no topic: the MQListener topic must be the queue URL.
-            listener.setTopic(queueUrl);
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
-
-            MQEvent event = new MQEvent();
-            event.setMsgId("sqs-it-" + System.nanoTime());
-            event.setTopic(queueUrl);
-            event.setTag(TAG);
-            event.publish();
-
-            await().atMost(Duration.ofSeconds(20)).until(() -> bean.received.get() != null);
-            MQEvent received = bean.received.get();
-            assertThat(received.getMsgId()).isEqualTo(event.getMsgId());
-            assertThat(received.getTopic()).isEqualTo(queueUrl);
-            assertThat(received.getTag()).isEqualTo(TAG);
-        } finally {
-            LOCALSTACK.stop();
-        }
+    @Override
+    protected String topicName() {
+        // 逻辑队列名；物理 topic（queue URL）由 adaptListenerTopic 改写
+        return "ddd4j-it-queue";
     }
 
-    private static SqsProperties sqsProperties() {
+    @Override
+    protected GenericContainer<?> container() {
+        return LOCALSTACK;
+    }
+
+    @Override
+    protected SqsProperties newProperties() {
         SqsProperties props = new SqsProperties();
         props.setRegion("us-east-1");
         props.setAccessKey("test");
@@ -126,16 +65,36 @@ class Ddd4jSqsMqIT {
         return props;
     }
 
-    /**
-     * Listener bean invoked by the ddd4j consume pipeline; records the delivered event.
-     */
-    public static class SmokeListener {
+    @Override
+    protected SqsMQClient newClient(SqsProperties props) {
+        return new SqsMQClient(props);
+    }
 
-        final AtomicReference<MQEvent> received = new AtomicReference<>();
+    @Override
+    protected Module guiceModule(SqsMQClient client, SqsProperties props) {
+        return new Ddd4jSqsMqGuiceModule(client, props);
+    }
 
-        @MQEventListener(topic = "queueUrl-overridden-in-test", tags = TAG, group = "it-sqs-consumer")
-        public void onSmoke(MQEvent event) {
-            received.set(event);
+    @Override
+    protected Class<SqsMQClient> clientClass() {
+        return SqsMQClient.class;
+    }
+
+    @Override
+    protected void adaptListenerTopic(MQListener listener, SqsProperties props) {
+        // SQS has no topic: create the queue up front and point the listener at its URL.
+        String queueUrl;
+        try (SqsClient sqs = props.client()) {
+            queueUrl = sqs.createQueue(CreateQueueRequest.builder()
+                    .queueName(topicName()).build()).queueUrl();
         }
+        assertThat(queueUrl).startsWith("http://");
+        listener.setTopic(queueUrl);
+    }
+
+    @Override
+    protected Duration consumerSettleDelay() {
+        // SQS consumer 为轮询线程，init 返回即已就绪，无需额外等待
+        return Duration.ZERO;
     }
 }

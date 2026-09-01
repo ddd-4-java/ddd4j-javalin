@@ -1,46 +1,31 @@
 package io.ddd4j.javalin.mq.pulsar.it;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Module;
 import io.ddd4j.javalin.mq.pulsar.Ddd4jPulsarMqGuiceModule;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
-import io.ddd4j.mq.MQClient;
-import io.ddd4j.mq.MQProperties;
-import io.ddd4j.mq.annotation.MQEventListener;
-import io.ddd4j.mq.event.MQEvent;
-import io.ddd4j.mq.listener.MQListener;
+import io.ddd4j.javalin.testcontainers.messaging.AbstractMqIntegrationTest;
 import io.ddd4j.mq.pulsar.PulsarMQClient;
 import io.ddd4j.mq.pulsar.PulsarProperties;
-import io.ddd4j.mq.serialization.JsonMQEventSerialization;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 /**
  * Integration test for {@link Ddd4jPulsarMqGuiceModule} against a real Apache Pulsar
  * standalone instance brought up by Testcontainers (GenericContainer, no GA Testcontainers
- * module yet).
+ * module yet). 公共骨架继承自 {@link AbstractMqIntegrationTest}。
  *
- * <p>Verifies a real publish → broker → consume round trip through
- * {@link PulsarMQClient}: the event is published without a tag on purpose — the Pulsar
- * adapter appends {@code :tag} to the physical topic on publish while the consumer
- * subscribes to the bare topic, so a tagged round trip would target different topics.
+ * <p>Pulsar 差异：事件<b>不带 tag</b> 发布 —— Pulsar 适配层在 publish 时把
+ * {@code :tag} 拼到物理 topic 上，而 consumer 订阅裸 topic，带 tag 的 round trip
+ * 会落到不同 topic。因此 {@link #tagName()} 返回 {@code null}、listener 订阅
+ * tags 为 {@code *}。
  */
 @Tag("integration")
 @JunitJupiterTestContainers
-class Ddd4jPulsarMqIT {
-
-    private static final String TOPIC = "ddd4j.it.pulsar";
+class Ddd4jPulsarMqIT extends AbstractMqIntegrationTest<PulsarProperties, PulsarMQClient> {
 
     @SuppressWarnings("resource")
     private static final GenericContainer<?> PULSAR = new GenericContainer<>(
@@ -54,76 +39,60 @@ class Ddd4jPulsarMqIT {
             .waitingFor(Wait.forLogMessage(".*Created namespace public/default.*", 1)
                     .withStartupTimeout(Duration.ofMinutes(5)));
 
-    @Test
-    void shouldResolveCoreContractsFromGuice() {
-        PULSAR.start();
-        try {
-            PulsarProperties brokerProps = new PulsarProperties();
-            brokerProps.setServiceUrl("pulsar://" + PULSAR.getHost() + ":" + PULSAR.getMappedPort(6650));
-            brokerProps.setNamespace("default");
-            MQProperties mqProps = new MQProperties();
-            mqProps.setEnabled(true);
-            mqProps.setBroker("pulsar");
-
-            Injector injector = Guice.createInjector(new Ddd4jPulsarMqGuiceModule(
-                    new PulsarMQClient(brokerProps), brokerProps));
-
-            assertThat(injector.getInstance(MQClient.class)).isNotNull();
-            assertThat(injector.getInstance(PulsarMQClient.class)).isNotNull();
-            assertThat(injector.getInstance(MQProperties.class)).isSameAs(brokerProps);
-        } finally {
-            PULSAR.stop();
-        }
+    @Override
+    protected String brokerName() {
+        return "pulsar";
     }
 
-    @Test
-    void shouldPublishAndConsumeRoundTrip() throws Exception {
-        PULSAR.start();
-        try {
-            PulsarProperties brokerProps = new PulsarProperties();
-            brokerProps.setServiceUrl("pulsar://" + PULSAR.getHost() + ":" + PULSAR.getMappedPort(6650));
-            brokerProps.setNamespace("default");
-            brokerProps.setSubscriptionName("it-sub");
-            MQProperties mqProps = new MQProperties();
-            mqProps.setEnabled(true);
-            mqProps.setBroker("pulsar");
-            mqProps.setPersist(false);
-
-            PulsarMQClient client = new PulsarMQClient(brokerProps);
-            Injector injector = Guice.createInjector(new Ddd4jPulsarMqGuiceModule(client, brokerProps));
-            MQClient mqClient = injector.getInstance(MQClient.class);
-
-            SmokeListener bean = new SmokeListener();
-            Method onSmoke = SmokeListener.class.getMethod("onSmoke", MQEvent.class);
-            MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
-
-            // No tag: the consumer subscribes to the bare physical topic
-            // (tenant/namespace/topic), the producer appends ":tag" on publish.
-            MQEvent event = new MQEvent();
-            event.setMsgId("pulsar-it-" + System.nanoTime());
-            event.setTopic(TOPIC);
-            event.publish();
-
-            await().atMost(Duration.ofSeconds(20)).until(() -> bean.received.get() != null);
-            MQEvent received = bean.received.get();
-            assertThat(received.getMsgId()).isEqualTo(event.getMsgId());
-            assertThat(received.getTopic()).isEqualTo(TOPIC);
-        } finally {
-            PULSAR.stop();
-        }
+    @Override
+    protected String topicName() {
+        return "ddd4j.it.pulsar";
     }
 
-    /**
-     * Listener bean invoked by the ddd4j consume pipeline; records the delivered event.
-     */
-    public static class SmokeListener {
+    @Override
+    protected GenericContainer<?> container() {
+        return PULSAR;
+    }
 
-        final AtomicReference<MQEvent> received = new AtomicReference<>();
+    @Override
+    protected PulsarProperties newProperties() {
+        PulsarProperties props = new PulsarProperties();
+        props.setServiceUrl("pulsar://" + PULSAR.getHost() + ":" + PULSAR.getMappedPort(6650));
+        props.setNamespace("default");
+        props.setSubscriptionName("it-sub");
+        return props;
+    }
 
-        @MQEventListener(topic = TOPIC, tags = "*", group = "it-pulsar-consumer")
-        public void onSmoke(MQEvent event) {
-            received.set(event);
-        }
+    @Override
+    protected PulsarMQClient newClient(PulsarProperties props) {
+        return new PulsarMQClient(props);
+    }
+
+    @Override
+    protected Module guiceModule(PulsarMQClient client, PulsarProperties props) {
+        return new Ddd4jPulsarMqGuiceModule(client, props);
+    }
+
+    @Override
+    protected Class<PulsarMQClient> clientClass() {
+        return PulsarMQClient.class;
+    }
+
+    @Override
+    protected String tagName() {
+        // No tag: the consumer subscribes to the bare physical topic
+        // (tenant/namespace/topic), the producer appends ":tag" on publish.
+        return null;
+    }
+
+    @Override
+    protected String listenerTags() {
+        return "*";
+    }
+
+    @Override
+    protected Duration consumerSettleDelay() {
+        // Pulsar consumer 创建为同步（receive 前已 subscribe），无需额外等待
+        return Duration.ZERO;
     }
 }

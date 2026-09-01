@@ -45,6 +45,30 @@
             <artifactId>microprofile-config-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- 单元测试：junit-jupiter / assertj-core 由 ddd4j-dependencies 继承链统一管理（test scope） -->
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 根 pom pluginManagement 全局 skip 单元测试；本模块含纯单元测试（无容器依赖），
+                 参照 ddd4j-javalin-mq-* 模块方式本地开启。argLine 必须覆写：继承链中的
+                 -XX:PermSize/-XX:MaxPermSize 在 JDK 17 下会导致 fork JVM 启动失败。 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <skipTests>false</skipTests>
+                    <argLine>-Xmx1024m -Dfile.encoding=UTF-8</argLine>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

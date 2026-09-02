@@ -61,8 +61,8 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
-                        <skip>true</skip>
-                        <skipTests>true</skipTests>
+                        <skip>false</skip>
+                        <skipTests>false</skipTests>
                         <argLine>${jacoco.agent.argLine} -Xmx1024m -Dfile.encoding=UTF-8</argLine>
                     </configuration>
                 </plugin>

@@ -16,7 +16,10 @@
         CacheConfig/Readiness 等 + runtime-guice 核心装配类）。6.7.x 改挂 core 1.0.x 时，
         这些在 1.0.x（Spring AutoConfig 范式）中不存在，由本模块以原包名提供，
         javalin 各模块 import 零改动。来源：ddd4j 2.0.x ddd4j-runtime-guice / ddd4j-core。
-        排除项（另行处理）：Ddd4jMybatis/Crypto/Logs/Cache 四个 data 向 Module 与 ddd4j-cache。
+        M4 补充：core.cache 契约补全（CacheStats/CacheType/CasCache/CASOperation/AtomicCache/
+        CacheLock/GetsResponse，支撑 ddd4j-javalin-cache 内联的 CacheKit/CaffeineCache）。
+        其余去向：Ddd4jCacheGuiceModule → ddd4j-javalin-cache；Ddd4jMybatis/CryptoGuiceModule →
+        ddd4j-javalin-data 对应模块；Ddd4jLogsGuiceModule 仍为排除项（另行处理）。
     </description>
 
     <dependencies>

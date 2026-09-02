@@ -11,24 +11,35 @@
     </parent>
 
     <artifactId>ddd4j-javalin-cache</artifactId>
-    <description>ddd4j-javalin 缓存层 Guice 桥接：通过 Guice Module 注册 CacheKit 到 Javalin + Guice 容器。</description>
+    <description>
+        ddd4j-javalin 缓存层 Guice 桥接：通过 Guice Module 注册 CacheKit 到 Javalin + Guice 容器。
+        内联 2.0.x ddd4j-cache 消费子集（io.ddd4j.cache.CacheKit / cache.local.CaffeineCache，原包名）
+        与 Ddd4jCacheGuiceModule：6.7.x 改挂 core 1.0.x（无 ddd4j-cache 构件）时 import 零改动。
+        排除项：cache.subject.InMemorySubject/InMemorySubjectProvider（1.0.x Subject 契约变更为
+        M5 重写项）；CacheKit 的 GUAVA/HUTOOL 实现类（无消费方，未内联，枚举值保留）。
+    </description>
 
     <dependencies>
+        <!-- 内联 core.cache 契约（io.ddd4j.core.cache.*）与 Guice 运行时 -->
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-cache</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-runtime-guice</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
-</dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

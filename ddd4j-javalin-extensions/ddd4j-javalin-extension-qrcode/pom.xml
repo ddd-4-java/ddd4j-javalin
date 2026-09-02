@@ -11,13 +11,30 @@
     </parent>
 
     <artifactId>ddd4j-javalin-extension-qrcode</artifactId>
-    <description>Ddd4j Javalin QR Code Guice assembly and opt-in routes</description>
+    <description>
+        Ddd4j Javalin QR Code Guice assembly and opt-in routes.
+        内联 2.0.x ddd4j-extension-qrcode 全量 23 类（io.ddd4j.extension.qrcode，原包名）：
+        6.7.x 改挂 core 1.0.x（无该构件）时 javalin 侧 import 零改动。
+    </description>
 
     <dependencies>
+        <!-- 内联类所需：zxing（编解码）+ commons-lang3 + lombok -->
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-extension-qrcode</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

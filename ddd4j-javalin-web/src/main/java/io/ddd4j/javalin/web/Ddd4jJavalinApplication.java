@@ -132,9 +132,10 @@ public final class Ddd4jJavalinApplication {
 
     private static void applyHealthEndpoint(Javalin app, Ddd4jJavalinProperties properties) {
         if (properties.isHealthEndpoint()) {
-            app.unsafe.routes.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
-            app.unsafe.routes.get("/health/readiness", ctx -> ctx.json("{\"status\":\"READY\"}"));
-            app.unsafe.routes.get("/health/liveness", ctx -> ctx.json("{\"status\":\"LIVE\"}"));
+            // Javalin 6 API：start() 前经 RoutingApi 注册（7.x 的 app.unsafe.routes 在 6.7.0 不存在）
+            app.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
+            app.get("/health/readiness", ctx -> ctx.json("{\"status\":\"READY\"}"));
+            app.get("/health/liveness", ctx -> ctx.json("{\"status\":\"LIVE\"}"));
         }
     }
 }

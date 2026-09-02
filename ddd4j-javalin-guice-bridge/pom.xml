@@ -17,6 +17,12 @@
         这些在 1.0.x（Spring AutoConfig 范式）中不存在，由本模块以原包名提供，
         javalin 各模块 import 零改动。来源：ddd4j 2.0.x ddd4j-runtime-guice / ddd4j-core。
         排除项（另行处理）：Ddd4jMybatis/Crypto/Logs/Cache 四个 data 向 Module 与 ddd4j-cache。
+
+        M3 追加：ddd4j 2.0.x web 契约内联（io.ddd4j.web.core 25 文件 +
+        io.ddd4j.web.javalin 10 文件，Javalin 6 API 形态，原包名不变）。
+        来源：ddd4j 2.0.x ddd4j-web-core / ddd4j-web-javalin。
+        web-core 排除项：context.SynchronousWebRequestSession（消费闭包外）、
+        idempotency.CacheIdempotencyGuard（依赖 ddd4j-cache.CacheKit，随 cache 内联另行处理）。
     </description>
 
     <dependencies>
@@ -41,6 +47,16 @@
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
+        </dependency>
+        <!-- M3：web 契约（io.ddd4j.web.javalin）编译所需 -->
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

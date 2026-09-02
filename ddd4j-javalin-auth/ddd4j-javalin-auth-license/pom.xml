@@ -19,6 +19,12 @@
     </description>
 
     <dependencies>
+        <!-- 共享认证 Module 骨架（AbstractAuthJavalinModule） -->
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-auth-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <dependency>
             <groupId>io.ddd4j</groupId>
             <artifactId>ddd4j-extension-license</artifactId>

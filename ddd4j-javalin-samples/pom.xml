@@ -25,8 +25,9 @@
         <subproject>ddd4j-javalin-sample-auth-satoken</subproject>
         <subproject>ddd4j-javalin-sample-auth-security</subproject>
         <subproject>ddd4j-javalin-sample-auth-shiro</subproject>
-        <subproject>ddd4j-javalin-sample-cqrs-person</subproject>
-        <subproject>ddd4j-javalin-sample-rich-model</subproject>
+        <!-- 中档 7.1.x：cqrs-person/rich-model 的上游 sample 构件（ddd4j-sample-*:2.0.x）不存在，排除 -->
+        <!-- <subproject>ddd4j-javalin-sample-cqrs-person</subproject> -->
+        <!-- <subproject>ddd4j-javalin-sample-rich-model</subproject> -->
         <subproject>ddd4j-javalin-sample-mybatis-testcontainers</subproject>
         <subproject>ddd4j-javalin-sample-order-outbox</subproject>
     </subprojects>

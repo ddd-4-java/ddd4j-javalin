@@ -17,6 +17,8 @@
 | `ddd4j-javalin-sample-mq-kafka`               | MQ        | Apache Kafka 示例 |
 | `ddd4j-javalin-sample-mq-rabbitmq`            | MQ        | RabbitMQ（AMQP 0-9-1）示例 |
 
+> ⚠️ **sample-mq-{disruptor,kafka,rabbitmq} 暂不参与主构建**：三者面向 2.0.x 线 API（`io.ddd4j.core.event` 包）编写，依赖的上游快照（`io.ddd4j:ddd4j-core/mq-*:2.0.x.20260730-SNAPSHOT`、`ddd4j-runtime-guice:2.0.x`）尚未部署到阿里云私仓，当前无法编译。上游构件补发后，将三个模块加入 `ddd4j-javalin-samples/pom.xml` 的 `<modules>` 即可启用。
+
 验证命令：
 
 ```bash

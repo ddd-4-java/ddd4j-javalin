@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>io.ddd4j.javalin</groupId>
         <artifactId>ddd4j-javalin-auth</artifactId>
@@ -11,25 +10,21 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>ddd4j-javalin-auth-license</artifactId>
+    <artifactId>ddd4j-javalin-auth-core</artifactId>
     <description>
-        ddd4j-javalin + ddd4j-extension-license 整合：
-        Guice Module 注册 LicenseVerify + LicenseProperties，installOnStart 控制证书安装。
-        对标 ddd4j-boot-auth-license / ddd4j-boot-extension-akka license 配置。
+        ddd4j-javalin-auth 共享内核：AbstractAuthJavalinModule 模板基类
+        （SubjectProvider eager 绑定 + SubjectKit 写回 + 子模块装配钩子）。
+        license / satoken / security / shiro 四个整合模块共同继承，消除重复的 Guice Module 骨架。
     </description>
 
     <dependencies>
-        <!-- 共享认证 Module 骨架（AbstractAuthJavalinModule） -->
-        <dependency>
-            <groupId>io.ddd4j.javalin</groupId>
-            <artifactId>ddd4j-javalin-auth-core</artifactId>
-            <version>${revision}</version>
-        </dependency>
+        <!-- ddd4j core：SubjectProvider / SubjectKit -->
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-extension-license</artifactId>
+            <artifactId>ddd4j-core</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <!-- Guice（DI 容器） -->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>

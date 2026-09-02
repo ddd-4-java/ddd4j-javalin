@@ -43,6 +43,21 @@
         <module>ddd4j-javalin-mq-mqtt</module>
         <module>ddd4j-javalin-mq-mqtt-mica</module>
         <module>ddd4j-javalin-mq-tdmq</module>
+        <!-- ======== M2 内联契约模块（来源：ddd4j 2.0.x ddd4j-mq，原包名 io.ddd4j.mq.*） ======== -->
+        <module>ddd4j-javalin-mq-contract</module>
+        <module>ddd4j-javalin-mq-activemq-contract</module>
+        <module>ddd4j-javalin-mq-disruptor-contract</module>
+        <module>ddd4j-javalin-mq-kafka-contract</module>
+        <module>ddd4j-javalin-mq-mqtt-contract</module>
+        <module>ddd4j-javalin-mq-mqtt-mica-contract</module>
+        <module>ddd4j-javalin-mq-nats-contract</module>
+        <module>ddd4j-javalin-mq-ons-contract</module>
+        <module>ddd4j-javalin-mq-pulsar-contract</module>
+        <module>ddd4j-javalin-mq-rabbitmq-contract</module>
+        <module>ddd4j-javalin-mq-redis-stream-contract</module>
+        <module>ddd4j-javalin-mq-rocketmq-contract</module>
+        <module>ddd4j-javalin-mq-sqs-contract</module>
+        <module>ddd4j-javalin-mq-tdmq-contract</module>
     </modules>
 
 </project>

@@ -79,11 +79,12 @@
         </dependency>
 
         <!-- messaging.AbstractMqIntegrationTest（main 目录）所需的 MQ 契约 / Guice / 断言 / 等待库；
-             compile scope 以便 10 个 mq-* IT 模块经 test 依赖传递引用 -->
+             compile scope 以便 10 个 mq-* IT 模块经 test 依赖传递引用。
+             M2 内联：改挂 ddd4j-javalin-mq-contract（2.0.x ddd4j-mq-core 契约原包名内联），不再依赖私服缺失的 2.0.x 构件 -->
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-mq-core</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-mq-contract</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

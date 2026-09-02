@@ -20,10 +20,11 @@
             <artifactId>ddd4j-javalin-mq-core</artifactId>
             <version>${revision}</version>
         </dependency>
+        <!-- M2 内联：2.0.x ddd4j-mq-kafka 契约已内联至 ddd4j-javalin-mq-kafka-contract（原包名 io.ddd4j.mq.*） -->
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-mq-kafka</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-mq-kafka-contract</artifactId>
+            <version>${revision}</version>
         </dependency>
 
         <!-- ======== 测试：验证 Guice 装配 + 契约解析（用 mock KafkaTemplate，无需真实 Kafka）======== -->

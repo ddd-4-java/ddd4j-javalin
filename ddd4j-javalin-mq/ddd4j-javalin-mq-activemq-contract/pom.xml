@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-mq</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-mq-activemq-contract</artifactId>
+    <description>
+        内联契约：ddd4j 2.0.x ddd4j-mq-activemq 的 ActiveMQClient/ActiveMQProperties（io.ddd4j.mq.activemq.*，原包名），供 ddd4j-javalin-mq-activemq 的 Guice 桥接编译可达。来源：ddd4j 2.0.x ddd4j-mq/ddd4j-mq-activemq。
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-mq-contract</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!-- 客户端版本显式钉住（源自 2.0.x ddd4j-dependencies artemis-bom），M5 切 1.0.x 后 MQ 契约自包含 -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-jakarta-client</artifactId>
+            <version>2.44.0</version>
+        </dependency>
+    </dependencies>
+</project>

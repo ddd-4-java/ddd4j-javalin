@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-mq</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-mq-redis-stream-contract</artifactId>
+    <description>
+        内联契约：ddd4j 2.0.x ddd4j-mq-redis-stream 的 RedisStreamMQClient/RedisStreamMQProperties 及 Jedis/Lettuce/Redisson 三实现（io.ddd4j.mq.redisstream.*，原包名），供 ddd4j-javalin-mq-redis-stream 的 Guice 桥接编译可达。来源：ddd4j 2.0.x ddd4j-mq/ddd4j-mq-redis-stream。
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-mq-contract</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>7.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>7.1.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.52.0</version>
+        </dependency>
+    </dependencies>
+</project>

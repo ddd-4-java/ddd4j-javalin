@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-mq</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-mq-contract</artifactId>
+    <description>
+        内联契约：ddd4j 2.0.x ddd4j-mq-core 的纯 Java MQ 抽象（io.ddd4j.mq.*，零 Spring），
+        6.7.x 改挂 core 1.0.x 时私服缺失 2.0.x ddd4j-mq 构件，由本模块以原包名提供，
+        javalin-mq 各模块 import 零改动。来源：ddd4j 2.0.x ddd4j-mq/ddd4j-mq-core。
+        契约对 io.ddd4j.core.context / io.ddd4j.kit.lang 的引用沿用 ${ddd4j.version} 构件，
+        M5 切 1.0.x 时随 bridge 同步消解。
+    </description>
+
+    <dependencies>
+        <!-- MQ 契约引用的 core 契约：BaseContext / ThreadContext / ContextConstants -->
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-core</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+        <!-- MQ 契约引用的 kit 工具：JsonKit / StrKit -->
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-kit</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+        <!-- MQEvent @JsonAlias；2.0.x ddd4j-core 中为 optional，不传递，需显式声明（版本走已 import 的 ddd4j-dependencies BOM） -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+    </dependencies>
+</project>

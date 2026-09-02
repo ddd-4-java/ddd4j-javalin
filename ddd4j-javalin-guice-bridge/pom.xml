@@ -31,6 +31,40 @@
         ddd4j-javalin-data 对应模块；Ddd4jLogsGuiceModule 仍为排除项（另行处理）。
     </description>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- 本模块直赖 javalin 6.7.0（显式钉版见下），jetty 必须同步 11.x；
+                 直接条目优先于 parent 链/2.0.x BOM 的 12.1.8 管理（该版本不存在） -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-bom</artifactId>
+                <version>11.0.25</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.websocket</groupId>
+                <artifactId>websocket-servlet</artifactId>
+                <version>11.0.25</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>11.0.25</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>11.0.25</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>11.0.25</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>io.ddd4j</groupId>
@@ -54,10 +88,13 @@
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
         </dependency>
-        <!-- M3：web 契约（io.ddd4j.web.javalin）编译所需 -->
+        <!-- M3：web 契约（io.ddd4j.web.javalin）编译所需。
+             显式钉 6.7.0：否则 ddd4j-core:2.0.x 传递的 2.0.x BOM（javalin 7.2.2）
+             会赢得仲裁，造成 bridge 编译于 J7、运行于 J6 的混合解析 -->
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
+            <version>6.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

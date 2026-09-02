@@ -91,10 +91,13 @@ public final class Ddd4jJavalinWeb {
 
     public void configure(JavalinConfig config) {
         JavalinConfig javalinConfig = Objects.requireNonNull(config, "config must not be null");
-        javalinConfig.routes.before(this::openContext);
-        javalinConfig.routes.after(this::completeContext);
-        javalinConfig.routes.exception(Exception.class, this::handleException);
-        javalinConfig.routes.get(ReadinessEndpoint.PATH, this::readiness);
+        // Javalin 6.7.0：路由注册在 config.router（7.x 改名 routes），经 mount 挂回调
+        javalinConfig.router.mount(router -> {
+            router.before(this::openContext);
+            router.after(this::completeContext);
+            router.exception(Exception.class, this::handleException);
+            router.get(ReadinessEndpoint.PATH, this::readiness);
+        });
     }
 
     private void readiness(Context context) {

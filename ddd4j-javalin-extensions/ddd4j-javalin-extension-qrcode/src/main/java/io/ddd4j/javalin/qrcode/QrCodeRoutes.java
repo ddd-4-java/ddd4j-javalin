@@ -31,10 +31,10 @@ public class QrCodeRoutes {
 
     public void register(Javalin app) {
         Objects.requireNonNull(app, "app must not be null");
-        app.unsafe.routes.post(config.getBasePath() + "/render", this::render);
-        app.unsafe.routes.post(config.getBasePath() + "/base64", this::base64);
-        app.unsafe.routes.post(config.getBasePath() + "/decode", this::decode);
-        app.unsafe.routes.exception(IllegalArgumentException.class, (exception, context) -> error(context,
+        app.post(config.getBasePath() + "/render", this::render);
+        app.post(config.getBasePath() + "/base64", this::base64);
+        app.post(config.getBasePath() + "/decode", this::decode);
+        app.exception(IllegalArgumentException.class, (exception, context) -> error(context,
                 400, "QRCODE_INVALID_ARGUMENT", exception.getMessage()));
     }
 

@@ -140,6 +140,18 @@ class MyIT extends JavalinTestFixture {
 - **6.3.x 轨**(本仓库)— 框架集成层,正在追赶 [`ddd4j-boot`](../ddd4j-boot) 的能力矩阵
 - 当前快照:`1.0.x.20260630-SNAPSHOT` / `ddd4j 2.0.x` / Java 17
 
+### 三档版本矩阵（2026-09 定版）
+
+| 档位 | core 上游 | 本仓库分支 | Javalin | Jackson | JDK | 定位 |
+|------|----------|-----------|---------|---------|-----|------|
+| 低档 | `1.0.x.20260630-SNAPSHOT` | `feature/6.7.x`（改挂工程：`opt/retarget-1.0.x` @ tag `m5-retarget-1.0.x`，142 测试全绿） | 6.7.0 | Jackson 2 | 17* | 存量 Spring 生态维护线 |
+| 中档 | `2.0.x.20260730-SNAPSHOT` | `feature/7.1.x` @ c62b7e5 | 7.1.0 | Jackson 2 | 17 | **新项目主力线**（JDK17+J2 当前主流基线） |
+| 高档 | `3.0.x.20260630-SNAPSHOT` | `feature/7.2.x` @ f5cf1b1 | 7.2.3 | Jackson 3 | 21 | 前瞻预留线（未来升 Javalin 7.3.x） |
+
+\* 低档 javalin 侧编译 Java 17，消费的 core 1.0.x 构件为 Java 8。
+
+中档/高档共性排除清单（上游构件在对应 core 线不存在）：extension-akka/jackson/pf4j、sample-cqrs-person/rich-model；低档另排除 extension-akka/jackson/pf4j（同因）。auth-security 链在低档暂排（待上游 1.0.x 修复 core.auth.* 面板）。
+
 ## 生产就绪状态
 
 当前阶段：**internal beta**（功能完成、56 模块单测全绿、10 个容器级 IT 中 9 个真实 round-trip 通过）。

@@ -1,9 +1,8 @@
 package io.ddd4j.javalin.auth.shiro;
 
-import com.google.inject.AbstractModule;
 import io.ddd4j.auth.shiro.subject.ShiroSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
-import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.javalin.auth.AbstractAuthJavalinModule;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -39,7 +38,7 @@ import org.apache.shiro.authz.UnauthorizedException;
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
 @Slf4j
-public class Ddd4jShiroJavalinModule extends AbstractModule {
+public class Ddd4jShiroJavalinModule extends AbstractAuthJavalinModule {
 
     /**
      * 注册 Javalin 异常处理器：统一 Shiro 鉴权异常响应（对标 Spring @ControllerAdvice ShiroExceptionHandler）。
@@ -63,16 +62,12 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
                         + exception.getMessage() + "\"}"));
     }
 
+    /**
+     * SubjectProvider 工厂钩子：提供 Shiro 适配的 {@link ShiroSubjectProvider}，
+     * 由基类负责 eager 单例绑定 + SubjectKit 写回。
+     */
     @Override
-    protected void configure() {
-        // 创建 SubjectProvider 实例并 eager 绑定（单例）
-        ShiroSubjectProvider provider = new ShiroSubjectProvider();
-        bind(SubjectProvider.class).toInstance(provider);
-
-        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
-        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
-        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
-        SubjectKit.register(provider);
-        log.info("ShiroSubjectProvider registered to SubjectKit (eager, at Injector creation)");
+    protected SubjectProvider subjectProvider() {
+        return new ShiroSubjectProvider();
     }
 }

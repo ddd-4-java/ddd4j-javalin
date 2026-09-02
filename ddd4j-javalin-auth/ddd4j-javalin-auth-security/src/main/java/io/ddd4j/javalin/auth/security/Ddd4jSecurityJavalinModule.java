@@ -1,9 +1,8 @@
 package io.ddd4j.javalin.auth.security;
 
-import com.google.inject.AbstractModule;
 import io.ddd4j.auth.security.subject.SecuritySubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
-import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.javalin.auth.AbstractAuthJavalinModule;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -47,7 +46,7 @@ import org.springframework.security.core.AuthenticationException;
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
 @Slf4j
-public class Ddd4jSecurityJavalinModule extends AbstractModule {
+public class Ddd4jSecurityJavalinModule extends AbstractAuthJavalinModule {
 
     /**
      * 注册 Javalin 异常处理器：统一 Spring Security 鉴权异常响应
@@ -75,16 +74,12 @@ public class Ddd4jSecurityJavalinModule extends AbstractModule {
                         + exception.getMessage() + "\"}"));
     }
 
+    /**
+     * SubjectProvider 工厂钩子：提供 Spring Security 适配的 {@link SecuritySubjectProvider}，
+     * 由基类负责 eager 单例绑定 + SubjectKit 写回。
+     */
     @Override
-    protected void configure() {
-        // 创建 SubjectProvider 实例并 eager 绑定（单例）
-        SecuritySubjectProvider provider = new SecuritySubjectProvider();
-        bind(SubjectProvider.class).toInstance(provider);
-
-        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
-        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
-        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
-        SubjectKit.register(provider);
-        log.info("SecuritySubjectProvider registered to SubjectKit (eager, at Injector creation)");
+    protected SubjectProvider subjectProvider() {
+        return new SecuritySubjectProvider();
     }
 }

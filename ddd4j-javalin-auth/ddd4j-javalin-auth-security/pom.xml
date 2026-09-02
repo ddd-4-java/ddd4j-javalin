@@ -17,6 +17,12 @@
     </description>
 
     <dependencies>
+        <!-- 共享内核：AbstractAuthJavalinModule 模板基类 -->
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-auth-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <!-- ddd4j auth security 实现（允许 Spring） -->
         <dependency>
             <groupId>io.ddd4j</groupId>

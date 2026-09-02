@@ -1,9 +1,9 @@
 package io.ddd4j.javalin.auth.license;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.extension.license.LicenseVerify;
+import io.ddd4j.javalin.auth.AbstractAuthJavalinModule;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,9 +18,12 @@ import lombok.extern.slf4j.Slf4j;
  * the responsibility of the consumer application. The intent is that the ddd4j-web-javalin
  * filter chain (or the consumer's {@code Application} class) inspects the resolved
  * {@code LicenseVerify} and decides whether to gate requests.
+ *
+ * <p>license 模块无 {@link io.ddd4j.core.subject.SubjectProvider} 可注册（仅提供证书校验），
+ * 不覆写 {@code subjectProvider()} 钩子（返回 {@code null}，基类跳过注册）。
  */
 @Slf4j
-public class Ddd4jLicenseJavalinModule extends AbstractModule {
+public class Ddd4jLicenseJavalinModule extends AbstractAuthJavalinModule {
 
     private final LicenseProperties properties;
 
@@ -33,7 +36,7 @@ public class Ddd4jLicenseJavalinModule extends AbstractModule {
     }
 
     @Override
-    protected void configure() {
+    protected void configureModule() {
         bind(LicenseProperties.class).toInstance(properties);
     }
 

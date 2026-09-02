@@ -4,12 +4,11 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.strategy.SaAnnotationStrategy;
-import com.google.inject.AbstractModule;
 import io.ddd4j.auth.satoken.handler.SaInternalCheckHandler;
 import io.ddd4j.auth.satoken.handler.SaMixCheckLoginHandler;
 import io.ddd4j.auth.satoken.subject.SaTokenSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
-import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.javalin.auth.AbstractAuthJavalinModule;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
 @Slf4j
-public class Ddd4jSaTokenJavalinModule extends AbstractModule {
+public class Ddd4jSaTokenJavalinModule extends AbstractAuthJavalinModule {
 
     /**
      * 注册 Javalin 异常处理器：统一 Sa-Token 鉴权异常响应（对标 Spring @ControllerAdvice）。
@@ -67,23 +66,24 @@ public class Ddd4jSaTokenJavalinModule extends AbstractModule {
                         + exception.getMessage() + "\"}"));
     }
 
+    /**
+     * SubjectProvider 工厂钩子：提供 sa-token 适配的 {@link SaTokenSubjectProvider}，
+     * 由基类负责 eager 单例绑定 + SubjectKit 写回。
+     */
     @Override
-    protected void configure() {
-        // 创建 SubjectProvider 实例并 eager 绑定（单例）
-        SaTokenSubjectProvider provider = new SaTokenSubjectProvider();
+    protected SubjectProvider subjectProvider() {
+        return new SaTokenSubjectProvider();
+    }
+
+    @Override
+    protected void configureModule() {
+        // broker 特定组件：sa-token 混合登录 / 内部 API Key 注解处理器
         SaMixCheckLoginHandler mixCheckLoginHandler = new SaMixCheckLoginHandler();
         SaInternalCheckHandler internalCheckHandler = new SaInternalCheckHandler();
-        bind(SubjectProvider.class).toInstance(provider);
         bind(SaMixCheckLoginHandler.class).toInstance(mixCheckLoginHandler);
         bind(SaInternalCheckHandler.class).toInstance(internalCheckHandler);
 
         SaAnnotationStrategy.instance.registerAnnotationHandler(mixCheckLoginHandler);
         SaAnnotationStrategy.instance.registerAnnotationHandler(internalCheckHandler);
-
-        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
-        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
-        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
-        SubjectKit.register(provider);
-        log.info("SaTokenSubjectProvider registered to SubjectKit (eager, at Injector creation)");
     }
 }

@@ -3,9 +3,6 @@ package io.ddd4j.javalin.cache;
 import io.ddd4j.cache.CacheKit;
 import io.ddd4j.core.cache.Cache;
 import io.ddd4j.core.cache.CacheConfig;
-import io.ddd4j.cache.CacheKit;
-import io.ddd4j.core.cache.Cache;
-import io.ddd4j.core.cache.CacheConfig;
 
 import java.util.function.Function;
 

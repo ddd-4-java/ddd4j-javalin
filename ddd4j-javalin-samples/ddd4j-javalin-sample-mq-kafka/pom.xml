@@ -33,9 +33,9 @@
 
         <!-- ddd4j Guice 运行时绑定 -->
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-runtime-guice</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+            <version>${revision}</version>
         </dependency>
 
         <!-- ddd4j MQ 核心 -->

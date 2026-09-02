@@ -48,6 +48,11 @@ public final class SpiKeys {
      * 认证主体提供者 SPI key，对应 {@code io.ddd4j.core.subject.SubjectProvider}
      */
     public static final String SUBJECT_PROVIDER = PREFIX + "security.SubjectProvider";
+
+    /**
+     * 1.0.x 改挂补钉：请求级 Subject 线程绑定 key（2.0.x ThreadContext#bind(Subject) 的承载位）。
+     */
+    public static final String SUBJECT = PREFIX + "subject.Subject";
     /**
      * 国际化提供者 SPI key，对应 {@code io.ddd4j.core.i18n.I18nProvider}
      */

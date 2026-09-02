@@ -3,6 +3,7 @@ package io.ddd4j.core.context;
 import io.ddd4j.core.constant.SpiKeys;
 import lombok.experimental.UtilityClass;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -44,11 +45,14 @@ public class Contexts {
      * @return 包装的服务实例 Optional
      */
     public <T> Optional<T> get(String key, Class<T> type) {
-        Optional<T> threadScoped = ThreadContext.get(key, type);
-        if (threadScoped.isPresent()) {
-            return threadScoped;
+        Object value = ThreadContext.get(key);
+        if (Objects.isNull(value)) {
+            value = BaseContext.get(key);
         }
-        return BaseContext.get(key, type);
+        if (SpiRegistrationScope.REMOVED == value) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(type.cast(value));
     }
 
     /**
@@ -78,6 +82,6 @@ public class Contexts {
      * @param <T>   服务类型
      */
     public <T> void register(String key, Class<T> type, T value) {
-        BaseContext.inject(key, type, value);
+        BaseContext.inject(key, value);
     }
 }

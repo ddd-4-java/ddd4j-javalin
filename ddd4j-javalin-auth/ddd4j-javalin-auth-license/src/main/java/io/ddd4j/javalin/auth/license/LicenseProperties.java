@@ -7,7 +7,7 @@ import lombok.Setter;
  * Configuration properties for ddd4j-javalin-auth-license, bound from
  * {@code ddd4j.auth.license.*} keys.
  *
- * <p>Mirrors {@code io.ddd4j.extension.license.LicenseProperties} but expressed as a
+ * <p>Mirrors {@code io.ddd4j.auth.license.LicenseProperties} but expressed as a
  * plain POJO so the Javalin module doesn't need to depend on the ddd4j extension
  * module's Lombok-generated setters.
  */

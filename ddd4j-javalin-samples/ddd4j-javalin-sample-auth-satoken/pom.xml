@@ -15,9 +15,9 @@
     <dependencies>
         <!-- ddd4j-runtime-guice 提供 Guice 基础设施和 DDD 注解扫描绑定 -->
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-runtime-guice</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+            <version>${revision}</version>
         </dependency>
         <!-- ddd4j-javalin auth sa-token 适配 -->
         <dependency>

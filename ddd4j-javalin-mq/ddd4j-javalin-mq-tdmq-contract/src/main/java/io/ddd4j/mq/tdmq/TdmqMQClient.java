@@ -106,7 +106,7 @@ public class TdmqMQClient implements MQClient {
         }
         String topic = resolveTopic(listener, mqProperties);
         String tagExpression = listener.getTags();
-        String group = StrKit.hasText(listener.getGroup()) ? listener.getGroup() : properties.getDefaultGroup();
+        String group = StrKit.isNotBlank(listener.getGroup()) ? listener.getGroup() : properties.getDefaultGroup();
         if (Objects.isNull(brokerSubscriber)) {
             this.brokerSubscriber = new InMemoryBrokerSubscriber(topicSubscribers);
             log.warn("TdmqMQClient: no BrokerSubscriber injected, falling back to in-memory broker (test only).");

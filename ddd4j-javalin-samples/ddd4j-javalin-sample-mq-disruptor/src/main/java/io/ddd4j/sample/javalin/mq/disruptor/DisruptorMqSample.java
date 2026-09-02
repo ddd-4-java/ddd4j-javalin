@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.core.constant.SpiKeys;
 import io.ddd4j.core.context.BaseContext;
-import io.ddd4j.core.event.MQEventPublisher;
+import io.ddd4j.core.contract.MQEventPublisher;
 import io.ddd4j.core.i18n.I18nProvider;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.sample.javalin.mq.disruptor.mq.OrderCreatedMqListener;
@@ -78,7 +78,7 @@ public class DisruptorMqSample {
                 message -> {
                     // 委托给 @MQEventListener 标注的方法
                     try {
-                        Object payload = io.ddd4j.kit.lang.JsonKit.fromJson(
+                        Object payload = io.ddd4j.core.utils.JsonKit.fromJson(
                                 (String) message.getPayload(),
                                 io.ddd4j.sample.javalin.mq.disruptor.order.domain.OrderCreatedEvent.class);
                         listener.onOrderCreated((io.ddd4j.sample.javalin.mq.disruptor.order.domain.OrderCreatedEvent) payload);

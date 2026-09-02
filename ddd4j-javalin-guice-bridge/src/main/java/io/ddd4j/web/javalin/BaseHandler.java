@@ -4,6 +4,7 @@ import io.ddd4j.core.constant.SpiKeys;
 import io.ddd4j.core.context.Contexts;
 import io.ddd4j.core.ddd.event.DomainEventPublisher;
 import io.ddd4j.core.i18n.I18nProvider;
+import io.ddd4j.guice.event.ObjectEventPublisher;
 import io.ddd4j.web.core.context.WebRequestFailure;
 import io.ddd4j.web.javalin.util.WebKit;
 import io.javalin.http.Context;
@@ -23,8 +24,12 @@ public abstract class BaseHandler {
 
     protected void logException(Context context, Exception exception) {
         log.error("Exception in request [{} {}]", context.method(), context.path(), exception);
+        // 1.0.x 改挂：DomainEventPublisher 无 publish(Object) default，经 ObjectEventPublisher
+        // 恢复 2.0.x「任意事件路由到本地事件总线」契约（Guice 实现路由到 Guava EventBus）。
         Contexts.get(SpiKeys.DOMAIN_EVENT_PUBLISHER, DomainEventPublisher.class)
-                .ifPresent(publisher -> publisher.publish(
+                .filter(ObjectEventPublisher.class::isInstance)
+                .map(ObjectEventPublisher.class::cast)
+                .ifPresent(publisher -> publisher.publishObject(
                         new WebRequestFailure(context.method().name(), context.path(), exception)));
     }
 

@@ -1,6 +1,6 @@
 package io.ddd4j.sample.javalin.mq.kafka.order.domain;
 
-import io.ddd4j.core.event.MQEvent;
+import io.ddd4j.core.contract.MQEvent;
 import lombok.Getter;
 
 import java.util.Objects;

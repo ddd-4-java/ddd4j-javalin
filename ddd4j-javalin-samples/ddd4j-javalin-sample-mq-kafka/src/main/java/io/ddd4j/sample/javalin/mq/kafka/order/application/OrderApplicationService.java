@@ -1,6 +1,6 @@
 package io.ddd4j.sample.javalin.mq.kafka.order.application;
 
-import io.ddd4j.core.event.MQEventPublisher;
+import io.ddd4j.core.contract.MQEventPublisher;
 import io.ddd4j.sample.javalin.mq.kafka.order.domain.Order;
 import io.ddd4j.sample.javalin.mq.kafka.order.domain.OrderCreatedEvent;
 

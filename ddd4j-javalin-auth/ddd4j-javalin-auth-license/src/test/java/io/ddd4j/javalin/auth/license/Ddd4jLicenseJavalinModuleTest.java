@@ -2,7 +2,7 @@ package io.ddd4j.javalin.auth.license;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.extension.license.LicenseVerify;
+import io.ddd4j.auth.license.LicenseVerify;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

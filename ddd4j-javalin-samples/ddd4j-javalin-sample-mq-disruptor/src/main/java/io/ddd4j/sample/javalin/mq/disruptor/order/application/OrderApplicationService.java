@@ -1,6 +1,6 @@
 package io.ddd4j.sample.javalin.mq.disruptor.order.application;
 
-import io.ddd4j.core.event.MQEventPublisher;
+import io.ddd4j.core.contract.MQEventPublisher;
 import io.ddd4j.sample.javalin.mq.disruptor.order.domain.Order;
 import io.ddd4j.sample.javalin.mq.disruptor.order.domain.OrderCreatedEvent;
 

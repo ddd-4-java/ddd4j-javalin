@@ -49,6 +49,13 @@
         <testcontainers.version>1.20.6</testcontainers.version>
         <testcontainers-keycloak.version>3.5.1</testcontainers-keycloak.version>
         <wiremock-standalone.version>3.9.1</wiremock-standalone.version>
+
+        <!-- 1.0.x 改挂补钉：2.0.x ddd4j-dependencies 管理而 1.0.x 链缺失的第三方版本 -->
+        <awaitility.version>4.2.2</awaitility.version>
+        <awssdk.version>2.30.0</awssdk.version>
+        <pulsar-client.version>4.2.2</pulsar-client.version>
+        <postgresql.version>42.7.8</postgresql.version>
+        <quarkus-bom.version>3.37.0</quarkus-bom.version>
     </properties>
 
     <dependencyManagement>
@@ -113,18 +120,40 @@
                 <version>${jetty11.version}</version>
             </dependency>
 
-            <!-- ddd4j Guice 适配（提供 3 个核心 SPI 的 Guice 实现 Ddd4jGuiceModule） -->
+            <!-- ddd4j Guice 适配 + web 适配（1.0.x 改挂：runtime-guice / web-core / web-javalin 均并入 bridge） -->
             <dependency>
-                <groupId>io.ddd4j</groupId>
-                <artifactId>ddd4j-runtime-guice</artifactId>
-                <version>${ddd4j.version}</version>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+                <version>${revision}</version>
             </dependency>
 
-            <!-- ddd4j web 适配（Javalin 6）— 双轨模块，applyTo 契约 -->
+            <!-- 1.0.x 改挂补钉：2.0.x 链管理而 1.0.x 链缺失的第三方版本（mq/data/sample 模块消费） -->
             <dependency>
-                <groupId>io.ddd4j</groupId>
-                <artifactId>ddd4j-web-javalin</artifactId>
-                <version>${ddd4j.version}</version>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>sqs</artifactId>
+                <version>${awssdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.pulsar</groupId>
+                <artifactId>pulsar-client</artifactId>
+                <version>${pulsar-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-bom</artifactId>
+                <version>${quarkus-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Javalin 6.7.0 核心框架与 OpenAPI 插件（显式覆盖父 BOM javalin-bom:7.2.2 管理的版本） -->

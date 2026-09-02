@@ -3,7 +3,7 @@ package io.ddd4j.web.core.error;
 import io.ddd4j.core.exception.BizRuntimeException;
 import io.ddd4j.core.exception.IdempotentException;
 import io.ddd4j.core.exception.ParamException;
-import io.ddd4j.core.exception.ValidateException;
+import io.ddd4j.core.contract.exception.ValidateException;
 import io.ddd4j.kit.lang.StrKit;
 
 import java.util.NoSuchElementException;

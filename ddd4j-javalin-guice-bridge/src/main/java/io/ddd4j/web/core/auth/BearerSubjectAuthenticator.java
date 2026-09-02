@@ -2,7 +2,7 @@ package io.ddd4j.web.core.auth;
 
 import io.ddd4j.core.constant.SpiKeys;
 import io.ddd4j.core.context.Contexts;
-import io.ddd4j.core.auth.AuthPrincipal;
+import io.ddd4j.core.subject.AuthPrincipal;
 import io.ddd4j.core.subject.Subject;
 import io.ddd4j.core.subject.SubjectProvider;
 
@@ -43,7 +43,8 @@ public final class BearerSubjectAuthenticator {
         SubjectProvider provider = Contexts.get(SpiKeys.SUBJECT_PROVIDER, SubjectProvider.class)
                 .orElseThrow(() -> new WebStatusException(401, "Subject provider is unavailable"));
         Subject subject = provider.getSubject();
-        AuthPrincipal principal = subject.verify(token);
+        // 1.0.x 改挂：Subject 无 verify(String)，等价 API 为 getPrincipalByToken(String)
+        AuthPrincipal principal = subject.getPrincipalByToken(token);
         if (Objects.isNull(principal)) {
             throw new WebStatusException(401, "Bearer token is invalid or expired");
         }

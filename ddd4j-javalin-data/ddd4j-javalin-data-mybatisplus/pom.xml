@@ -24,20 +24,22 @@
             <version>${ddd4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-runtime-guice</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+            <version>${revision}</version>
         </dependency>
         <!-- Guice（Javalin DI 容器） -->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
-        <!-- MyBatis-Plus 分页插件（运行时注册 PaginationInnerInterceptor） -->
+        <!-- 1.0.x 改挂补钉：上游 ddd4j-data-mybatisplus:1.0.x 的 POM invalid（parent 指向 jar 打包的
+             ddd4j-data），传递依赖不可用；显式补齐 mybatis-plus 本体（1.0.x 链钉 3.5.8，
+             PaginationInnerInterceptor/MybatisPlusInterceptor 位于 extension，无需 3.5.9+ 的
+             mybatis-plus-jsqlparser 独立构件）。 -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-jsqlparser</artifactId>
-            <scope>provided</scope>
+            <artifactId>mybatis-plus</artifactId>
         </dependency>
         <!-- Javalin -->
         <dependency>

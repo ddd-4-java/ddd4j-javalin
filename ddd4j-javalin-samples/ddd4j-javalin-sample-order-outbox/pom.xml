@@ -52,9 +52,9 @@
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-runtime-guice</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>io.javalin</groupId>
@@ -73,9 +73,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-cache</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-cache</artifactId>
+            <version>${revision}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

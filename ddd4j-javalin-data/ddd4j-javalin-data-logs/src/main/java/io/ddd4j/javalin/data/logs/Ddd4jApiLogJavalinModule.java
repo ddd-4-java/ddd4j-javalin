@@ -4,8 +4,8 @@ import cn.hutool.core.lang.Snowflake;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import io.ddd4j.data.logs.ApiOperationLogProvider;
-import io.ddd4j.data.logs.DefaultApiOperationLogProvider;
+import io.ddd4j.data.logs.aspect.ApiOperationLogProvider;
+import io.ddd4j.data.logs.aspect.DefaultApiOperationLogProvider;
 import io.ddd4j.data.logs.aspect.ApiOperationLogAspect;
 
 /**
@@ -35,7 +35,8 @@ public class Ddd4jApiLogJavalinModule extends AbstractModule {
 
     @Provides
     @Singleton
-    ApiOperationLogAspect apiOperationLogAspect(Snowflake snowflake, ApiOperationLogProvider logProvider) {
-        return new ApiOperationLogAspect(snowflake, logProvider);
+    ApiOperationLogAspect apiOperationLogAspect() {
+        // 1.0.x 改挂：ApiOperationLogAspect 收敛为无参构造（requestId 内聚），不再注入 Snowflake/Provider
+        return new ApiOperationLogAspect();
     }
 }

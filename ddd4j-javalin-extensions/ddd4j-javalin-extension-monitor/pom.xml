@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-extension-monitor</artifactId>
+            <artifactId>ddd4j-monitor</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
     </dependencies>

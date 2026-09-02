@@ -4,7 +4,6 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.strategy.SaAnnotationStrategy;
-import io.ddd4j.auth.satoken.handler.SaInternalCheckHandler;
 import io.ddd4j.auth.satoken.handler.SaMixCheckLoginHandler;
 import io.ddd4j.auth.satoken.subject.SaTokenSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
@@ -69,13 +68,11 @@ public class Ddd4jSaTokenJavalinModule extends AbstractAuthJavalinModule {
 
     @Override
     protected void configureModule() {
-        // 注册 sa-token 注解处理器（混合登录 + 内部 API Key），并 eager 绑定为单例
+        // 注册 sa-token 注解处理器（混合登录），并 eager 绑定为单例。
+        // 1.0.x 改挂：SaInternalCheckHandler（内部 API Key 校验）在 1.0.x satoken 中不存在，剔除。
         SaMixCheckLoginHandler mixCheckLoginHandler = new SaMixCheckLoginHandler();
-        SaInternalCheckHandler internalCheckHandler = new SaInternalCheckHandler();
         bind(SaMixCheckLoginHandler.class).toInstance(mixCheckLoginHandler);
-        bind(SaInternalCheckHandler.class).toInstance(internalCheckHandler);
 
         SaAnnotationStrategy.instance.registerAnnotationHandler(mixCheckLoginHandler);
-        SaAnnotationStrategy.instance.registerAnnotationHandler(internalCheckHandler);
     }
 }

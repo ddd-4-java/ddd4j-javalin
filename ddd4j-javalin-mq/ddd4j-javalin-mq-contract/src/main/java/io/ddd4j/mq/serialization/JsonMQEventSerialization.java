@@ -1,6 +1,6 @@
 package io.ddd4j.mq.serialization;
 
-import io.ddd4j.kit.lang.JsonKit;
+import io.ddd4j.core.utils.JsonKit;
 import io.ddd4j.kit.lang.StrKit;
 import io.ddd4j.mq.event.MQEventSerialization;
 

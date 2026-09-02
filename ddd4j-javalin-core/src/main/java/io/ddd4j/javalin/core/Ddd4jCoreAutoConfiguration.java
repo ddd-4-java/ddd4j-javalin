@@ -62,8 +62,8 @@ public final class Ddd4jCoreAutoConfiguration {
         if (properties.isProjectionEnabled()) {
             ProjectionPositionRepository repository =
                     injector.getInstance(ProjectionPositionRepository.class);
-            BaseContext.inject(SpiKeys.PROJECTION_POSITION_REPOSITORY,
-                    ProjectionPositionRepository.class, repository);
+            // 1.0.x 改挂：BaseContext.inject(K,V) 两参（1.0.x 无 (key,type,value) 重载）
+            BaseContext.inject(SpiKeys.PROJECTION_POSITION_REPOSITORY, repository);
             log.info("ddd4j Core: registered projection position repository SPI: {}",
                     repository.getClass().getSimpleName());
         } else {

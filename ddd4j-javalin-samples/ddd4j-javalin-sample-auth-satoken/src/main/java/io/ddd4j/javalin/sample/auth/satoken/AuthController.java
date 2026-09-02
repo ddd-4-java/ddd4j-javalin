@@ -1,25 +1,42 @@
 package io.ddd4j.javalin.sample.auth.satoken;
 
-import io.ddd4j.core.auth.AuthPrincipal;
-import io.ddd4j.core.auth.AuthRequest;
-import io.ddd4j.core.util.SubjectKit;
+import cn.dev33.satoken.stp.StpUtil;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import io.ddd4j.core.constant.SpiKeys;
+import io.ddd4j.core.context.Contexts;
+import io.ddd4j.core.subject.Subject;
+import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.guice.annotation.ddd.ApplicationService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * 鉴权示例控制器：演示 SubjectKit 统一鉴权入口（sa-token 底层，Javalin 编程式路由）。
+ * 鉴权示例控制器（sa-token 底层，Javalin 编程式路由）。
  *
- * <p>本控制器的业务逻辑与 Spring Boot / Quarkus 示例完全一致，
- * 证明切换底层框架时业务代码零改动（仅路由注册方式不同）。
+ * <p>1.0.x 改挂：2.0.x 的统一鉴权门面 {@code io.ddd4j.core.util.SubjectKit} 与
+ * {@code io.ddd4j.core.auth.AuthRequest}（login/logout/session 语义）在 1.0.x core 中不存在，
+ * 本示例改用「sa-token 原生登录 + 1.0.x Subject SPI 查询」的等价演示：
+ * <ul>
+ *   <li>登录/登出/会话：sa-token 原生 {@link StpUtil}</li>
+ *   <li>权限/角色校验：经 {@link SubjectProvider} SPI（Guice 注册的 SaTokenSubjectProvider）获取 {@link Subject}</li>
+ * </ul>
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
 @ApplicationService
 public class AuthController {
+
+    private final Provider<SubjectProvider> subjectProviders;
+
+    @Inject
+    public AuthController(Provider<SubjectProvider> subjectProviders) {
+        this.subjectProviders = subjectProviders;
+    }
 
     /**
      * 用 Javalin 编程式 API 注册路由（Javalin 无注解路由，这是原生方式）。
@@ -33,74 +50,68 @@ public class AuthController {
         app.get("/auth/status", this::status);
     }
 
+    private Subject subject() {
+        SubjectProvider provider = Objects.requireNonNull(subjectProviders).get();
+        return provider.getSubject();
+    }
+
     /**
-     * 登录：SubjectKit.login(AuthRequest)
+     * 登录：sa-token 原生 StpUtil.login
      */
     public void login(Context ctx) {
         String userId = ctx.queryParam("userId");
-        AuthPrincipal principal = new AuthPrincipal()
-                .setLoginId(userId)
-                .setUserId(userId)
-                .setRoleCode("user");
-
-        AuthRequest request = AuthRequest.of(userId).setTimeout(7200);
-        request.setPrincipal(principal);
-        String token = SubjectKit.login(request);
-
+        StpUtil.login(userId);
         Map<String, Object> result = new HashMap<>();
-        result.put("token", token);
-        result.put("principal", principal);
+        result.put("token", StpUtil.getTokenValue());
+        result.put("loginId", StpUtil.getLoginIdAsString());
         ctx.json(result);
     }
 
     /**
-     * 登出：SubjectKit.logout()
+     * 登出：sa-token 原生 StpUtil.logout
      */
     public void logout(Context ctx) {
-        SubjectKit.logout();
+        StpUtil.logout();
         ctx.json(Map.of("success", true));
     }
 
     /**
-     * 当前用户：SubjectKit.getPrincipal()
+     * 当前用户：sa-token 会话态
      */
     public void me(Context ctx) {
-        AuthPrincipal principal = SubjectKit.getPrincipal();
-        if (principal == null) {
+        if (!StpUtil.isLogin()) {
             ctx.json(Map.of("authenticated", false));
             return;
         }
         Map<String, Object> result = new HashMap<>();
         result.put("authenticated", true);
-        result.put("loginId", principal.getLoginId());
-        result.put("userId", principal.getUserId());
-        result.put("roleCode", principal.getRoleCode());
+        result.put("loginId", StpUtil.getLoginIdAsString());
         ctx.json(result);
     }
 
     /**
-     * 权限校验：SubjectKit.hasPermission()
+     * 权限校验：Subject SPI isPermitted
      */
     public void checkPermission(Context ctx) {
         String permission = ctx.queryParam("permission");
-        boolean has = SubjectKit.hasPermission(permission);
+        boolean has = subject().isPermitted(permission);
         ctx.json(Map.of("permission", permission, "has", has));
     }
 
     /**
-     * 角色校验：SubjectKit.hasRole()
+     * 角色校验：Subject SPI hasRole
      */
     public void checkRole(Context ctx) {
         String role = ctx.queryParam("role");
-        boolean has = SubjectKit.hasRole(role);
+        boolean has = subject().hasRole(role);
         ctx.json(Map.of("role", role, "has", has));
     }
 
     /**
-     * 登录状态：SubjectKit.isLogin()
+     * 登录状态：sa-token 原生 StpUtil.isLogin
      */
     public void status(Context ctx) {
-        ctx.json(Map.of("login", SubjectKit.isLogin()));
+        ctx.json(Map.of("login", StpUtil.isLogin()));
     }
 
 }

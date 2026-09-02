@@ -2,8 +2,8 @@ package io.ddd4j.javalin.data.datascope;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
-import io.ddd4j.data.datascope.DataScopeProvider;
-import io.ddd4j.data.datascope.RequiresDataPermissionsValidator;
+import io.ddd4j.auth.datascope.DataScopeProvider;
+import io.ddd4j.auth.datascope.RequiresDataPermissionsValidator;
 
 /**
  * Guice Module wiring the ddd4j-data-datascope SPI for Javalin applications.

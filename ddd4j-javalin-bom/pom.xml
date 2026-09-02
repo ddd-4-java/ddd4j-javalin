@@ -68,16 +68,11 @@
                 <artifactId>ddd4j-core</artifactId>
                 <version>${ddd4j.version}</version>
             </dependency>
-            <!-- ddd4j Guice 适配（提供 3 个核心 SPI 的 Guice 实现 Ddd4jGuiceModule） -->
+            <!-- ddd4j Guice 适配 + web 适配（1.0.x 改挂：runtime-guice / web-core / web-javalin 均并入 bridge） -->
             <dependency>
-                <groupId>io.ddd4j</groupId>
-                <artifactId>ddd4j-runtime-guice</artifactId>
-                <version>${ddd4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.ddd4j</groupId>
-                <artifactId>ddd4j-web-javalin</artifactId>
-                <version>${ddd4j.version}</version>
+                <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+                <version>${revision}</version>
             </dependency>
             <!-- Javalin auth -->
             <dependency>

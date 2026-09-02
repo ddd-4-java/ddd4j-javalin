@@ -28,6 +28,12 @@
             <artifactId>ddd4j-kit</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <!-- 1.0.x 改挂：core.api（R/Page/IR）由 bridge 内联提供（1.0.x core 无该包） -->
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <!-- Guice DI -->
         <dependency>
             <groupId>com.google.inject</groupId>

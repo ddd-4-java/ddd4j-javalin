@@ -17,7 +17,7 @@ import java.util.Objects;
  * @since 2.0.x
  */
 @Slf4j
-public class GuiceDomainEventPublisher implements DomainEventPublisher {
+public class GuiceDomainEventPublisher implements DomainEventPublisher, ObjectEventPublisher {
 
     /**
      * Guava 事件总线
@@ -36,6 +36,20 @@ public class GuiceDomainEventPublisher implements DomainEventPublisher {
             return;
         }
         log.debug("Publishing domain event: {}", event.getClass().getSimpleName());
+        eventBus.post(event);
+    }
+
+    /**
+     * 1.0.x 改挂补钉：恢复 2.0.x {@code DomainEventPublisher#publish(Object)} 契约，
+     * 供非 DomainEvent 体系事件（如 WebRequestFailure）路由到 EventBus。
+     */
+    @Override
+    public void publishObject(Object event) {
+        if (Objects.isNull(event)) {
+            log.warn("Attempted to publish null event object");
+            return;
+        }
+        log.debug("Publishing event object: {}", event.getClass().getSimpleName());
         eventBus.post(event);
     }
 

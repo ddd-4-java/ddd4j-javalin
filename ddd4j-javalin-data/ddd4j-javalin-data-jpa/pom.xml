@@ -28,6 +28,12 @@
             <artifactId>ddd4j-data-jpa</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <!-- 1.0.x 改挂补钉：jakarta.persistence-api 版本 1.0.x 链不管理，显式钉 3.1.0 -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
         <dependency>
             <groupId>io.ddd4j</groupId>
             <artifactId>ddd4j-kit</artifactId>

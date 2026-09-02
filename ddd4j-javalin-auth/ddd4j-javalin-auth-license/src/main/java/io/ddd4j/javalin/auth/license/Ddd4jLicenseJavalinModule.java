@@ -2,7 +2,7 @@ package io.ddd4j.javalin.auth.license;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import io.ddd4j.extension.license.LicenseVerify;
+import io.ddd4j.auth.license.LicenseVerify;
 import io.ddd4j.javalin.auth.AbstractAuthJavalinModule;
 import lombok.extern.slf4j.Slf4j;
 

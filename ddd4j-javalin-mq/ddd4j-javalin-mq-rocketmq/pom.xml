@@ -27,9 +27,9 @@
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-runtime-guice</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+            <version>${revision}</version>
         </dependency>
 
         <!-- ======== 测试：验证 Guice 装配 + 契约解析（关闭自动启动，无需真实 RocketMQ）======== -->

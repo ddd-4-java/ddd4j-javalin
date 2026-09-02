@@ -39,21 +39,21 @@ public class KafkaMqConfig {
      * <p>生产环境应使用 ddd4j-mq-kafka 提供的 KafkaMQEventPublisher 实现。
      * 本示例为演示结构，返回简化实现。
      */
-    public io.ddd4j.core.event.MQEventPublisher mqEventPublisher() {
+    public io.ddd4j.core.contract.MQEventPublisher mqEventPublisher() {
         // 使用 ddd4j-mq-kafka 的 KafkaMQEventPublisher
         // 实际生产中由 ddd4j-mq-kafka 自动配置提供
         return new io.ddd4j.mq.publish.MQEventPublisher() {
             @Override
             @SuppressWarnings("unchecked")
-            public <T extends io.ddd4j.core.event.MQEvent> void publish(T event, io.ddd4j.mq.contract.MQDestination destination) {
+            public <T extends io.ddd4j.core.contract.MQEvent> void publish(T event, io.ddd4j.mq.contract.MQDestination destination) {
                 System.out.printf("[Kafka Publisher] 发送事件到 Kafka: topic=%s, tag=%s, msgId=%s%n",
                         event.getTopic(), event.getTag(), event.getMsgId());
                 System.out.printf("  Kafka Broker: %s%n", bootstrapServers);
-                System.out.printf("  载荷: %s%n", io.ddd4j.kit.lang.JsonKit.toJson(event));
+                System.out.printf("  载荷: %s%n", io.ddd4j.core.utils.JsonKit.toJson(event));
             }
 
             @Override
-            public void publish(io.ddd4j.core.event.MQEvent event) {
+            public void publish(io.ddd4j.core.contract.MQEvent event) {
                 publish(event, io.ddd4j.mq.contract.MQDestination.from(event));
             }
         };

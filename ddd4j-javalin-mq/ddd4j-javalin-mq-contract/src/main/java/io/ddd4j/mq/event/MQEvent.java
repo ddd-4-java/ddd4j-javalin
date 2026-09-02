@@ -1,7 +1,7 @@
 package io.ddd4j.mq.event;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import io.ddd4j.core.constant.ContextConstants;
+import io.ddd4j.core.contract.constant.ContextConstants;
 import io.ddd4j.core.context.BaseContext;
 import io.ddd4j.core.context.ThreadContext;
 import io.ddd4j.kit.lang.StrKit;

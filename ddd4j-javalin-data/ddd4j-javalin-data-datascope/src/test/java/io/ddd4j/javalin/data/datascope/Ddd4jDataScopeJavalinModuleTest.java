@@ -2,7 +2,7 @@ package io.ddd4j.javalin.data.datascope;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.ddd4j.data.datascope.RequiresDataPermissionsValidator;
+import io.ddd4j.auth.datascope.RequiresDataPermissionsValidator;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

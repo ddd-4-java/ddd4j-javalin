@@ -2,7 +2,7 @@ package io.ddd4j.sample.javalin.mq.rabbitmq;
 
 import io.ddd4j.core.constant.SpiKeys;
 import io.ddd4j.core.context.BaseContext;
-import io.ddd4j.core.event.MQEventPublisher;
+import io.ddd4j.core.contract.MQEventPublisher;
 import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.sample.javalin.mq.rabbitmq.mq.OrderCreatedMqListener;
 import io.ddd4j.sample.javalin.mq.rabbitmq.mq.config.RabbitMqConfig;

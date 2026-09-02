@@ -23,8 +23,12 @@
              原有的 sample-druid（io.javalin.sample 独立体系 + 不完整 JOOQ 生成代码 +
              引用已铲除的平行宇宙包）已移除，避免维护与 ddd4j 适配无关的腐烂示例。 -->
         <module>ddd4j-javalin-sample-auth-satoken</module>
-        <module>ddd4j-javalin-sample-auth-security</module>
-        <module>ddd4j-javalin-sample-auth-shiro</module>
+        <!-- 1.0.x 改挂排除：上游 1.0.x ddd4j-auth-security / ddd4j-auth-shiro 构件残留对
+             io.ddd4j.core.auth.*（AuthRequest/AuthPrincipal 2.0.x 包名）的编译期引用，
+             而该包在 1.0.x ddd4j-core 中已不存在（SecuritySubject/ShiroSubject 类链接不安全），
+             示例的 SubjectKit 门面（login/logout）在 1.0.x 亦无等价实现，待上游对齐后恢复。 -->
+        <!-- <module>ddd4j-javalin-sample-auth-security</module> -->
+        <!-- <module>ddd4j-javalin-sample-auth-shiro</module> -->
         <!-- <module>ddd4j-javalin-sample-cqrs-person</module> 上游构件缺失（与 7.1.x 同步排除） -->
         <!-- <module>ddd4j-javalin-sample-rich-model</module> 上游构件缺失（与 7.1.x 同步排除） -->
         <module>ddd4j-javalin-sample-mybatis-testcontainers</module>

@@ -10,6 +10,12 @@ import java.util.Optional;
  */
 public final class SpiRegistrationScope implements AutoCloseable {
 
+    /**
+     * 1.0.x 改挂补钉：BaseContext（1.0.x）仅提供 inject/get/contains，无 remove；
+     * 卸载时注入本哨兵占位，Contexts.get 读取到哨兵时按"未注册"处理。
+     */
+    static final Object REMOVED = new Object();
+
     private final List<Registration<?>> registrations = new ArrayList<>();
     private final List<Registration<?>> installed = new ArrayList<>();
     private boolean started;
@@ -66,20 +72,22 @@ public final class SpiRegistrationScope implements AutoCloseable {
         }
 
         private void install() {
-            previous = BaseContext.get(key, type);
-            BaseContext.inject(key, type, service);
+            Object existing = BaseContext.get(key);
+            previous = SpiRegistrationScope.REMOVED == existing || Objects.isNull(existing)
+                    ? Optional.empty()
+                    : Optional.of(type.cast(existing));
+            BaseContext.inject(key, service);
         }
 
         private void uninstall() {
-            BaseContext.get(key, type)
-                    .filter(current -> current == service)
-                    .ifPresent(ignored -> {
-                        if (previous.isPresent()) {
-                            BaseContext.inject(key, type, previous.orElseThrow());
-                        } else {
-                            BaseContext.remove(key);
-                        }
-                    });
+            Object current = BaseContext.get(key);
+            if (current == service) {
+                if (previous.isPresent()) {
+                    BaseContext.inject(key, previous.orElseThrow());
+                } else {
+                    BaseContext.inject(key, SpiRegistrationScope.REMOVED);
+                }
+            }
             previous = Optional.empty();
         }
     }

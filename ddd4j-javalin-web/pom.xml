@@ -26,17 +26,11 @@
     </description>
 
     <dependencies>
-        <!-- ddd4j web 适配（Javalin 6，applyTo 契约） -->
+        <!-- ddd4j Guice 适配 + web 适配（1.0.x 改挂：runtime-guice / web-javalin 均并入 bridge） -->
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-web-javalin</artifactId>
-            <version>${ddd4j.version}</version>
-        </dependency>
-        <!-- ddd4j runtime guice（提供 Ddd4jGuiceModule） -->
-        <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-runtime-guice</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+            <version>${revision}</version>
         </dependency>
         <!-- Javalin -->
         <dependency>

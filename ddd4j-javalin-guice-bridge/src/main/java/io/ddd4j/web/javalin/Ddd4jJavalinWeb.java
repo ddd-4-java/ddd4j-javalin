@@ -1,5 +1,6 @@
 package io.ddd4j.web.javalin;
 
+import io.ddd4j.core.constant.SpiKeys;
 import io.ddd4j.core.context.ThreadContext;
 import io.ddd4j.kit.lang.StrKit;
 import io.ddd4j.runtime.health.RuntimeReadinessRegistry;
@@ -120,7 +121,8 @@ public final class Ddd4jJavalinWeb {
         context.header(WebHeaders.TRACE_ID, requestContext.traceId());
         try {
             requestLifecycle.authenticate(requestContext)
-                    .ifPresent(authentication -> ThreadContext.bind(authentication.subject()));
+                    // 1.0.x 改挂：ThreadContext 无 bind(Subject)，改为按 SPI key 写入线程上下文
+                            .ifPresent(authentication -> ThreadContext.set(SpiKeys.SUBJECT, authentication.subject()));
             idempotencyLifecycle.flatMap(lifecycle -> lifecycle.open(requestContext,
                     context.header(WebHeaders.IDEMPOTENCY_KEY))).ifPresent(state::idempotencyScope);
         } catch (RuntimeException exception) {

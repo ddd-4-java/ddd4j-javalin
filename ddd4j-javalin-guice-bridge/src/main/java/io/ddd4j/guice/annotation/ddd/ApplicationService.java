@@ -1,7 +1,7 @@
 package io.ddd4j.guice.annotation.ddd;
 
 import com.google.inject.Singleton;
-import io.ddd4j.annotation.ddd.DDDAnnotation;
+import io.ddd4j.annotation.DDDAnnotation;
 
 import java.lang.annotation.*;
 

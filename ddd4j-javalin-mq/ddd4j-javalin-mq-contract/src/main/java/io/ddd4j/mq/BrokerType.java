@@ -39,7 +39,7 @@ public enum BrokerType {
      * 解析配置字符串为 Broker 类型（兼容 redisStream 等历史命名）。
      */
     public static BrokerType from(String raw) {
-        if (!StrKit.hasText(raw) || "none".equalsIgnoreCase(raw.trim())) {
+        if (!StrKit.isNotBlank(raw) || "none".equalsIgnoreCase(raw.trim())) {
             return NONE;
         }
         String normalized = raw.trim()

@@ -1,6 +1,6 @@
 package io.ddd4j.web.core.context;
 
-import io.ddd4j.core.constant.ContextConstants;
+import io.ddd4j.core.contract.constant.ContextConstants;
 import io.ddd4j.core.context.ThreadContext;
 import io.ddd4j.kit.lang.StrKit;
 import org.slf4j.MDC;
@@ -20,13 +20,13 @@ public final class WebContextScope implements AutoCloseable {
     public static final String HTTP_METHOD = "http-method";
     public static final String HTTP_PATH = "http-path";
 
-    private final ThreadContext.Scope threadScope;
+    private final ThreadContextScope threadScope;
     private final Map<String, String> previousMdc;
     private boolean closed;
 
     private WebContextScope(WebRequestContext context) {
         WebRequestContext requestContext = Objects.requireNonNull(context, "context must not be null");
-        this.threadScope = ThreadContext.open();
+        this.threadScope = ThreadContextScope.open();
         this.previousMdc = MDC.getCopyOfContextMap();
         bind(requestContext);
     }
@@ -65,7 +65,8 @@ public final class WebContextScope implements AutoCloseable {
 
     private void put(String key, Object value) {
         if (Objects.nonNull(value)) {
-            ThreadContext.put(key, value);
+            // 1.0.x 改挂：ThreadContext.put → set（1.0.x API 命名）
+            ThreadContext.set(key, value);
         }
     }
 

@@ -204,3 +204,16 @@ Apache 2.0
 | 高档 7.2.x | 60 | 与低档一致，5 个模块在 core 3.0.x 已移除（结构正确差异） |
 
 **7 个测试差异解释**：5 个 core 2.0.x 专有模块（datascope/external/jpa/logs/qlexpress）在 7.1.x 上有测试，在 7.2.x 上模块已删除——这是正确的结构差异，不是测试遗漏。共享模块（auth/mq/web/core/cache 等）测试数逐模块对齐一致。
+
+### 三线测试基线实测（2026-09-03，最终）
+
+| 档位 | 测试数 | 说明 |
+|------|--------|------|
+| 低档 6.7.x | 75 | surefire 解锁 + web J6 API 修复 + auth-core |
+| 中档 7.1.x | 67 | auth-core + 5 模块 surefire 解锁；+7 来自 core 2.0.x 专有模块 |
+| 高档 7.2.x | 60 | auth-core + surefire 解锁；5 个模块在 core 3.0.x 已移除（结构差异） |
+
+**15 个测试差异解释**：
+- 6.7.x vs 7.x 差异（75 vs 60/67）：6.7.x 包含更多模块（panache、testcontainers 额外测试等）
+- 7.1.x vs 7.2.x 差异（67 vs 60）：5 个 core 2.0.x 专有模块（datascope/external/jpa/logs/qlexpress）在 3.0.x 已正确删除
+- 共享模块测试数逐模块一致

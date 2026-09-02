@@ -1,11 +1,9 @@
 package io.ddd4j.javalin.auth.shiro;
 
-import com.google.inject.AbstractModule;
 import io.ddd4j.auth.shiro.subject.ShiroSubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
-import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.javalin.auth.AbstractAuthJavalinModule;
 import io.javalin.Javalin;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.UnauthorizedException;
 
 /**
@@ -15,8 +13,9 @@ import org.apache.shiro.authz.UnauthorizedException;
  * {@code ShiroExceptionHandler}，在 Guice 容器中装配 Shiro 鉴权基础设施，承担三个核心职责：
  * <ol>
  *   <li><b>SubjectProvider 注册</b>：绑定 {@link ShiroSubjectProvider} 到 {@link SubjectProvider}
- *       （对标 Spring 的 {@code @Bean SubjectProvider shiroSubjectProvider()}）</li>
- *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link SubjectKit} 静态注册中心，
+ *       （对标 Spring 的 {@code @Bean SubjectProvider shiroSubjectProvider()}）——
+ *       由基类 {@link AbstractAuthJavalinModule} 统一完成 eager 绑定 + {@code SubjectKit} 写回</li>
+ *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@code SubjectKit} 静态注册中心，
  *       保证 {@code SubjectKit.getSubject()} 全局可用（对标 Spring 的 {@code SubjectRegistrar}
  *       BeanPostProcessor，但用 eager 注册替代）</li>
  *   <li><b>异常处理器</b>：{@link #registerExceptionHandler(Javalin)} 注册 Javalin 异常处理器，
@@ -38,8 +37,7 @@ import org.apache.shiro.authz.UnauthorizedException;
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
-@Slf4j
-public class Ddd4jShiroJavalinModule extends AbstractModule {
+public class Ddd4jShiroJavalinModule extends AbstractAuthJavalinModule {
 
     /**
      * 注册 Javalin 异常处理器：统一 Shiro 鉴权异常响应（对标 Spring @ControllerAdvice ShiroExceptionHandler）。
@@ -64,15 +62,7 @@ public class Ddd4jShiroJavalinModule extends AbstractModule {
     }
 
     @Override
-    protected void configure() {
-        // 创建 SubjectProvider 实例并 eager 绑定（单例）
-        ShiroSubjectProvider provider = new ShiroSubjectProvider();
-        bind(SubjectProvider.class).toInstance(provider);
-
-        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
-        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
-        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
-        SubjectKit.register(provider);
-        log.info("ShiroSubjectProvider registered to SubjectKit (eager, at Injector creation)");
+    protected SubjectProvider subjectProvider() {
+        return new ShiroSubjectProvider();
     }
 }

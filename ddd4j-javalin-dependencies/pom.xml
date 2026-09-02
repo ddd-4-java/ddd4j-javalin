@@ -17,11 +17,16 @@
     </description>
 
     <properties>
-        <!-- Javalin 专属：HTTP 框架版本。6.7.x 线自 2026-09 起对齐 ddd4j 2.0.x 上游的
-             ddd4j-web-javalin（其二进制基于 Javalin 7.x 的 JavalinConfig.routes API 编译），
-             运行时与父 BOM 统一为 7.2.2，不再降级 6.7.0。 -->
+        <!-- Javalin 专属：HTTP 框架版本（javalin-bom 仅 7.x 存在，保留 7.2.2 让父 BOM import 可解析；
+             实际 Javalin 运行时版本由下方 dependencyManagement 显式覆盖为 6.7.0） -->
         <javalin.version>7.2.2</javalin.version>
+        <javalin6.version>6.7.0</javalin6.version>
 
+        <!-- Jetty 11.0.25（Javalin 6.7.0 基线）。
+             注意属性名不能叫 jetty.version：Maven 的 import BOM 中 ${jetty11.version} 按消费者
+             属性插值，若同名会把父 BOM 的 jetty-bom/ee10-bom import 一并带成 11.0.25
+             （jetty-ee10-bom 无 11.x 版本，直接解析失败）。父 BOM 维持 12.1.12 import 不受影响。 -->
+        <jetty11.version>11.0.25</jetty11.version>
         <jackson.version>2.17.2</jackson.version>
         <jackson-databind.version>2.17.2</jackson-databind.version>
 
@@ -57,10 +62,56 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- Jetty 不再逐 artifact 覆盖：Javalin 7.2.2 传递 Jetty 12.1.x（ee10 命名空间），
-             与父 ddd4j-dependencies BOM 管理的 jetty 12.1.8 一致，直接继承即可。
-             旧的 org.eclipse.jetty.websocket:websocket-servlet 11.0.25 钉版随
-             Javalin 6.7 基线一并移除（Jetty 12.1 中该坐标已由 ee10 构件取代）。 -->
+            <!-- Jetty 11.0.25 显式覆盖（Javalin 6.7.0 基线）— 父 ddd4j-dependencies BOM 的 jetty-bom:12.1.12
+                 与 Javalin 6.7.0 传递的 Jetty 11.x 冲突；此处逐个覆盖核心 Jetty artifact 为 11.0.25。 -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-http</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-io</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-security</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-webapp</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-xml</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
+            <!-- 核心 BOM 把 websocket-servlet 提升到 12.1.8（不存在，Jetty 12.1.x 中
+                 websocket-servlet 已迁移到 ee10 命名空间）。6.7.x 用 Jetty 11，
+                 显式降回 11.0.25 与传递依赖 websocket-jetty-server 对齐。 -->
+            <dependency>
+                <groupId>org.eclipse.jetty.websocket</groupId>
+                <artifactId>websocket-servlet</artifactId>
+                <version>${jetty11.version}</version>
+            </dependency>
 
             <!-- ddd4j Guice 适配（提供 3 个核心 SPI 的 Guice 实现 Ddd4jGuiceModule） -->
             <dependency>
@@ -69,33 +120,33 @@
                 <version>${ddd4j.version}</version>
             </dependency>
 
-            <!-- ddd4j web 适配 — 双轨模块，基于 Javalin 7.x 的 configure(JavalinConfig) 装配契约 -->
+            <!-- ddd4j web 适配（Javalin 6）— 双轨模块，applyTo 契约 -->
             <dependency>
                 <groupId>io.ddd4j</groupId>
                 <artifactId>ddd4j-web-javalin</artifactId>
                 <version>${ddd4j.version}</version>
             </dependency>
 
-            <!-- Javalin 7.2.2 核心框架与 OpenAPI 插件（与 ddd4j-web-javalin 编译基线一致） -->
+            <!-- Javalin 6.7.0 核心框架与 OpenAPI 插件（显式覆盖父 BOM javalin-bom:7.2.2 管理的版本） -->
             <dependency>
                 <groupId>io.javalin</groupId>
                 <artifactId>javalin</artifactId>
-                <version>${javalin.version}</version>
+                <version>${javalin6.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.javalin.community.openapi</groupId>
                 <artifactId>javalin-openapi-plugin</artifactId>
-                <version>${javalin.version}</version>
+                <version>${javalin6.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.javalin.community.openapi</groupId>
                 <artifactId>javalin-swagger-plugin</artifactId>
-                <version>${javalin.version}</version>
+                <version>${javalin6.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.javalin.community.openapi</groupId>
                 <artifactId>javalin-redoc-plugin</artifactId>
-                <version>${javalin.version}</version>
+                <version>${javalin6.version}</version>
             </dependency>
 
             <!-- Javalin 专属：legacy javax.servlet（扩展模块 optional 依赖） -->

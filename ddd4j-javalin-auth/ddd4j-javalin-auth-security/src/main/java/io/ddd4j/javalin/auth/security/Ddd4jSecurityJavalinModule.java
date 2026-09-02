@@ -1,11 +1,9 @@
 package io.ddd4j.javalin.auth.security;
 
-import com.google.inject.AbstractModule;
 import io.ddd4j.auth.security.subject.SecuritySubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
-import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.javalin.auth.AbstractAuthJavalinModule;
 import io.javalin.Javalin;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -18,8 +16,9 @@ import org.springframework.security.core.AuthenticationException;
  * 承担三个核心职责：
  * <ol>
  *   <li><b>SubjectProvider 注册</b>：绑定 {@link SecuritySubjectProvider} 到 {@link SubjectProvider}
- *       （对标 Spring 的 {@code @Bean SubjectProvider securitySubjectProvider()}）</li>
- *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link SubjectKit} 静态注册中心，
+ *       （对标 Spring 的 {@code @Bean SubjectProvider securitySubjectProvider()}）——
+ *       由基类 {@link AbstractAuthJavalinModule} 统一完成 eager 绑定 + {@code SubjectKit} 写回</li>
+ *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@code SubjectKit} 静态注册中心，
  *       保证 {@code SubjectKit.getSubject()} 全局可用（对标 Spring 的 {@code SubjectRegistrar}
  *       BeanPostProcessor，但用 eager 注册替代）</li>
  *   <li><b>异常处理器</b>：{@link #registerExceptionHandler(Javalin)} 注册 Javalin 异常处理器，
@@ -46,8 +45,7 @@ import org.springframework.security.core.AuthenticationException;
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
-@Slf4j
-public class Ddd4jSecurityJavalinModule extends AbstractModule {
+public class Ddd4jSecurityJavalinModule extends AbstractAuthJavalinModule {
 
     /**
      * 注册 Javalin 异常处理器：统一 Spring Security 鉴权异常响应
@@ -76,15 +74,7 @@ public class Ddd4jSecurityJavalinModule extends AbstractModule {
     }
 
     @Override
-    protected void configure() {
-        // 创建 SubjectProvider 实例并 eager 绑定（单例）
-        SecuritySubjectProvider provider = new SecuritySubjectProvider();
-        bind(SubjectProvider.class).toInstance(provider);
-
-        // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
-        // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心，
-        // 保证 SubjectKit.getSubject()/login()/isLogin() 等全局可用，无需业务方手动注册。
-        SubjectKit.register(provider);
-        log.info("SecuritySubjectProvider registered to SubjectKit (eager, at Injector creation)");
+    protected SubjectProvider subjectProvider() {
+        return new SecuritySubjectProvider();
     }
 }

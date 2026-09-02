@@ -27,6 +27,7 @@
             <groupId>io.ddd4j.javalin</groupId>
             <artifactId>ddd4j-javalin-testcontainers</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.ddd4j.javalin</groupId>

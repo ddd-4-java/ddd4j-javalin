@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.ddd4j.javalin.data.mybatis.Ddd4jMybatisJavalinModule;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
 import io.ddd4j.javalin.testcontainers.database.MySqlTestContainerFixture;
-import io.ddd4j.javalin.web.JavalinTestFixture;
+import io.ddd4j.javalin.testcontainers.web.JavalinTestFixture;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;

@@ -89,14 +89,14 @@ public class DisruptorMqSample {
 
         // 5. 启动 Javalin 并注册 REST 端点
         Javalin app = Javalin.create();
-        app.post("/orders", ctx -> {
+        app.unsafe.routes.post("/orders", ctx -> {
             var request = ctx.bodyAsClass(CreateOrderRequest.class);
             var service = new io.ddd4j.sample.javalin.mq.disruptor.order.application.OrderApplicationService(
                     mqConfig.mqEventPublisher());
             var order = service.createOrder(request.orderNo(), request.buyerId(), request.buyerName());
             ctx.json(order);
         });
-        app.get("/orders/{id}", ctx -> {
+        app.unsafe.routes.get("/orders/{id}", ctx -> {
             ctx.json(java.util.Map.of("message", "订单查询端点（本示例仅演示 MQ 发布/消费链路）"));
         });
 

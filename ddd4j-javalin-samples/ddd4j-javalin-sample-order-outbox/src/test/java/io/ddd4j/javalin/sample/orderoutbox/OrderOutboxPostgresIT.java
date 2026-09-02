@@ -6,7 +6,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
 import io.ddd4j.javalin.testcontainers.database.PostgresTestContainerFixture;
-import io.ddd4j.javalin.web.JavalinTestFixture;
+import io.ddd4j.javalin.testcontainers.web.JavalinTestFixture;
 import io.ddd4j.sample.order.application.OutboxDispatchResult;
 import io.ddd4j.sample.order.application.OutboxMessage;
 import io.ddd4j.sample.order.jdbc.TransactionalOutboxPublisher;

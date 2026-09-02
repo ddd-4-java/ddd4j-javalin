@@ -51,7 +51,7 @@ public class KafkaMqSample {
 
         // 5. 启动 Javalin 并注册 REST 端点
         Javalin app = Javalin.create();
-        app.post("/orders", ctx -> {
+        app.unsafe.routes.post("/orders", ctx -> {
             var request = ctx.bodyAsClass(CreateOrderRequest.class);
             var order = orderService.createOrder(request.orderNo(), request.buyerId(), request.buyerName());
             ctx.json(order);

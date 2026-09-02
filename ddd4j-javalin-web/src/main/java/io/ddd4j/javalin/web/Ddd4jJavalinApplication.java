@@ -68,8 +68,9 @@ public final class Ddd4jJavalinApplication {
         Injector injector = Guice.createInjector(modules);
 
         Ddd4jJavalinWeb web = injector.getInstance(Ddd4jJavalinWeb.class);
+        // ddd4j-web-javalin 2.0.x：统一请求生命周期等全部经 configure(config) 装配，
+        // 无独立的 applyTo 步骤（与 ddd4j-sample-javalin 的标准用法一致）。
         Javalin app = Javalin.create((JavalinConfig config) -> web.configure(config));
-        web.applyTo(app);
         applyHealthEndpoint(app, properties);
         app.start(properties.getHost(), properties.getPort());
 
@@ -103,7 +104,8 @@ public final class Ddd4jJavalinApplication {
 
     /**
      * Minimal SPI bindings for the Javalin web layer to start in isolation. See the
-     * corresponding helper inside {@link JavalinTestFixture} for rationale.
+     * corresponding helper inside {@code JavalinTestFixture}（位于 ddd4j-javalin-testcontainers
+     * 模块）for rationale.
      */
     private static final class MinimalSpiModule extends AbstractModule {
         @Override
@@ -130,9 +132,9 @@ public final class Ddd4jJavalinApplication {
 
     private static void applyHealthEndpoint(Javalin app, Ddd4jJavalinProperties properties) {
         if (properties.isHealthEndpoint()) {
-            app.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
-            app.get("/health/readiness", ctx -> ctx.json("{\"status\":\"READY\"}"));
-            app.get("/health/liveness", ctx -> ctx.json("{\"status\":\"LIVE\"}"));
+            app.unsafe.routes.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
+            app.unsafe.routes.get("/health/readiness", ctx -> ctx.json("{\"status\":\"READY\"}"));
+            app.unsafe.routes.get("/health/liveness", ctx -> ctx.json("{\"status\":\"LIVE\"}"));
         }
     }
 }

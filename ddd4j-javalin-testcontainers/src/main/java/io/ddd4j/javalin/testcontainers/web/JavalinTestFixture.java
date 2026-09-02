@@ -1,4 +1,4 @@
-package io.ddd4j.javalin.web;
+package io.ddd4j.javalin.testcontainers.web;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -13,6 +13,9 @@ import io.ddd4j.guice.context.GuiceContext;
 import io.ddd4j.guice.event.GuiceDomainEventPublisher;
 import io.ddd4j.guice.i18n.GuiceI18nProvider;
 import io.ddd4j.guice.subject.GuiceSubjectProvider;
+import io.ddd4j.javalin.web.Ddd4jJavalinApplication;
+import io.ddd4j.javalin.web.Ddd4jJavalinAutoConfiguration;
+import io.ddd4j.javalin.web.Ddd4jJavalinProperties;
 import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
 import io.javalin.Javalin;
 import org.junit.jupiter.api.AfterEach;
@@ -38,7 +41,7 @@ import java.util.function.Consumer;
  * class MyFeatureIT extends JavalinTestFixture {
  *     @Override protected String[] basePackages() { return new String[]{"io.example.app"}; }
  *     @Override protected void configureRoutes(Javalin app) {
- *         app.get("/hello", ctx -> ctx.result("hi"));
+ *         app.unsafe.routes.get("/hello", ctx -> ctx.result("hi"));
  *     }
  *     @Test void shouldCallHello() throws Exception {
  *         HttpResponse<String> r = http(HttpRequest.newBuilder(url("/hello")).GET().build());
@@ -102,10 +105,11 @@ public abstract class JavalinTestFixture {
         afterInjector(injector);
 
         Ddd4jJavalinWeb web = injector.getInstance(Ddd4jJavalinWeb.class);
+        // ddd4j-web-javalin 2.0.x：统一请求生命周期等全部经 configure(config) 装配，
+        // 无独立的 applyTo 步骤（与 ddd4j-sample-javalin 的标准用法一致）。
         app = Javalin.create(config -> web.configure(config));
-        web.applyTo(app);
         // Default health endpoint for tests.
-        app.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
+        app.unsafe.routes.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
         configureRoutes(app);
         app.start();
 

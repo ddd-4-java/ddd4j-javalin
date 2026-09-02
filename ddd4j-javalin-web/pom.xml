@@ -18,7 +18,9 @@
         - Ddd4jJavalinProperties：ddd4j.web.javalin.* 配置 POJO
         - Ddd4jJavalinAutoConfiguration：Guice Module，装配 ddd4j-web-javalin 的 Ddd4jJavalinWeb
         - Ddd4jJavalinApplication：静态 run(...) 一键启动入口
-        - JavalinTestFixture：测试基类，app.start(0) + HttpClient round-trip
+
+        注：JavalinTestFixture 测试基类已迁移至 ddd4j-javalin-testcontainers 模块
+        （io.ddd4j.javalin.testcontainers.web），本模块主代码不再依赖测试基础设施。
 
         所有 ddd4j-javalin sample 改为通过本模块启动，不再手工 Javalin.create()。
     </description>

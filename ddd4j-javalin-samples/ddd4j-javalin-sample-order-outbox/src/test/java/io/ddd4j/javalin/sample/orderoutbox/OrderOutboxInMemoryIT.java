@@ -3,7 +3,7 @@ package io.ddd4j.javalin.sample.orderoutbox;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
-import io.ddd4j.javalin.web.JavalinTestFixture;
+import io.ddd4j.javalin.testcontainers.web.JavalinTestFixture;
 import io.ddd4j.sample.order.application.OutboxDispatchResult;
 import io.ddd4j.sample.order.application.OutboxMessage;
 import io.ddd4j.sample.order.application.OutboxPort;

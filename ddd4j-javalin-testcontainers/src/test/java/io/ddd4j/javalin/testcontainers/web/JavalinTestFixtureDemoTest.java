@@ -1,4 +1,4 @@
-package io.ddd4j.javalin.web;
+package io.ddd4j.javalin.testcontainers.web;
 
 import io.ddd4j.web.core.auth.BearerSubjectAuthenticator;
 import io.ddd4j.web.core.auth.PathWebAccessPolicy;
@@ -31,7 +31,7 @@ class JavalinTestFixtureDemoTest extends JavalinTestFixture {
 
     @Override
     protected void configureRoutes(Javalin app) {
-        app.get("/demo/hello", ctx -> ctx.result("hello, ddd4j"));
+        app.unsafe.routes.get("/demo/hello", ctx -> ctx.result("hello, ddd4j"));
     }
 
     @Test

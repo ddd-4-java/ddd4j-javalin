@@ -14,8 +14,10 @@
     <artifactId>ddd4j-javalin-testcontainers</artifactId>
     <description>
         ddd4j-javalin Testcontainers 集成测试基础设施：
-        提供 11 个共享容器 Fixture + JUnit 5 Extension，让 ddd4j-javalin 各子模块（mq/data/auth）
-        以一致的 pattern 写真实集成测试。对齐 ddd4j-boot mq/README.md §13。
+        提供 11 个共享容器 Fixture + JUnit 5 Extension + JavalinTestFixture 测试基类
+        （io.ddd4j.javalin.testcontainers.web，自 ddd4j-javalin-web 迁入），
+        让 ddd4j-javalin 各子模块（mq/data/auth/samples）以一致的 pattern 写真实集成测试。
+        对齐 ddd4j-boot mq/README.md §13。
     </description>
 
     <dependencies>
@@ -87,6 +89,24 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
+
+        <!-- JavalinTestFixture（io.ddd4j.javalin.testcontainers.web）所需的
+             web 启动装配 / Guice 运行时 / Javalin 本体（均为 fixture 直接引用） -->
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-web</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-runtime-guice</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>

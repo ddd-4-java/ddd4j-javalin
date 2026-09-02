@@ -119,6 +119,8 @@ public class MyApplication {
 
 ## 一行集成测试
 
+> `JavalinTestFixture` 位于 `io.ddd4j.javalin.testcontainers.web`（`ddd4j-javalin-testcontainers` 模块，test scope 依赖）。
+
 ```java
 class MyIT extends JavalinTestFixture {
     @Container static MySQLContainer<?> MYSQL = new MySqlTestContainerFixture().newContainer();

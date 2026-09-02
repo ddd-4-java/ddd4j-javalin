@@ -28,10 +28,10 @@ public class JavalinOrderController {
     }
 
     public void register(Javalin app) {
-        app.unsafe.routes.post("/orders", this::create);
-        app.unsafe.routes.post("/orders/{orderId}/lines", this::addLine);
-        app.unsafe.routes.post("/orders/{orderId}/pay", this::pay);
-        app.unsafe.routes.get("/orders/by-no/{orderNo}", this::findByOrderNo);
+        app.post("/orders", this::create);
+        app.post("/orders/{orderId}/lines", this::addLine);
+        app.post("/orders/{orderId}/pay", this::pay);
+        app.get("/orders/by-no/{orderNo}", this::findByOrderNo);
     }
 
     public void create(Context ctx) {

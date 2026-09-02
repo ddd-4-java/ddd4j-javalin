@@ -25,8 +25,8 @@
         <module>ddd4j-javalin-sample-auth-satoken</module>
         <module>ddd4j-javalin-sample-auth-security</module>
         <module>ddd4j-javalin-sample-auth-shiro</module>
-        <module>ddd4j-javalin-sample-cqrs-person</module>
-        <module>ddd4j-javalin-sample-rich-model</module>
+        <!-- <module>ddd4j-javalin-sample-cqrs-person</module> 上游构件缺失（与 7.1.x 同步排除） -->
+        <!-- <module>ddd4j-javalin-sample-rich-model</module> 上游构件缺失（与 7.1.x 同步排除） -->
         <module>ddd4j-javalin-sample-mybatis-testcontainers</module>
         <module>ddd4j-javalin-sample-order-outbox</module>
     </modules>

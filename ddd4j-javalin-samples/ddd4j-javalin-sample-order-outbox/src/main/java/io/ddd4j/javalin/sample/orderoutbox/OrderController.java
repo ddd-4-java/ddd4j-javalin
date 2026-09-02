@@ -33,9 +33,9 @@ public class OrderController {
     }
 
     public void register(Javalin app) {
-        app.unsafe.routes.post("/api/orders", this::create);
-        app.unsafe.routes.post("/api/orders/{orderId}/lines", this::addLine);
-        app.unsafe.routes.get("/api/orders/{orderId}", this::find);
+        app.post("/api/orders", this::create);
+        app.post("/api/orders/{orderId}/lines", this::addLine);
+        app.get("/api/orders/{orderId}", this::find);
     }
 
     public void create(Context ctx) {

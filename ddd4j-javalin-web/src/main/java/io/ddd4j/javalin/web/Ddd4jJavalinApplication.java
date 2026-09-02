@@ -10,7 +10,7 @@ import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.guice.DddAnnotationModule;
 import io.ddd4j.guice.i18n.GuiceI18nProvider;
 import io.ddd4j.guice.subject.GuiceSubjectProvider;
-import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
+import io.ddd4j.javalin.web.Ddd4jJavalinWeb;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
 import lombok.extern.slf4j.Slf4j;

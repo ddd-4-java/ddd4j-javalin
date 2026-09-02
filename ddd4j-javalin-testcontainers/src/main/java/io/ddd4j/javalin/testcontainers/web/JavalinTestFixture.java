@@ -16,7 +16,7 @@ import io.ddd4j.guice.subject.GuiceSubjectProvider;
 import io.ddd4j.javalin.web.Ddd4jJavalinApplication;
 import io.ddd4j.javalin.web.Ddd4jJavalinAutoConfiguration;
 import io.ddd4j.javalin.web.Ddd4jJavalinProperties;
-import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
+import io.ddd4j.javalin.web.Ddd4jJavalinWeb;
 import io.javalin.Javalin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

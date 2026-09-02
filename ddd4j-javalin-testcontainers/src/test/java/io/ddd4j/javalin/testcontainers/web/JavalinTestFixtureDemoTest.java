@@ -5,7 +5,7 @@ import io.ddd4j.web.core.auth.PathWebAccessPolicy;
 import io.ddd4j.web.core.context.WebRequestContextFactory;
 import io.ddd4j.web.core.context.WebRequestLifecycle;
 import io.ddd4j.web.core.error.WebExceptionTranslator;
-import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
+import io.ddd4j.javalin.web.Ddd4jJavalinWeb;
 import io.javalin.Javalin;
 import org.junit.jupiter.api.Test;
 

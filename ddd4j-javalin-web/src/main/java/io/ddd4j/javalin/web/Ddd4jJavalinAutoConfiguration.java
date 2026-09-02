@@ -10,7 +10,7 @@ import io.ddd4j.web.core.context.WebRequestContextFactory;
 import io.ddd4j.web.core.context.WebRequestLifecycle;
 import io.ddd4j.web.core.error.DefaultWebExceptionTranslator;
 import io.ddd4j.web.core.error.WebExceptionTranslator;
-import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
+import io.ddd4j.javalin.web.Ddd4jJavalinWeb;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;

@@ -1,8 +1,8 @@
 package io.ddd4j.javalin.auth;
 
 import com.google.inject.AbstractModule;
+import io.ddd4j.core.subject.SubjectKit;
 import io.ddd4j.core.subject.SubjectProvider;
-import io.ddd4j.core.util.SubjectKit;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -69,7 +69,9 @@ public abstract class AbstractAuthJavalinModule extends AbstractModule {
         bind(SubjectProvider.class).toInstance(provider);
         // 【关键】对标 Spring SubjectRegistrar（BeanPostProcessor）：
         // Injector 创建即把 SubjectProvider 写回 SubjectKit 静态注册中心。
-        SubjectKit.register(provider);
+        // 1.0.x 改挂：SubjectKit 由 io.ddd4j.core.util 移至 io.ddd4j.core.subject，
+        // 且无 register(...) 方法，改为公开 volatile 字段写回。
+        SubjectKit.subjectProvider = provider;
         log.info("{} registered to SubjectKit (eager, at Injector creation)",
                 provider.getClass().getSimpleName());
     }

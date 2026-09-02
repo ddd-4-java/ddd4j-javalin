@@ -37,6 +37,8 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
+            <!-- 1.0.x 改挂补钉：1.0.x 链钉 jedis 7.1.0（无 RedisClient），上游 jar 需 7.4+，显式升 7.5.3 -->
+            <version>7.5.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>

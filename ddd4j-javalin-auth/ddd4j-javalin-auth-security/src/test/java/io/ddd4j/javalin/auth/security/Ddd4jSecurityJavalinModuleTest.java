@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.auth.security.subject.SecuritySubjectProvider;
 import io.ddd4j.core.subject.SubjectProvider;
-import io.ddd4j.core.util.SubjectKit;
+import io.ddd4j.core.subject.SubjectKit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

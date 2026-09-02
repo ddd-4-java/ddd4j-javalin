@@ -22,7 +22,13 @@
         <module>ddd4j-javalin-auth-core</module>
         <module>ddd4j-javalin-auth-license</module>
         <module>ddd4j-javalin-auth-satoken</module>
-        <module>ddd4j-javalin-auth-security</module>
+        <!-- 1.0.x 改挂排除：上游 ddd4j-auth-security:1.0.x 的 SecuritySubject/SecuritySubjectProvider
+             编译期引用 1.0.x core 中已不存在的整套 2.0.x 鉴权门面（io.ddd4j.core.auth.AuthRequest/
+             AuthPrincipal、io.ddd4j.core.util.SubjectKit、SubjectDataProvider/SubjectStrategy 与
+             AccountExpiredException 等 7 个异常类），类链接即 NoClassDefFoundError；补齐需内联
+             13+ 个类且与 1.0.x core.subject.SubjectKit 语义割裂，待上游对齐后恢复。
+             对应 sample-auth-security 同步排除。 -->
+        <!-- <module>ddd4j-javalin-auth-security</module> -->
         <module>ddd4j-javalin-auth-shiro</module>
     </modules>
 

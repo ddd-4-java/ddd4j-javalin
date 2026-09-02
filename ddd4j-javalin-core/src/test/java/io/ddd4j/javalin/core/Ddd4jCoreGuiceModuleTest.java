@@ -9,6 +9,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.core.constant.SpiKeys;
 import io.ddd4j.core.context.BaseContext;
+import io.ddd4j.core.context.SpiRegistrationScope;
 import io.ddd4j.core.context.Contexts;
 import io.ddd4j.core.cqrs.command.CommandBus;
 import io.ddd4j.core.cqrs.readmodel.InMemoryProjectionPositionRepository;
@@ -43,8 +44,10 @@ class Ddd4jCoreGuiceModuleTest {
                 && Objects.nonNull(injector.getExistingBinding(Key.get(Ddd4jGuiceRuntime.class)))) {
             injector.getInstance(Ddd4jGuiceRuntime.class).close();
         }
-        // 手工装配入口注册的投影 SPI 不在 Ddd4jGuiceRuntime 作用域内，显式移除
-        BaseContext.remove(SpiKeys.PROJECTION_POSITION_REPOSITORY);
+        // 手工装配入口注册的投影 SPI 不在 Ddd4jGuiceRuntime 作用域内，显式移除。
+        // 1.0.x 改挂：BaseContext 无 remove(...)，注入 SpiRegistrationScope.REMOVED 哨兵占位
+        // （Contexts.get 读取到哨兵按"未注册"处理）。
+        BaseContext.inject(SpiKeys.PROJECTION_POSITION_REPOSITORY, SpiRegistrationScope.REMOVED);
         GuiceContext.clear();
     }
 

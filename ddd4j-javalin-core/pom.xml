@@ -48,6 +48,12 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- 1.0.x 改挂补钉：assertj 原经 2.0.x 上游链传递，1.0.x 链不传递，显式声明（版本由 1.0.x ddd4j-dependencies 管理） -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
 </dependencies>
 
     <build>

@@ -39,6 +39,21 @@
             <artifactId>mica-mqtt-client</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- 1.0.x 改挂补钉：mica-mqtt 2.5.x 的 pom 错钉 mica-net-core 1.2.6（org.tio 包名），上游 ddd4j-mq-mqtt-mica:1.0.x 编译于 2.0.x（net.dreamlu.mica.net 包名），显式钉 2.0.13 -->
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-net-core</artifactId>
+            <version>2.0.13</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- 1.0.x 改挂补钉：mica-mqtt 2.5.10 运行时需要 org.tio（其 pom 错钉的 mica-net-core 1.2.6
+             已被上面的 2.0.13 覆盖以提供 net.dreamlu.mica.net 包），由官方 t-io-core 3.8.6 补齐 org.tio 包 -->
+        <dependency>
+            <groupId>org.t-io</groupId>
+            <artifactId>tio-core</artifactId>
+            <version>3.8.6.v20240801-RELEASE</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.ddd4j.javalin</groupId>
             <artifactId>ddd4j-javalin-testcontainers</artifactId>

@@ -14,7 +14,7 @@ public final class SpiRegistrationScope implements AutoCloseable {
      * 1.0.x 改挂补钉：BaseContext（1.0.x）仅提供 inject/get/contains，无 remove；
      * 卸载时注入本哨兵占位，Contexts.get 读取到哨兵时按"未注册"处理。
      */
-    static final Object REMOVED = new Object();
+    public static final Object REMOVED = new Object();
 
     private final List<Registration<?>> registrations = new ArrayList<>();
     private final List<Registration<?>> installed = new ArrayList<>();

@@ -51,7 +51,12 @@
             <artifactId>microprofile-config-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- 单元测试：junit-jupiter / assertj-core 由 ddd4j-dependencies 继承链统一管理（test scope） -->
+        <!-- 1.0.x 改挂补钉：assertj 原经 2.0.x 上游链传递，1.0.x 链不传递，显式声明（版本由 1.0.x ddd4j-dependencies 管理） -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

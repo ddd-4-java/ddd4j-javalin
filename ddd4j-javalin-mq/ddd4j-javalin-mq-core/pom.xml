@@ -12,10 +12,11 @@
     <artifactId>ddd4j-javalin-mq-core</artifactId>
     <description>ddd4j-javalin MQ 核心桥接：MQ 契约（contract/spi）+ Guice 支持，不绑定具体 broker。</description>
     <dependencies>
+        <!-- M2 内联：2.0.x ddd4j-mq-core 契约已内联至 ddd4j-javalin-mq-contract（原包名 io.ddd4j.mq.*） -->
         <dependency>
-            <groupId>io.ddd4j</groupId>
-            <artifactId>ddd4j-mq-core</artifactId>
-            <version>${ddd4j.version}</version>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-mq-contract</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>

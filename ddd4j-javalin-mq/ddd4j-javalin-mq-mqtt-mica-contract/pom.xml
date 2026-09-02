@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin-mq</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-mq-mqtt-mica-contract</artifactId>
+    <description>
+        内联契约：ddd4j 2.0.x ddd4j-mq-mqtt-mica 的 MicaMqttMQClient/MicaMqttProperties（io.ddd4j.mq.mqttmica.*，原包名），供 ddd4j-javalin-mq-mqtt-mica 的 Guice 桥接编译可达。来源：ddd4j 2.0.x ddd4j-mq/ddd4j-mq-mqtt-mica。
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-mq-contract</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dromara.mica-mqtt</groupId>
+            <artifactId>mica-mqtt-client</artifactId>
+            <version>2.6.6</version>
+        </dependency>
+    </dependencies>
+</project>

@@ -29,12 +29,12 @@ public class JavalinRichModelApplication {
         // any controllers that depend on user-defined beans. Sample controllers are
         // resolved from the Guice Injector via a small helper so the pattern stays
         // compatible with future refactors.
-        app.unsafe.routes.get("/orders/by-no/{orderNo}", ctx -> {
+        app.get("/orders/by-no/{orderNo}", ctx -> {
             // Minimal in-place handler that demonstrates the new entry point without
             // requiring a full controller refactor for this sample.
             ctx.json("{\"status\":\"UP\",\"note\":\"see sample-rich-model domain classes\"}");
         });
-        app.unsafe.routes.get("/health/rich-model", ctx -> ctx.json("{\"status\":\"OK\"}"));
+        app.get("/health/rich-model", ctx -> ctx.json("{\"status\":\"OK\"}"));
     }
 
     /**

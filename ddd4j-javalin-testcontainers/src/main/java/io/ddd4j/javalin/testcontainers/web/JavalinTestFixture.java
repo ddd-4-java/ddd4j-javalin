@@ -41,7 +41,7 @@ import java.util.function.Consumer;
  * class MyFeatureIT extends JavalinTestFixture {
  *     @Override protected String[] basePackages() { return new String[]{"io.example.app"}; }
  *     @Override protected void configureRoutes(Javalin app) {
- *         app.unsafe.routes.get("/hello", ctx -> ctx.result("hi"));
+ *         app.get("/hello", ctx -> ctx.result("hi"));
  *     }
  *     @Test void shouldCallHello() throws Exception {
  *         HttpResponse<String> r = http(HttpRequest.newBuilder(url("/hello")).GET().build());
@@ -108,8 +108,8 @@ public abstract class JavalinTestFixture {
         // ddd4j-web-javalin 2.0.x：统一请求生命周期等全部经 configure(config) 装配，
         // 无独立的 applyTo 步骤（与 ddd4j-sample-javalin 的标准用法一致）。
         app = Javalin.create(config -> web.configure(config));
-        // Default health endpoint for tests.
-        app.unsafe.routes.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
+        // Default health endpoint for tests.（Javalin 6.7.0 无 unsafe.routes，用 pre-start get）
+        app.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
         configureRoutes(app);
         app.start();
 

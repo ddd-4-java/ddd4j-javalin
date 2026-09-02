@@ -22,6 +22,7 @@
         <module>ddd4j-javalin-bom</module>
         <module>ddd4j-javalin-dependencies</module>
         <module>ddd4j-javalin-ddd</module>
+        <module>ddd4j-javalin-guice-bridge</module>
         <module>ddd4j-javalin-core</module>
         <module>ddd4j-javalin-web</module>
         <module>ddd4j-javalin-testcontainers</module>

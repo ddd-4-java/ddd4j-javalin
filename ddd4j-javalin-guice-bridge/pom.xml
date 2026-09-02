@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.ddd4j.javalin</groupId>
+        <artifactId>ddd4j-javalin</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ddd4j-javalin-guice-bridge</artifactId>
+    <description>
+        内联桥：ddd4j 2.0.x 的 Guice 运行时与核心契约子集（SpiKeys/I18nProvider/Contexts/
+        CacheConfig/Readiness 等 + runtime-guice 核心装配类）。6.7.x 改挂 core 1.0.x 时，
+        这些在 1.0.x（Spring AutoConfig 范式）中不存在，由本模块以原包名提供，
+        javalin 各模块 import 零改动。来源：ddd4j 2.0.x ddd4j-runtime-guice / ddd4j-core。
+        排除项（另行处理）：Ddd4jMybatis/Crypto/Logs/Cache 四个 data 向 Module 与 ddd4j-cache。
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-core</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-kit</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+        </dependency>
+    </dependencies>
+</project>

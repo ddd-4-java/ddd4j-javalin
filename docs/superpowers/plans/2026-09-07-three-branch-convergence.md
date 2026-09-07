@@ -391,7 +391,7 @@
 
   After authorized push, wait for the final SHA's CI and integration workflows. A workflow file existing locally is not completion evidence.
 
-- [ ] **Step 5: Compare local and remote SHAs**
+- [x] **Step 5: Compare local and remote SHAs**
 
   Compare each official branch against both configured remotes with `git ls-remote --heads`. Report any divergence without force-pushing.
 

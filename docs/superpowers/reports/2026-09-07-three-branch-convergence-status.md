@@ -29,7 +29,7 @@ ONS、TDMQ 是需要外部凭据的托管服务，不纳入本地容器验收；
 - 两个 workflow 已按分支修正 JDK、Maven Wrapper、监听分支和 `MAVEN_SETTINGS_XML` 原始 XML 校验。
 - 三个实现提交已分别推送到 `origin` 和 `github`，推送后双远端 SHA 与本地逐分支一致。
 - 六个 workflow 均已触发并到达终态：6.7.x [CI](https://github.com/ddd-4-java/ddd4j-javalin/actions/runs/34106299776) / [Integration](https://github.com/ddd-4-java/ddd4j-javalin/actions/runs/34106299513)，7.1.x [CI](https://github.com/ddd-4-java/ddd4j-javalin/actions/runs/34106303665) / [Integration](https://github.com/ddd-4-java/ddd4j-javalin/actions/runs/34106303715)，7.2.x [CI](https://github.com/ddd-4-java/ddd4j-javalin/actions/runs/34106308007) / [Integration](https://github.com/ddd-4-java/ddd4j-javalin/actions/runs/34106307960)。全部在执行任何 step 前被 GitHub 账户付款失败或 Actions spending limit 门禁拒绝，因而结论为 failure；这不是代码、Secret 或容器测试失败。
-- ddd4j 3.0.x 最新 Verify [运行 34096093007](https://github.com/ddd-4-java/ddd4j/actions/runs/34096093007) 正在执行；此前最近完成的 Verify 与 Deploy 均失败。`feature/7.2.x` 通过的是已填充本地 Maven 仓库，不构成空白仓库远端消费证明。
+- ddd4j 3.0.x 最新 [Verify 运行 34096093007](https://github.com/ddd-4-java/ddd4j/actions/runs/34096093007) 已结束且结论为 failure，最近的 Deploy 同样失败。`feature/7.2.x` 通过的是已填充本地 Maven 仓库，不构成空白仓库远端消费证明。
 - Maven 4 仍报告来自已部署 ddd4j 3.0.x BOM 的重复依赖管理冲突警告，需在上游模型中收敛。
 
 ## 结论

@@ -53,7 +53,7 @@ sequenceDiagram
     participant App as Ddd4jJavalinApplication
     participant Guice as Guice Injector
     participant Web as Ddd4jJavalinWeb
-    participant Javalin as Javalin 7
+    participant Javalin as Javalin 6/7
 
     Main->>App: run(args, basePkg, modules...)
     App->>App: 加载 Properties(CLI 覆盖)

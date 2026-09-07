@@ -264,19 +264,19 @@
 - Consumes: Testcontainers BOM 1.20.6, existing pinned images, official/community module classifications from `https://testcontainers.com/modules/`.
 - Produces: centralized fixtures with pinned image tags and real consumer-facing round-trip assertions.
 
-- [ ] **Step 1: Write failing fixture contract cases**
+- [x] **Step 1: Write failing fixture contract cases**
 
   For each fixture, instantiate the real container type and assert its configured Docker image name literal. Add negative assertions that no fixture uses `latest` or an unqualified major-less tag. The test must fail if a production change selects the wrong image family/tag.
 
-- [ ] **Step 2: Verify RED for current gaps**
+- [x] **Step 2: Verify RED for current gaps**
 
   Expected failures should identify any unpinned image, wrong container type, duplicated per-IT container configuration, or the SQS fixture still using a plain `GenericContainer` when `LocalStackContainer` is compatible with 1.20.6.
 
-- [ ] **Step 3: Apply minimal fixture corrections**
+- [x] **Step 3: Apply minimal fixture corrections**
 
   Prefer module-specific Java container classes available in 1.20.6 for MySQL, PostgreSQL, MariaDB, MongoDB, Kafka, RabbitMQ, and LocalStack. Retain `GenericContainer` for services without a compatible 1.20.6 module wrapper. Keep the currently proven ARM64-compatible broker tags unless a focused container startup test proves they are invalid.
 
-- [ ] **Step 4: Verify fixture contract GREEN**
+- [x] **Step 4: Verify fixture contract GREEN**
 
   On `feature/6.7.x` and `feature/7.1.x`, run:
 
@@ -289,7 +289,7 @@
 
   On `feature/7.2.x`, run the same arguments through `./mvnw`.
 
-- [ ] **Step 5: Audit disabled tests**
+- [x] **Step 5: Audit disabled tests**
 
   Ensure ONS and TDMQ are explicitly disabled with managed-service reasons. Ensure Mica is either actually annotated `@Disabled` with a current issue reason or is executed; a comment saying it is disabled is insufficient.
 
@@ -404,3 +404,4 @@
 - 2026-09-07 7.2.x GREEN (local): all POMs retain `4.1.0/<subprojects>`, internal parents use Maven 4 relative-path inference, workflows use JDK 21/Maven 4, dependency tree resolves ddd4j `3.0.x.20260630-SNAPSHOT` and Javalin `7.2.3`, and the full local unit Reactor completed with zero failures/errors/skips.
 - 2026-09-07 7.2.x Maven model correction: every source POM now uses matching 4.1.0 namespace/schema, and internal parents use relative-path inference without duplicate GAV. Maven still reports repeated imported-BOM conflicts originating from the deployed ddd4j 3.0.x model; these are upstream publication/model warnings, not closed by the local Javalin build.
 - 2026-09-07 7.2.x publication gate: clean remote-consumption evidence remains blocked because the latest ddd4j 3.0.x Verify and Deploy runs are red. The populated local Maven repository is not accepted as publication proof.
+- 2026-09-07 Testcontainers: added the Testcontainers 1.20.6 LocalStack module and centralized SQS fixture, replaced the SQS IT's duplicated GenericContainer setup, and expanded the fixture contract to 13 pinned-image cases. ONS/TDMQ remain managed-service exclusions; Mica remains explicitly disabled for the recorded upstream AIO defect.

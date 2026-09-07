@@ -29,7 +29,7 @@ ONS、TDMQ 是需要外部凭据的托管服务，不纳入本地容器验收；
 - 两个 workflow 已按分支修正 JDK、Maven Wrapper、监听分支和 `MAVEN_SETTINGS_XML` 原始 XML 校验。
 - 当前变更仅存在于本地提交，尚未获得 push 授权，因此没有最终提交对应的 GitHub Actions URL 或 conclusion。
 - 只读远端核对显示 `origin` 与 `github` 三分支 SHA 完全一致：6.7.x 为 `80d300d`、7.1.x 为 `ac5d795`、7.2.x 为 `e2db96e`；三个本地分支均领先对应远端。
-- ddd4j 3.0.x 的远端 Verify/Deploy 当前仍为红色；`feature/7.2.x` 通过的是已填充本地 Maven 仓库，不构成空白仓库远端消费证明。
+- ddd4j 3.0.x 最新 Verify [运行 34096093007](https://github.com/ddd-4-java/ddd4j/actions/runs/34096093007) 正在执行；此前最近完成的 Verify 与 Deploy 均失败。`feature/7.2.x` 通过的是已填充本地 Maven 仓库，不构成空白仓库远端消费证明。
 - Maven 4 仍报告来自已部署 ddd4j 3.0.x BOM 的重复依赖管理冲突警告，需在上游模型中收敛。
 
 ## 结论

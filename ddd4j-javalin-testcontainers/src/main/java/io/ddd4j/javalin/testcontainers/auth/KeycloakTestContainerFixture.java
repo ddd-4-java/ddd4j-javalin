@@ -7,7 +7,7 @@ import io.ddd4j.javalin.testcontainers.AbstractTestContainerFixture;
  * Shared Keycloak container fixture (used by {@code ddd4j-javalin-auth-*} integration tests
  * to verify end-to-end login flows against a real OIDC provider).
  *
- * <p>Uses the {@code quay.io/keycloak/keycloak:24.0} image in start-dev mode. The realm
+ * <p>Uses the {@code quay.io/keycloak/keycloak:26.2} image in start-dev mode. The realm
  * "ddd4j-test" is auto-imported on startup, with a preconfigured client and a test user
  * ({@code test-user / test-pass}).
  *
@@ -17,7 +17,7 @@ import io.ddd4j.javalin.testcontainers.AbstractTestContainerFixture;
  */
 public class KeycloakTestContainerFixture extends AbstractTestContainerFixture<KeycloakContainer> {
 
-    public static final String DEFAULT_IMAGE = "quay.io/keycloak/keycloak:24.0";
+    public static final String DEFAULT_IMAGE = "quay.io/keycloak/keycloak:26.2";
     public static final String DEFAULT_REALM = "ddd4j-test";
 
     @Override

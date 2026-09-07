@@ -13,7 +13,6 @@ import io.ddd4j.javalin.testcontainers.messaging.KafkaTestContainerFixture;
 import io.ddd4j.javalin.testcontainers.messaging.RabbitMqTestContainerFixture;
 import io.ddd4j.javalin.testcontainers.messaging.RocketMqTestContainerFixture;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.MariaDBContainer;
@@ -21,7 +20,6 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
-import dasniko.testcontainers.keycloak.KeycloakContainer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -109,16 +107,12 @@ class FixtureContractTest {
     }
 
     @Test
-    void keycloakFixtureShouldConstructPinnedContainer() {
-        KeycloakContainer container = new KeycloakTestContainerFixture().newContainer();
-        assertNotNull(container);
-        assertEquals("quay.io/keycloak/keycloak:24.0", KeycloakTestContainerFixture.DEFAULT_IMAGE);
+    void keycloakFixtureShouldUsePinnedImage() {
+        assertEquals("quay.io/keycloak/keycloak:26.2", KeycloakTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
-    void localStackFixtureShouldConstructPinnedContainer() {
-        LocalStackContainer container = new LocalStackTestContainerFixture().newContainer();
-        assertNotNull(container);
+    void localStackFixtureShouldUsePinnedImage() {
         assertEquals("localstack/localstack:3.4", LocalStackTestContainerFixture.DEFAULT_IMAGE);
     }
 

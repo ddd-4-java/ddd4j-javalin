@@ -61,13 +61,18 @@ jobs:
             module: ddd4j-javalin-mq/ddd4j-javalin-mq-redis-stream
           - broker: mqtt
             module: ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt
-          - broker: order-outbox
-            module: ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox
-
     steps:
       # ── 1. Checkout ddd4j-javalin ──────────────────────────────────────
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          overwrite-settings: true
 
       # ── 2. Configure Maven settings (org secret) ─────────────────────
       # ddd-4-java 组织 secret MAVEN_SETTINGS_XML：完整 settings.xml（阿里云私服
@@ -75,11 +80,27 @@ jobs:
       - name: Configure Maven settings (org secret)
         env:
           MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        shell: bash
         run: |
-          if [ -n "$MAVEN_SETTINGS_XML" ]; then
-            mkdir -p ~/.m2
-            printf '%s' "$MAVEN_SETTINGS_XML" > ~/.m2/settings.xml
-          fi
+          install -d -m 700 "$HOME/.m2"
+          umask 077
+          python3 -c "
+          import os
+          from xml.etree import ElementTree
+          content = os.environ.get('MAVEN_SETTINGS_XML', '')
+          target = os.path.expanduser('~/.m2/settings.xml')
+          with open(target, 'w') as settings_file:
+              settings_file.write(content)
+          size = os.path.getsize(target)
+          if size < 50:
+              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
+              exit(1)
+          ElementTree.parse(target)
+          if '2624322-snapshot-3EoOv3' not in content:
+              print('::error::settings.xml missing Aliyun snapshot repository')
+              exit(1)
+          print('Maven settings validated')
+          "
 
       # ── 5. Run integration tests for this broker ──────────────────────
       # ubuntu-latest has Docker pre-installed; Testcontainers works out of

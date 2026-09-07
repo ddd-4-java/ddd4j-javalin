@@ -26,6 +26,12 @@
             <artifactId>ddd4j-mq-activemq</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <!-- Artemis 2.19.0 使用 javax.json 包；core 1.0.x 的全局管理会误升到 Jakarta JSON 2.x。 -->
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>${artemis-json-api.version}</version>
+        </dependency>
 
         <!-- ======== 测试：验证 Guice 装配 + 契约解析（用 mock JmsTemplate，无需真实 ActiveMQ）======== -->
         <dependency>

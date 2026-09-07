@@ -35,7 +35,7 @@
 - Consumes: root `pom.xml`, `ddd4j-javalin-dependencies/pom.xml`, `.mvn/wrapper/maven-wrapper.properties`, `.github/workflows/ci.yml`, `.github/workflows/integration-it.yml`.
 - Produces: a JUnit 5 contract that derives the line from root `<revision>` and rejects incompatible ddd4j, Javalin, Maven model, aggregate element, wrapper, JDK, or workflow branch combinations.
 
-- [ ] **Step 1: Write the failing test for the current 6.7.x mismatch**
+- [x] **Step 1: Write the failing test for the current 6.7.x mismatch**
 
   Add a table-driven test with literal expectations:
 
@@ -49,7 +49,7 @@
 
   Parse POMs with JDK DOM APIs, not regex. Assert the root parent and `<ddd4j.version>` equal the expected ddd4j version, the dependencies POM exposes one unambiguous runtime Javalin property, and the aggregation/model match the line.
 
-- [ ] **Step 2: Run the contract and verify RED**
+- [x] **Step 2: Run the contract and verify RED**
 
   Run:
 
@@ -62,7 +62,7 @@
 
   Expected on the current formal 6.7.x branch: FAIL because the root parent/`ddd4j.version` is `2.0.x.20260730-SNAPSHOT`, not `1.0.x.20260630-SNAPSHOT`. If dependency resolution prevents the test JVM from starting, capture that as the earlier publication/configuration failure and run the test in the 1.0.x candidate after Task 2 establishes its reactor.
 
-- [ ] **Step 3: Add wrapper and workflow assertions**
+- [x] **Step 3: Add wrapper and workflow assertions**
 
   Assert observable configuration contracts:
 
@@ -72,7 +72,7 @@
   - Both workflows consume `secrets.MAVEN_SETTINGS_XML` through an environment variable.
   - Neither workflow contains job-level `continue-on-error: true`.
 
-- [ ] **Step 4: Re-run to preserve the expected RED state**
+- [x] **Step 4: Re-run to preserve the expected RED state**
 
   Use the command from Step 2. Record the exact failing assertions; failures caused only by typos or inability to locate the repository root must be fixed before proceeding.
 
@@ -92,7 +92,7 @@
 - Consumes: `opt/retarget-1.0.x`, formal `feature/6.7.x`, ddd4j `feature/1.0.x` deployed artifacts.
 - Produces: official `feature/6.7.x` with the 1.0.x compatibility bridge and later formal-branch auth/Web/test fixes.
 
-- [ ] **Step 1: Create a commit and conflict ledger without changing branches**
+- [x] **Step 1: Create a commit and conflict ledger without changing branches**
 
   Run:
 
@@ -104,11 +104,11 @@
 
   Classify each unique commit/file as candidate-required, formal-required, obsolete because upstream 1.0.x now supplies it, or documentation-only. Save the classification in the plan's validation record; do not create another specification.
 
-- [ ] **Step 2: Stop for local commit authorization**
+- [x] **Step 2: Stop for local commit authorization**
 
   The repository currently contains the approved spec and plan as untracked changes. Obtain explicit authorization before making the local documentation checkpoint or any merge/cherry-pick commit. Do not stash, reset, clean, or use a worktree to bypass this gate.
 
-- [ ] **Step 3: Establish the integrated 6.7.x branch**
+- [x] **Step 3: Establish the integrated 6.7.x branch**
 
   After authorization, commit the approved spec/plan, integrate the candidate history into `feature/6.7.x`, and resolve conflicts according to the ledger. Preserve:
 
@@ -118,11 +118,11 @@
   - JDK 17 build target;
   - Guice bridge types only when absent from the newly deployed 1.0.x artifacts.
 
-- [ ] **Step 4: Run the build contract and verify GREEN**
+- [x] **Step 4: Run the build contract and verify GREEN**
 
   Run the Task 1 focused command. Expected: `BuildLineContractTest` PASS.
 
-- [ ] **Step 5: Prove resolved versions**
+- [x] **Step 5: Prove resolved versions**
 
   Run with Maven 3 and the configured settings:
 
@@ -135,7 +135,7 @@
 
   Expected: only ddd4j `1.0.x.20260630-SNAPSHOT` and Javalin `6.7.0`; no ddd4j 2.x/3.x or Javalin 7.x artifact.
 
-- [ ] **Step 6: Run full unit tests**
+- [x] **Step 6: Run full unit tests**
 
   ```bash
   mvn -U -B -ntp -Denforcer.skip=true test \
@@ -400,3 +400,7 @@
 ## Validation Record
 
 - 2026-09-07: Plan created from the approved design. No POM, production source, test, workflow, branch, commit, or remote was changed during planning.
+- 2026-09-07 6.7.x RED: `BuildLineContractTest` failed 3/3 on core `2.0.x.20260730`, ambiguous Javalin properties, and Maven 4 wrapper.
+- 2026-09-07 6.7.x candidate ledger: `opt/retarget-1.0.x` overlaps 185 Java types now present in ddd4j 1.0.x, so the candidate was not merged wholesale. Only still-missing compatibility behavior was applied to the formal branch.
+- 2026-09-07 6.7.x GREEN: build contract passed 3/3; dependency tree resolved ddd4j `1.0.x.20260630-SNAPSHOT` and Javalin `6.7.0`; full 52-module unit Reactor passed with 77 tests, zero failures/errors/skips.
+- 2026-09-07 6.7.x upstream exclusions: cqrs-person/rich-model artifacts are not published; ddd4j sample-order artifacts explicitly skip deploy and their published local POMs retain `${revision}`, so those cross-repository samples remain outside the official Reactor.

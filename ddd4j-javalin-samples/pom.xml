@@ -25,10 +25,12 @@
         <module>ddd4j-javalin-sample-auth-satoken</module>
         <module>ddd4j-javalin-sample-auth-security</module>
         <module>ddd4j-javalin-sample-auth-shiro</module>
-        <module>ddd4j-javalin-sample-cqrs-person</module>
-        <module>ddd4j-javalin-sample-rich-model</module>
+        <!-- ddd4j 1.0.x 未发布对应上游 sample 构件，保留源码但不纳入本发布线 Reactor。 -->
+        <!-- <module>ddd4j-javalin-sample-cqrs-person</module> -->
+        <!-- <module>ddd4j-javalin-sample-rich-model</module> -->
         <module>ddd4j-javalin-sample-mybatis-testcontainers</module>
-        <module>ddd4j-javalin-sample-order-outbox</module>
+        <!-- ddd4j-sample-order-* 明确配置为不发布，跨仓库构建无法解析其父 POM。 -->
+        <!-- <module>ddd4j-javalin-sample-order-outbox</module> -->
     </modules>
 
 </project>

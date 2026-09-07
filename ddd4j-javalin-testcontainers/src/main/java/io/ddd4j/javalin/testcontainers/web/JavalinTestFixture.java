@@ -22,6 +22,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.net.http.HttpClient;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -85,12 +86,12 @@ public abstract class JavalinTestFixture {
         Module webModule = new Ddd4jJavalinAutoConfiguration(properties);
         java.util.List<Module> head = new java.util.ArrayList<>();
         // The full Ddd4jGuiceModule binds DefaultProjectionService which lacks an
-        // @Inject constructor in ddd4j 2.0.x; provide the minimum SPIs manually.
+        // @Inject constructor in the current ddd4j line; provide the minimum SPIs manually.
         head.add(new MinimalSpiModule());
         // Skip DddAnnotationModule when no base packages are supplied (avoid ClassGraph
         // NoOp errors when running fixture-only integration tests).
         String[] basePackages = basePackages();
-        if (basePackages != null && basePackages.length > 0) {
+        if (Objects.nonNull(basePackages) && basePackages.length > 0) {
             head.add(new DddAnnotationModule(basePackages));
         }
         head.add(webModule);
@@ -105,20 +106,20 @@ public abstract class JavalinTestFixture {
         afterInjector(injector);
 
         Ddd4jJavalinWeb web = injector.getInstance(Ddd4jJavalinWeb.class);
-        // ddd4j-web-javalin 2.0.x：统一请求生命周期等全部经 configure(config) 装配，
+        // ddd4j-web-javalin：统一请求生命周期等全部经 configure(config) 装配，
         // 无独立的 applyTo 步骤（与 ddd4j-sample-javalin 的标准用法一致）。
         app = Javalin.create(config -> web.configure(config));
         // Default health endpoint for tests.
         app.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
         configureRoutes(app);
-        app.start();
+        app.start(properties.getHost(), properties.getPort());
 
         client = HttpClient.newHttpClient();
     }
 
     @AfterEach
     void stopJavalin() {
-        if (app != null) {
+        if (Objects.nonNull(app)) {
             app.stop();
         }
     }
@@ -148,7 +149,7 @@ public abstract class JavalinTestFixture {
      * Minimal SPI bindings for the Javalin web layer to start in isolation. We avoid the
      * full {@code Ddd4jGuiceModule} because it transitively pulls in
      * {@code DefaultProjectionService} which currently has no {@code @Inject}
-     * constructor (tracked upstream as ddd4j 2.0.x issue).
+     * constructor in the current core line.
      */
     private static final class MinimalSpiModule extends AbstractModule {
         @Override

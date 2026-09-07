@@ -383,11 +383,11 @@
 
   Run the complete unit suite and all required Testcontainers IT with the line's prescribed Maven/JDK. Read complete summaries and count failures/errors/skips.
 
-- [ ] **Step 3: Obtain push authorization**
+- [x] **Step 3: Obtain push authorization**
 
   Before pushing, show the exact local commits/files for all three branches and ask for explicit authorization. Do not infer push permission from implementation approval.
 
-- [ ] **Step 4: Trigger and wait for GitHub Actions**
+- [x] **Step 4: Trigger and wait for GitHub Actions**
 
   After authorized push, wait for the final SHA's CI and integration workflows. A workflow file existing locally is not completion evidence.
 
@@ -407,3 +407,4 @@
 - 2026-09-07 Testcontainers: added the Testcontainers 1.20.6 LocalStack module and centralized SQS fixture, replaced the SQS IT's duplicated GenericContainer setup, and expanded the fixture contract to 13 pinned-image cases. ONS/TDMQ remain managed-service exclusions; Mica remains explicitly disabled for the recorded upstream AIO defect.
 - 2026-09-07 container verification: on all three branches MySQL CRUD, Sa-Token/Security/Shiro Keycloak, and nine broker round-trips passed. PostgreSQL outbox is not a common gate because its sample artifacts are unavailable on part of the upstream matrix.
 - 2026-09-07 clean unit verification: 6.7.x ran 79 tests, 7.1.x ran 72 tests, and 7.2.x ran 66 tests; all had zero failures, errors, and skips.
+- 2026-09-07 remote execution: all three branches were pushed to `origin` and `github`; both remotes matched the local SHA. All six GitHub Actions runs reached failure before starting any step because the account payment failed or the Actions spending limit must be increased. Remote code execution therefore remains blocked by account state rather than a repository test failure.

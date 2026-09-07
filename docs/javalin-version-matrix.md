@@ -1,85 +1,36 @@
-# Javalin 版本 × JDK 基线矩阵（选型依据）
+# ddd4j-javalin 三分支兼容矩阵
 
-> 2026-08-16 调研沉淀。验证方法：解包每条主线终点版本 jar 读 `Javalin.class` 字节码 major、核对 `javalin-parent` POM `<jdk.version>` 与捆绑 Jetty 版本、官方文档交叉验证。
-> 结论：**网传"Javalin 6 要求 Java 17"不准确**——JDK 门槛共三次跳变。
+本矩阵是 2026-09-07 三分支收敛后的构建契约。分支版本、上游 ddd4j、Javalin、Maven 模型和 JDK 必须整组变更，不能单独漂移。
 
-## 版本矩阵
+| ddd4j-javalin 分支 | 本项目版本 | ddd4j 分支 / 版本 | Javalin | Maven Wrapper | POM 模型 / 聚合元素 | 构建 JDK |
+|---|---|---|---|---|---|---|
+| `feature/6.7.x` | `6.7.x.20260630-SNAPSHOT` | `feature/1.0.x` / `1.0.x.20260630-SNAPSHOT` | `6.7.0` | Maven `3.9.16` | `4.0.0` / `<modules>` | 17 |
+| `feature/7.1.x` | `7.1.x.20260630-SNAPSHOT` | `feature/2.0.x` / `2.0.x.20260630-SNAPSHOT` | `7.1.0` | Maven `3.9.16` | `4.0.0` / `<modules>` | 17 |
+| `feature/7.2.x` | `7.2.x.20260630-SNAPSHOT` | `feature/3.0.x` / `3.0.x.20260630-SNAPSHOT` | `7.2.3` | Maven `4.0.0-rc-6` | `4.1.0` / `<subprojects>` | 21 |
 
-| 版本线（终点版本） | JDK 要求 | 捆绑 Jetty | 验证依据 |
-|---|---|---|---|
-| 0.x（→ 0.5.4）、1.x（→ 1.7.0）、2.x（→ 2.8.0）、3.x（→ 3.13.13） | Java 8 | Jetty 9 | 字节码 major 52 |
-| 4.x（→ 4.6.8） | Java 8 | Jetty 9.4.x | 字节码 major 52 |
-| 5.x（→ 5.6.5） | Java 11 | Jetty 11 | 字节码 major 55；POM `jdk.version=11` |
-| 6.x（→ 6.7.0） | Java 11 | Jetty 11 | 字节码 major 55；POM `jdk.version=11`；v6 归档文档 |
-| 7.x（当前 7.2.3） | Java 17 | Jetty 12.1.x | 字节码 major 61；POM `jdk.version=17`；官方文档 "requires Java 17+, and Jetty 12+" |
+## Maven 兼容边界
 
-（major 52=Java 8，55=Java 11，61=Java 17；Maven Central 共 166 个版本）
+- `feature/6.7.x` 和 `feature/7.1.x` 消费 Maven 3 模型的上游，全部生产 POM 使用 `modelVersion 4.0.0` 和 `<modules>`。
+- `feature/7.2.x` 消费 ddd4j 3.0.x，全部生产 POM 使用 Maven 4 的 `modelVersion 4.1.0` 和 `<subprojects>`。
+- Maven 4 的内部父项目依靠相对路径推断；不在 `<parent>` 中同时声明本地相对坐标和重复 GAV。
+- `BuildLineContractTest` 会同时验证版本、POM 模型、聚合元素、Wrapper、JDK 和 GitHub Actions 分支，防止矩阵再次漂移。
 
-## 分支策略：两线制（2026-08-16 定案）
+## CI 约束
 
-**不按 Javalin 每个 minor 开分支线**（6.3/6.4/6.5/6.6/7.0/7.1 六条不开）——矩阵内 8 条线实际只有 2 个技术基线（6.x=Java11 字节码+Jetty 11，7.x=Java17+Jetty 12），组内适配层代码 99% 相同，多线维护是纯成本。用末代版本覆盖存量用户：
+- 两个 GitHub Actions workflow 都只监听当前分支，并使用该分支规定的 JDK 和 `./mvnw`。
+- 组织 Secret `MAVEN_SETTINGS_XML` 必须以原始 XML 内容注入并在执行 Maven 前校验；它不是文件路径。
+- 禁止 job 级 `continue-on-error: true` 掩盖构建或集成测试失败。
 
-| 活跃分支线 | ddd4j-javalin 版本 | Javalin 库 | ddd4j 核心 | 定位 |
-|---|---|---|---|---|
-| `feature/7.2.x` | `7.2.x-SNAPSHOT` | 7.2.3 | feature/3.0.x | **主战线**：承接全部最新成果（unsafe.routes API 形态） |
-| `feature/6.7.x` | `6.7.x-SNAPSHOT` | 6.7.0 | feature/2.0.x | ⚠️ 分支已就位（由 feature/6.3.x 改名，双 remote 已同步）；降级受核心阻塞（见下），待 B/C 路径决策。分支内容暂为 7 形态成果 |
+## 依赖维护规则
 
-**JDK 17 统一最低基线**（两线同规）：
-- 运行/CI/工具链统一 JDK 17；不做 JDK 8 兼容（Javalin 5.0 起已出局）。
-- `feature/6.7.x` 编译目标 `--release 11`（产物兼容面更广），但最低运行 JDK 仍为 17。
-- `feature/7.2.x` 编译与运行均为 17。
+1. Javalin、Jetty 和最低 Java 运行版本视为同一升级单元。
+2. Jetty 版本由 Javalin 传递依赖决定；适配模块不得各自固定冲突版本。
+3. 修改 ddd4j 主线映射前，先验证上游构件已经发布，再使用空白 Maven 本地仓库做消费证明。
+4. 跨 Javalin 或 ddd4j 主线的变更必须执行单元测试、MySQL、Keycloak 和 broker 容器回归。
 
-## 6.7.x 线可行性探测（2026-08-16，架构智能体报告）
+## 参考
 
-**核心硬阻塞**：核心仓库任何分支/tag 均无 Javalin 5/6 基线的 `ddd4j-web-javalin`——m2 中 v1(1.0.x)=Javalin 4.6.8（`io.javalin.core` 包，6.7.0 无法加载）、v2/v3(2.0.x/3.0.x)=Javalin 7.2.2（`config.routes.*` API，Javalin 6 不存在）。`ddd4j-javalin-web` 依赖核心 `Ddd4jJavalinWeb`，直接降库版本会 NoSuchMethodError。
-
-**API 差异面**（本仓库）：`app.unsafe.routes.*` 共 51 处/14 文件 → Javalin 6 等价 `app.get/post/exception(...)` 实例方法（纯机械替换）；核心侧 `config.routes.*` → Javalin 6 需移到实例方法注册；Context 差异 `method()/status()/req` 三处。
-
-**三路径**：
-| 路径 | 可行性 | 工程量 | 依赖 |
-|---|---|---|---|
-| A. 等核心开 javalin6 基线分支 | 低（历史无存量） | 核心侧 2-3 天 | 核心团队承诺，不可控 |
-| B. ddd4j-javalin-web 自研 Javalin 6 装配（Ddd4jJavalinWeb6，v1 源码为模板） | 中（51 处机械替换 + 1 个装配类 + 6 文件适配） | 本仓库 3-5 天 | 无，但分叉核心 Web SPI 契约需手工同步 |
-| C. 放弃 6.7.x 线，7.2.x 统一覆盖 | 最高（零成本） | 0 | 代价：Jetty 11/Java 11 存量用户无覆盖 |
-
-**决策门**：是否存在真实的 Javalin 6 / Java 11 / Jetty 11 下游需求——无则选 C，有则选 B。
-
-## 本项目选型与实测（2026-08-16，feature/7.2.x）
-
-| 项 | 本项目 | 与官方基线一致性 |
-|---|---|---|
-| Javalin | 7.2.3（自 7.2.2 升级，132 测试回归通过） | ✅ Java 17 基线（全仓 `<java.version>17</java.version>`） |
-| Jetty（透传） | 12.1.x（由 javalin 传递，统一） | ✅ |
-| Jetty（qrcode 模块） | ~~显式 pin 12.1.5~~ → 已删除，统一透传 | ✅ 修复了同模块混版本 |
-
-## 维护规则（强约束）
-
-1. **Jetty 版本由 Javalin 传递决定，禁止在业务/扩展模块显式 pin Jetty**——历史上核心 ddd4j-dependencies 曾把 `jetty-server`/`jetty-util` pin 到 9.4（Java 8 时代），导致 qrcode 模块被迫手工覆盖；该 pin 已不在当前链路，模块级 pin 也已全部移除。若未来核心 BOM 再现 9.4/11.x pin，应在 `ddd4j-javalin-dependencies` 的 `<dependencyManagement>` 统一覆盖为 Javalin 传递版本，而非模块各自为政。
-2. **升级 Javalin 主线版本 = 同步核对 JDK 与 Jetty 双基线**（三者绑定跳变：5.0/Jetty11/Java11，7.0/Jetty12/Java17）。
-3. **跨主线升级需回归容器级 IT**（`mvn verify -Pjavalin-integration-tests`）。
-
-## 已知坑
-
-- **Javalin 5.6.4**：用 JDK 21 构建，在 Java 17 上会崩（[issue #2239](https://github.com/javalin/javalin/issues/2239)）；停留 5.x 线请用 5.6.5。
-- **虚拟线程**：6.x/7.x 的 `config.useVirtualThreads = true` 需 JDK 21+，非框架最低要求。
-
-## 来源
-
+- [Maven 4 新特性](https://maven.apache.org/whatsnewinmaven4.html)
+- [Maven 4.1.0 模型参考](https://maven.apache.org/ref/4-LATEST/api/maven-api-model/maven.html)
 - [Javalin 官方文档](https://javalin.io/documentation)
-- [Javalin 6.0.0 稳定版公告](https://javalin.io/news/javalin-6.0.0-stable.html)
-- [Javalin v6 归档文档](https://javalin.io/archive/docs/v6.X.html)
-- [6→7 迁移指南](https://javalin.io/migration-guide-javalin-6-to-7) / [5→6 迁移指南](https://javalin.io/migration-guide-javalin-5-to-6)
-
-
-## 工具链基线（2026-08-16 调查）
-
-| 维度 | 当前状态 |
-|---|---|
-| Maven | 3.9.16（CI 与本地） |
-| modelVersion | javalin 全仓 + 核心 1.0.x/2.0.x 子 pom 均 4.0.0；核心 2.0.x 的 web-javalin 与 3.0.x 根 pom 4.1.0 |
-| `<module>`/`<subproject>` 兼容性 | javalin 全仓用 `<module>`（Maven 3 形态）；核心 3.0.x 根 pom 已用 `<subprojects>`（Maven 4 形态） |
-
-**决策**：按"已主动声明 Maven 4 的 pom 才同步改 `<module>`→`<subproject>`"原则，本轮**零代码变更**（核心 3.0.x 已是正确形态，core 2.0.x 的 web-javalin 无 reactor 子模块不需要 `<modules>`，javalin 全仓仍以 Maven 3 为目标）。
-
-升级到 Maven 4 时需另开专项全量重构（涉及 javalin 6 个父 pom + core 87 个 4.0.0 pom）。
-
+- [Javalin 6 到 7 迁移指南](https://javalin.io/migration-guide-javalin-6-to-7)

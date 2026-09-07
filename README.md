@@ -1,6 +1,6 @@
 # ddd4j-javalin
 
-> 基于 [Javalin 7](https://javalin.io/) + [Google Guice](https://github.com/google/guice) 的 [ddd4j](https://github.com/ddd4j/ddd4j) 框架适配层。
+> 基于 [Javalin 6/7](https://javalin.io/) + [Google Guice](https://github.com/google/guice) 的 [ddd4j](https://github.com/ddd4j/ddd4j) 框架适配层。
 >
 > 对齐目标:与 [`ddd4j-boot`](../ddd4j-boot) 能力矩阵一致,与 [`ddd4j`](../ddd4j) 全面适配。
 
@@ -47,7 +47,7 @@ ddd4j-javalin 是其中"Guice Runtime + Javalin 7 Web"的实现轨,目标是为�
 | RDBMS | `mysql:8.0` / `postgres:16-alpine` / `mariadb:11` | `ddd4j-javalin-testcontainers` |
 | NoSQL | `mongo:7` / `redis:7-alpine` | `ddd4j-javalin-testcontainers` |
 | MQ | `confluentinc/cp-kafka:7.5.0` / `rabbitmq:3.13.7-management-alpine` / `apache/activemq-artemis:2.39.0` / `apache/rocketmq:5.3.2` / `apachepulsar/pulsar:3.2.0` / `nats:2-alpine` / `eclipse-mosquitto:2.0` / `localstack/localstack:3.4` | `ddd4j-javalin-testcontainers` |
-| Auth | `quay.io/keycloak/keycloak:24.0` | `ddd4j-javalin-testcontainers` |
+| Auth | `quay.io/keycloak/keycloak:26.2` | `ddd4j-javalin-testcontainers` |
 | HTTP Mock | `wiremock/wiremock:3.5.0` | `ddd4j-javalin-testcontainers` |
 
 ## 跑集成测试
@@ -101,7 +101,7 @@ ddd4j-javalin/
     └── ddd4j-javalin-sample-mq-{disruptor,kafka,rabbitmq}
 ```
 
-## 一键启动(Sample 6.3.x)
+## 一键启动
 
 ```java
 public class MyApplication {
@@ -132,15 +132,19 @@ class MyIT extends JavalinTestFixture {
 }
 ```
 
-## 历史与版本
+## 三分支版本矩阵（2026-09 定版）
 
-- **2.0.x 轨** — 已定型,逐步达到人类架构师产出水准(参见 [`ddd4j`](../ddd4j))
-- **6.3.x 轨**(本仓库)— 框架集成层,正在追赶 [`ddd4j-boot`](../ddd4j-boot) 的能力矩阵
-- 当前快照:`1.0.x.20260630-SNAPSHOT` / `ddd4j 2.0.x` / Java 17
+| ddd4j-javalin 分支 | 本项目版本 | ddd4j | Javalin | Maven / POM | JDK |
+|---|---|---|---|---|---|
+| `feature/6.7.x` | `6.7.x.20260630-SNAPSHOT` | `1.0.x.20260630-SNAPSHOT` | `6.7.0` | Maven 3 / `4.0.0` / `<modules>` | 17 |
+| `feature/7.1.x` | `7.1.x.20260630-SNAPSHOT` | `2.0.x.20260630-SNAPSHOT` | `7.1.0` | Maven 3 / `4.0.0` / `<modules>` | 17 |
+| `feature/7.2.x` | `7.2.x.20260630-SNAPSHOT` | `3.0.x.20260630-SNAPSHOT` | `7.2.3` | Maven 4 / `4.1.0` / `<subprojects>` | 21 |
+
+`feature/7.1.x` 必须保持 Maven 3：它消费的 ddd4j 2.0.x 仍是 Maven 3 模型。只有消费 ddd4j 3.0.x 的 `feature/7.2.x` 使用 Maven 4。
 
 ## 生产就绪状态
 
-当前阶段：**internal beta**（功能完成、56 模块单测全绿、10 个容器级 IT 中 9 个真实 round-trip 通过）。
+当前阶段：**internal beta**。三分支本地单元回归均通过，并分别完成 MySQL、三套 Keycloak 适配和 9 个可本地运行的 broker round-trip；远端 GitHub Actions 仍需推送后验收。
 
 2026-08-16 实施了三项生产就绪改进：
 
@@ -151,8 +155,8 @@ class MyIT extends JavalinTestFixture {
 | **Release profile + 文档** | GPG 签名发布配置 + 发布工程演练手册 | 已实施 |
 
 **剩余阻塞项**（首个正式版发布前必须解决）：
-1. 核心依赖 SNAPSHOT 收敛：`ddd4j-parent:2.0.x.*` 需先发布正式版
-2. 核心仓库远端分叉裁决：`feature/1.0.x` 的 javax/jakarta 方向冲突待用户决策
+1. 三分支本地提交尚未推送，GitHub Actions 尚无最终 SHA 验收结果。
+2. ddd4j 3.0.x 远端 Verify/Deploy 仍需恢复，之后补做空白 Maven 本地仓库消费验证。
 
 详见 [RELEASE.md](RELEASE.md) 和 [生产就绪设计文档](docs/superpowers/specs/2026-08-16-production-readiness-design.md)。
 

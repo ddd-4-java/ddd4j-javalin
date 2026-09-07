@@ -57,7 +57,8 @@
   mvn -B -ntp -Denforcer.skip=true \
     -pl ddd4j-javalin-testcontainers -am \
     -DskipTests=false -Dsurefire.skip=false \
-    -Dtest=BuildLineContractTest test
+    -Dtest=BuildLineContractTest \
+    -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
   Expected on the current formal 6.7.x branch: FAIL because the root parent/`ddd4j.version` is `2.0.x.20260730-SNAPSHOT`, not `1.0.x.20260630-SNAPSHOT`. If dependency resolution prevents the test JVM from starting, capture that as the earlier publication/configuration failure and run the test in the 1.0.x candidate after Task 2 establishes its reactor.
@@ -158,7 +159,7 @@
 - Consumes: integrated shared tests/fixes from Task 2 where source-compatible, ddd4j `2.0.x.20260630-SNAPSHOT`.
 - Produces: Javalin 7.1.0 adapter built entirely with Maven 3/POM 4.0.0 semantics.
 
-- [ ] **Step 1: Apply the build contract and verify RED on 7.1.x**
+- [x] **Step 1: Apply the build contract and verify RED on 7.1.x**
 
   Expected failures:
 
@@ -167,7 +168,7 @@
   - wrapper points at Maven 4;
   - workflows listen to `feature/7.2.x` and describe ddd4j 3.0.x.
 
-- [ ] **Step 2: Convert all POMs mechanically to Maven 3 model**
+- [x] **Step 2: Convert all POMs mechanically to Maven 3 model**
 
   For every production POM:
 
@@ -181,19 +182,19 @@
 
   Replace `<subprojects>/<subproject>` with `<modules>/<module>` without changing module order or membership. Validate every POM with `xmllint --noout`.
 
-- [ ] **Step 3: Correct versions and Maven wrapper**
+- [x] **Step 3: Correct versions and Maven wrapper**
 
   Set root parent and `<ddd4j.version>` to `2.0.x.20260630-SNAPSHOT`, keep project revision `7.1.x.20260630-SNAPSHOT`, keep Javalin `7.1.0`, and select the Maven 3 wrapper version proven by the current ddd4j 2.0.x workflow/wrapper rather than inventing a version.
 
-- [ ] **Step 4: Correct both workflows**
+- [x] **Step 4: Correct both workflows**
 
   Make both workflows explicitly target `feature/7.1.x`, JDK 17, Maven 3, ddd4j 2.0.x, and raw-XML `MAVEN_SETTINGS_XML`. Remove 7.2.x/3.0.x comments and job-level `continue-on-error`.
 
-- [ ] **Step 5: Run the build contract and verify GREEN**
+- [x] **Step 5: Run the build contract and verify GREEN**
 
   Execute the focused Task 1 test with Maven 3. Expected: PASS.
 
-- [ ] **Step 6: Prove dependency resolution and full tests**
+- [x] **Step 6: Prove dependency resolution and full tests**
 
   Run the Task 2 dependency-tree and unit-test commands. Expected: only ddd4j `2.0.x.20260630-SNAPSHOT`, Javalin `7.1.0`, and zero test failures/errors.
 
@@ -209,15 +210,15 @@
 - Consumes: ddd4j `3.0.x.20260630-SNAPSHOT`, Javalin `7.2.3`, Maven 4 wrapper.
 - Produces: a JDK 21/Maven 4 branch with no production `<modules>` residue and branch-correct CI.
 
-- [ ] **Step 1: Apply the build contract and verify RED**
+- [x] **Step 1: Apply the build contract and verify RED**
 
   Expected current failure: `integration-it.yml` configures JDK 17 instead of JDK 21. CI publication resolution may also fail while ddd4j 3.0.x remains unpublished.
 
-- [ ] **Step 2: Correct workflows**
+- [x] **Step 2: Correct workflows**
 
   Use JDK 21 and `./mvnw` in both workflows, target only `feature/7.2.x`, consume `MAVEN_SETTINGS_XML`, and remove job-level `continue-on-error`.
 
-- [ ] **Step 3: Validate Maven 4 structure**
+- [x] **Step 3: Validate Maven 4 structure**
 
   ```bash
   rg -n '<modules>|<module>' --glob '**/pom.xml'
@@ -227,13 +228,14 @@
 
   Expected: no actual Maven 3 aggregate elements; comments containing `<module>` are either clarified or excluded from the structural check. All POMs parse.
 
-- [ ] **Step 4: Run the contract and local reactor checks**
+- [x] **Step 4: Run the contract and local reactor checks**
 
   ```bash
   ./mvnw -B -ntp -Denforcer.skip=true \
     -pl ddd4j-javalin-testcontainers -am \
     -DskipTests=false -Dsurefire.skip=false \
-    -Dtest=BuildLineContractTest test
+    -Dtest=BuildLineContractTest \
+    -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
   Expected: configuration contract PASS. If parent resolution fails, record publication gate BLOCKED separately.
@@ -309,15 +311,15 @@
 
   Run MySQL CRUD and PostgreSQL outbox modules with `-Pjavalin-integration-tests -am`. Expected: actual SQL write/read/transaction assertions, not only container startup.
 
-- [ ] **Step 2: Run auth IT**
+- [x] **Step 2: Run auth IT**
 
   Run Sa-Token, Security, and Shiro Keycloak IT separately. Expected: token acquisition plus an allow/deny decision through the adapter.
 
-- [ ] **Step 3: Run broker IT serially**
+- [x] **Step 3: Run broker IT serially**
 
   Execute Kafka, RabbitMQ, Artemis, RocketMQ, Pulsar, NATS, SQS, Redis Stream, and MQTT in separate Maven invocations. For each, require publish → broker → consume → acknowledgment assertions.
 
-- [ ] **Step 4: Record failures without blanket exemptions**
+- [x] **Step 4: Record failures without blanket exemptions**
 
   Classify failures as code defect, image/platform incompatibility, upstream client defect, private artifact resolution, or transient infrastructure. Only a reproducible upstream defect may justify an individual `@Disabled`; never enable job-level `continue-on-error`.
 
@@ -335,15 +337,15 @@
 - Consumes: actual final POMs, dependency trees, test reports, container runs, and CI URLs.
 - Produces: source-backed documentation with no stale 6.3.x/7.2.2/2.0.x.20260730 claims.
 
-- [ ] **Step 1: Update version and Maven matrices**
+- [x] **Step 1: Update version and Maven matrices**
 
   Document the exact matrix from Global Constraints and explicitly explain why 7.1.x is Maven 3 while 7.2.x is Maven 4.
 
-- [ ] **Step 2: Correct Testcontainers wording**
+- [x] **Step 2: Correct Testcontainers wording**
 
   Distinguish Testcontainers official modules, community modules, and images used through `GenericContainer`. Do not call every image “officially supported by Testcontainers.”
 
-- [ ] **Step 3: Record evidence by layer**
+- [x] **Step 3: Record evidence by layer**
 
   For each branch record:
 
@@ -355,7 +357,7 @@
   - GitHub Actions run URL and conclusion;
   - unresolved publication or platform blockers.
 
-- [ ] **Step 4: Run documentation consistency scan**
+- [x] **Step 4: Run documentation consistency scan**
 
   ```bash
   rg -n 'feature/6\.3\.x|Javalin 7\.2\.2|2\.0\.x\.20260730|feature/7\.2\.x' \
@@ -373,11 +375,11 @@
 - Consumes: completed Tasks 1–7.
 - Produces: final completion report or an explicit blocked report.
 
-- [ ] **Step 1: Run branch-local static gates**
+- [x] **Step 1: Run branch-local static gates**
 
   On each official branch run `git diff --check`, all-POM XML validation, forbidden Maven model/aggregate residue scan, and the focused build contract.
 
-- [ ] **Step 2: Run fresh full tests**
+- [x] **Step 2: Run fresh full tests**
 
   Run the complete unit suite and all required Testcontainers IT with the line's prescribed Maven/JDK. Read complete summaries and count failures/errors/skips.
 
@@ -405,3 +407,5 @@
 - 2026-09-07 6.7.x GREEN: build contract passed 3/3; dependency tree resolved ddd4j `1.0.x.20260630-SNAPSHOT` and Javalin `6.7.0`; full 52-module unit Reactor passed with 77 tests, zero failures/errors/skips.
 - 2026-09-07 6.7.x upstream exclusions: cqrs-person/rich-model artifacts are not published; ddd4j sample-order artifacts explicitly skip deploy and their published local POMs retain `${revision}`, so those cross-repository samples remain outside the official Reactor.
 - 2026-09-07 Testcontainers: added the Testcontainers 1.20.6 LocalStack module and centralized SQS fixture, replaced the SQS IT's duplicated GenericContainer setup, and expanded the fixture contract to 13 pinned-image cases. ONS/TDMQ remain managed-service exclusions; Mica remains explicitly disabled for the recorded upstream AIO defect.
+- 2026-09-07 container verification: on all three branches MySQL CRUD, Sa-Token/Security/Shiro Keycloak, and nine broker round-trips passed. PostgreSQL outbox is not a common gate because its sample artifacts are unavailable on part of the upstream matrix.
+- 2026-09-07 clean unit verification: 6.7.x ran 79 tests, 7.1.x ran 72 tests, and 7.2.x ran 66 tests; all had zero failures, errors, and skips.

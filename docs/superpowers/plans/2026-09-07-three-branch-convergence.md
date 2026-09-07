@@ -57,7 +57,8 @@
   mvn -B -ntp -Denforcer.skip=true \
     -pl ddd4j-javalin-testcontainers -am \
     -DskipTests=false -Dsurefire.skip=false \
-    -Dtest=BuildLineContractTest test
+    -Dtest=BuildLineContractTest \
+    -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
   Expected on the current formal 6.7.x branch: FAIL because the root parent/`ddd4j.version` is `2.0.x.20260730-SNAPSHOT`, not `1.0.x.20260630-SNAPSHOT`. If dependency resolution prevents the test JVM from starting, capture that as the earlier publication/configuration failure and run the test in the 1.0.x candidate after Task 2 establishes its reactor.
@@ -233,7 +234,8 @@
   ./mvnw -B -ntp -Denforcer.skip=true \
     -pl ddd4j-javalin-testcontainers -am \
     -DskipTests=false -Dsurefire.skip=false \
-    -Dtest=BuildLineContractTest test
+    -Dtest=BuildLineContractTest \
+    -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
   Expected: configuration contract PASS. If parent resolution fails, record publication gate BLOCKED separately.

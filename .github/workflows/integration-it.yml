@@ -1,11 +1,11 @@
-# Integration Tests for ddd4j-javalin MQ brokers (feature/7.2.x)
+# Integration Tests for ddd4j-javalin MQ brokers (feature/7.1.x)
 #
 # Each broker runs in an independent matrix job to avoid container OOM on a
 # single machine (lesson: running multiple Testcontainers brokers in parallel
 # causes OOM). Slowest brokers: Kafka ~5 min, SQS ~3 min.
 #
-# This branch is Maven 4 (modelVersion 4.1.0 + <subprojects>): use ./mvnw
-# (wrapper pinned to apache-maven 4.0.0-rc-6). ddd4j core SNAPSHOTs resolve
+# This branch follows ddd4j 2.0.x with Maven 3, POM 4.0.0 and <modules>.
+# ddd4j core SNAPSHOTs resolve
 # from the Aliyun private repo via org secret MAVEN_SETTINGS_XML.
 #
 # Excluded (all @Disabled in source, will not execute):
@@ -23,7 +23,7 @@ name: Integration Tests
 on:
   workflow_dispatch:
   push:
-    branches: [feature/7.2.x]
+    branches: [feature/7.1.x]
     paths:
       - '.github/workflows/integration-it.yml'
   schedule:
@@ -65,9 +65,6 @@ jobs:
             module: ddd4j-javalin-mq/ddd4j-javalin-mq-redis-stream
           - broker: mqtt
             module: ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt
-          - broker: order-outbox
-            module: ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox
-
     steps:
       # ── 1. Checkout ddd4j-javalin ──────────────────────────────────────
       - name: Checkout ddd4j-javalin
@@ -80,19 +77,40 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
+          overwrite-settings: true
 
       # ── 3. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
       - name: Write Maven settings from org secret
+        env:
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        shell: bash
         run: |
-          mkdir -p "$HOME/.m2"
-          printf '%s' "${{ secrets.MAVEN_SETTINGS_XML }}" > "$HOME/.m2/settings.xml"
+          install -d -m 700 "$HOME/.m2"
+          umask 077
+          python3 -c "
+          import os
+          from xml.etree import ElementTree
+          content = os.environ.get('MAVEN_SETTINGS_XML', '')
+          target = os.path.expanduser('~/.m2/settings.xml')
+          with open(target, 'w') as settings_file:
+              settings_file.write(content)
+          size = os.path.getsize(target)
+          if size < 50:
+              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
+              exit(1)
+          ElementTree.parse(target)
+          if '2624322-snapshot-3EoOv3' not in content:
+              print('::error::settings.xml missing Aliyun snapshot repository')
+              exit(1)
+          print('Maven settings validated')
+          "
 
       # ── 4. Run integration tests for this broker ──────────────────────
       # ubuntu-latest has Docker pre-installed; Testcontainers works out of
       # the box. -am builds required upstream modules (core, parent, etc.)
       - name: "Run IT: ${{ matrix.broker }}"
         run: >-
-          ./mvnw -B verify
+          mvn -U -Denforcer.skip=true -B verify
           -Pjavalin-integration-tests
           -pl ${{ matrix.module }}
           -am

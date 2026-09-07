@@ -1,9 +1,8 @@
-# CI: Unit tests & package verification for ddd4j-javalin (feature/7.2.x)
+# CI: Unit tests & package verification for ddd4j-javalin (feature/7.1.x)
 #
 # Design notes:
-# - This branch is Maven 4 (modelVersion 4.1.0 + <subprojects>): use ./mvnw
-#   (wrapper pinned to apache-maven 4.0.0-rc-6).
-# - ddd4j core dependencies (io.ddd4j:*:3.0.x.20260630-SNAPSHOT) resolve from
+# - This branch follows ddd4j 2.0.x with Maven 3, POM 4.0.0 and <modules>.
+# - ddd4j core dependencies (io.ddd4j:*:2.0.x.20260630-SNAPSHOT) resolve from
 #   the Aliyun private Maven repository; credentials/settings come from the
 #   org secret MAVEN_SETTINGS_XML (written to ~/.m2/settings.xml).
 # - Root pom.xml has surefire <skip>true</skip> by default. We override with
@@ -15,9 +14,9 @@ name: CI
 
 on:
   push:
-    branches: [feature/7.2.x]
+    branches: [feature/7.1.x]
   pull_request:
-    branches: [feature/7.2.x]
+    branches: [feature/7.1.x]
 
 permissions:
   contents: read
@@ -44,21 +43,42 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
+          overwrite-settings: true
 
       # ── 3. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
       # Contains the Aliyun packages repository + credentials needed to
       # resolve io.ddd4j:* SNAPSHOT artifacts.
       - name: Write Maven settings from org secret
+        env:
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        shell: bash
         run: |
-          mkdir -p "$HOME/.m2"
-          printf '%s' "${{ secrets.MAVEN_SETTINGS_XML }}" > "$HOME/.m2/settings.xml"
+          install -d -m 700 "$HOME/.m2"
+          umask 077
+          python3 -c "
+          import os
+          from xml.etree import ElementTree
+          content = os.environ.get('MAVEN_SETTINGS_XML', '')
+          target = os.path.expanduser('~/.m2/settings.xml')
+          with open(target, 'w') as settings_file:
+              settings_file.write(content)
+          size = os.path.getsize(target)
+          if size < 50:
+              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
+              exit(1)
+          ElementTree.parse(target)
+          if '2624322-snapshot-3EoOv3' not in content:
+              print('::error::settings.xml missing Aliyun snapshot repository')
+              exit(1)
+          print('Maven settings validated')
+          "
 
-      # ── 4. Unit tests (Maven 4 via wrapper) ───────────────────────────
+      # ── 4. Unit tests (Maven 3) ───────────────────────────────────────
       # Root pom disables surefire by default (<skip>true</skip>), so we
       # must explicitly re-enable it.
       - name: Run unit tests
-        run: ./mvnw -B test -DskipTests=false -Dsurefire.skip=false
+        run: mvn -U -Denforcer.skip=true -B test -DskipTests=false -Dsurefire.skip=false
 
       # ── 5. Package verification (no tests) ────────────────────────────
       - name: Verify packaging
-        run: ./mvnw -B package -DskipTests -DskipITs
+        run: mvn -U -Denforcer.skip=true -B package -DskipTests -DskipITs

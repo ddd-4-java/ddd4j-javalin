@@ -10,6 +10,7 @@ import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.guice.DddAnnotationModule;
 import io.ddd4j.guice.i18n.GuiceI18nProvider;
 import io.ddd4j.guice.subject.GuiceSubjectProvider;
+import io.ddd4j.kit.lang.StrKit;
 import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
 import io.javalin.Javalin;
 import io.javalin.config.JavalinConfig;
@@ -88,7 +89,7 @@ public final class Ddd4jJavalinApplication {
         // @Inject constructor in ddd4j 2.0.x. Provide the minimum SPIs manually;
         // consumers may pass their own Ddd4jGuiceModule via extraModules to override.
         head.add(new MinimalSpiModule());
-        if (basePackages != null && !basePackages.isBlank()) {
+        if (StrKit.isNotBlank(basePackages)) {
             head.add(new DddAnnotationModule(basePackages));
         }
         head.add(web);
@@ -113,14 +114,14 @@ public final class Ddd4jJavalinApplication {
     }
 
     private static void applyCliOverrides(Ddd4jJavalinProperties properties, String[] args) {
-        if (args == null) {
+        if (Objects.isNull(args)) {
             return;
         }
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ("--port".equals(arg) && i + 1 < args.length) {
                 properties.setPort(Integer.parseInt(args[++i]));
-            } else if (arg != null && arg.matches("\\d{2,5}")) {
+            } else if (Objects.nonNull(arg) && arg.matches("\\d{1,5}")) {
                 // tolerate a bare port as the first argument
                 properties.setPort(Integer.parseInt(arg));
             }

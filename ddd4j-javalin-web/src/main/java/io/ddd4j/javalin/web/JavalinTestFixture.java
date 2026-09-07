@@ -19,6 +19,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.net.http.HttpClient;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -87,7 +88,7 @@ public abstract class JavalinTestFixture {
         // Skip DddAnnotationModule when no base packages are supplied (avoid ClassGraph
         // NoOp errors when running fixture-only integration tests).
         String[] basePackages = basePackages();
-        if (basePackages != null && basePackages.length > 0) {
+        if (Objects.nonNull(basePackages) && basePackages.length > 0) {
             head.add(new DddAnnotationModule(basePackages));
         }
         head.add(webModule);
@@ -106,14 +107,14 @@ public abstract class JavalinTestFixture {
         // Default health endpoint for tests.
         app.unsafe.routes.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
         configureRoutes(app);
-        app.start();
+        app.start(properties.getHost(), properties.getPort());
 
         client = HttpClient.newHttpClient();
     }
 
     @AfterEach
     void stopJavalin() {
-        if (app != null) {
+        if (Objects.nonNull(app)) {
             app.stop();
         }
     }

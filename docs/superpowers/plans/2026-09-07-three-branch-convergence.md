@@ -158,7 +158,7 @@
 - Consumes: integrated shared tests/fixes from Task 2 where source-compatible, ddd4j `2.0.x.20260630-SNAPSHOT`.
 - Produces: Javalin 7.1.0 adapter built entirely with Maven 3/POM 4.0.0 semantics.
 
-- [ ] **Step 1: Apply the build contract and verify RED on 7.1.x**
+- [x] **Step 1: Apply the build contract and verify RED on 7.1.x**
 
   Expected failures:
 
@@ -167,7 +167,7 @@
   - wrapper points at Maven 4;
   - workflows listen to `feature/7.2.x` and describe ddd4j 3.0.x.
 
-- [ ] **Step 2: Convert all POMs mechanically to Maven 3 model**
+- [x] **Step 2: Convert all POMs mechanically to Maven 3 model**
 
   For every production POM:
 
@@ -181,19 +181,19 @@
 
   Replace `<subprojects>/<subproject>` with `<modules>/<module>` without changing module order or membership. Validate every POM with `xmllint --noout`.
 
-- [ ] **Step 3: Correct versions and Maven wrapper**
+- [x] **Step 3: Correct versions and Maven wrapper**
 
   Set root parent and `<ddd4j.version>` to `2.0.x.20260630-SNAPSHOT`, keep project revision `7.1.x.20260630-SNAPSHOT`, keep Javalin `7.1.0`, and select the Maven 3 wrapper version proven by the current ddd4j 2.0.x workflow/wrapper rather than inventing a version.
 
-- [ ] **Step 4: Correct both workflows**
+- [x] **Step 4: Correct both workflows**
 
   Make both workflows explicitly target `feature/7.1.x`, JDK 17, Maven 3, ddd4j 2.0.x, and raw-XML `MAVEN_SETTINGS_XML`. Remove 7.2.x/3.0.x comments and job-level `continue-on-error`.
 
-- [ ] **Step 5: Run the build contract and verify GREEN**
+- [x] **Step 5: Run the build contract and verify GREEN**
 
   Execute the focused Task 1 test with Maven 3. Expected: PASS.
 
-- [ ] **Step 6: Prove dependency resolution and full tests**
+- [x] **Step 6: Prove dependency resolution and full tests**
 
   Run the Task 2 dependency-tree and unit-test commands. Expected: only ddd4j `2.0.x.20260630-SNAPSHOT`, Javalin `7.1.0`, and zero test failures/errors.
 
@@ -400,3 +400,5 @@
 ## Validation Record
 
 - 2026-09-07: Plan created from the approved design. No POM, production source, test, workflow, branch, commit, or remote was changed during planning.
+- 2026-09-07 7.1.x RED: the build contract rejected ddd4j `2.0.x.20260730-SNAPSHOT`, Maven 4 wrapper/model, and workflows targeting 7.2.x.
+- 2026-09-07 7.1.x GREEN: all POMs use `4.0.0/<modules>`, wrapper uses Maven 3.9.16, workflows target 7.1.x with JDK 17/Maven 3, dependency tree resolves ddd4j `2.0.x.20260630-SNAPSHOT` and Javalin `7.1.0`, and the full unit Reactor completed with zero failures/errors/skips.

@@ -1,6 +1,8 @@
 package io.ddd4j.javalin.testcontainers;
 
 import io.ddd4j.javalin.testcontainers.WireMockTestContainerFixture;
+import io.ddd4j.javalin.testcontainers.cloud.LocalStackTestContainerFixture;
+import io.ddd4j.javalin.testcontainers.auth.KeycloakTestContainerFixture;
 import io.ddd4j.javalin.testcontainers.database.MariaDbTestContainerFixture;
 import io.ddd4j.javalin.testcontainers.database.MongoDbTestContainerFixture;
 import io.ddd4j.javalin.testcontainers.database.MySqlTestContainerFixture;
@@ -11,6 +13,7 @@ import io.ddd4j.javalin.testcontainers.messaging.KafkaTestContainerFixture;
 import io.ddd4j.javalin.testcontainers.messaging.RabbitMqTestContainerFixture;
 import io.ddd4j.javalin.testcontainers.messaging.RocketMqTestContainerFixture;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.MariaDBContainer;
@@ -18,7 +21,9 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import dasniko.testcontainers.keycloak.KeycloakContainer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,43 +37,39 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class FixtureContractTest {
 
-    private static boolean contains(GenericContainer<?> c, String fragment) {
-        String image = c.getImage().toString();
-        return image != null && image.contains(fragment);
-    }
-
     @Test
     void mysqlFixtureShouldConstructContainer() {
         MySQLContainer<?> container = new MySqlTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertTrue(contains(container, "mysql"));
+        assertEquals("mysql:8.0", MySqlTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void postgresFixtureShouldConstructContainer() {
         PostgreSQLContainer<?> container = new PostgresTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertTrue(contains(container, "postgres"));
+        assertEquals("postgres:16-alpine", PostgresTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void mariadbFixtureShouldConstructContainer() {
         MariaDBContainer<?> container = new MariaDbTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertTrue(contains(container, "mariadb"));
+        assertEquals("mariadb:11", MariaDbTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void mongodbFixtureShouldConstructContainer() {
         MongoDBContainer container = new MongoDbTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertTrue(contains(container, "mongo"));
+        assertEquals("mongo:7", MongoDbTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void redisFixtureShouldConstructContainer() {
         GenericContainer<?> container = new RedisTestContainerFixture().newContainer();
         assertNotNull(container);
+        assertEquals("redis:7-alpine", RedisTestContainerFixture.DEFAULT_IMAGE);
         assertTrue(container.getExposedPorts().contains(RedisTestContainerFixture.DEFAULT_PORT));
     }
 
@@ -76,35 +77,49 @@ class FixtureContractTest {
     void kafkaFixtureShouldConstructContainer() {
         KafkaContainer container = new KafkaTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertTrue(contains(container, "cp-kafka"));
+        assertEquals("confluentinc/cp-kafka:7.5.0", KafkaTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void rabbitMqFixtureShouldConstructContainer() {
         RabbitMQContainer container = new RabbitMqTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertTrue(contains(container, "rabbitmq"));
+        assertEquals("rabbitmq:3.13.7-management-alpine", RabbitMqTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void activeMqFixtureShouldConstructContainer() {
         GenericContainer<?> container = new ActiveMqTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertTrue(contains(container, "activemq"));
+        assertEquals("apache/activemq-artemis:2.39.0", ActiveMqTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void rocketMqFixtureShouldConstructContainer() {
         GenericContainer<?> container = new RocketMqTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertTrue(contains(container, "rocketmq"));
+        assertEquals("apache/rocketmq:5.3.2", RocketMqTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void wireMockFixtureShouldConstructContainer() {
         GenericContainer<?> container = new WireMockTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertNotNull(container.getImage().toString());
+        assertEquals("wiremock/wiremock:3.5.0", WireMockTestContainerFixture.DEFAULT_IMAGE);
+    }
+
+    @Test
+    void keycloakFixtureShouldConstructPinnedContainer() {
+        KeycloakContainer container = new KeycloakTestContainerFixture().newContainer();
+        assertNotNull(container);
+        assertEquals("quay.io/keycloak/keycloak:24.0", KeycloakTestContainerFixture.DEFAULT_IMAGE);
+    }
+
+    @Test
+    void localStackFixtureShouldConstructPinnedContainer() {
+        LocalStackContainer container = new LocalStackTestContainerFixture().newContainer();
+        assertNotNull(container);
+        assertEquals("localstack/localstack:3.4", LocalStackTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test

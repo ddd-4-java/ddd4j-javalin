@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.javalin.mq.sqs.Ddd4jSqsMqGuiceModule;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
+import io.ddd4j.javalin.testcontainers.cloud.LocalStackTestContainerFixture;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.MQProperties;
 import io.ddd4j.mq.annotation.MQEventListener;
@@ -14,9 +15,7 @@ import io.ddd4j.mq.sqs.SqsMQClient;
 import io.ddd4j.mq.sqs.SqsProperties;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.containers.localstack.LocalStackContainer;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
 
@@ -45,11 +44,8 @@ class Ddd4jSqsMqIT {
     private static final String TAG = "smoke";
 
     @SuppressWarnings("resource")
-    private static final GenericContainer<?> LOCALSTACK = new GenericContainer<>(
-            DockerImageName.parse("localstack/localstack:3.4"))
-            .withEnv("SERVICES", "sqs")
-            .withExposedPorts(4566)
-            .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(2)));
+    private static final LocalStackContainer LOCALSTACK =
+            new LocalStackTestContainerFixture().newContainer();
 
     @Test
     void shouldResolveCoreContractsFromGuice() {
@@ -120,7 +116,7 @@ class Ddd4jSqsMqIT {
         props.setRegion("us-east-1");
         props.setAccessKey("test");
         props.setSecretKey("test");
-        props.setEndpointOverride("http://" + LOCALSTACK.getHost() + ":" + LOCALSTACK.getMappedPort(4566));
+        props.setEndpointOverride(LOCALSTACK.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
         props.setWaitTimeSeconds(1);
         props.setPollIntervalMs(200);
         return props;

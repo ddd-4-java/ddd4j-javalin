@@ -165,6 +165,7 @@ CLAUDE.md
 .fastRequest
 *.json
 !cloud-agents-server/agents/maternal-recovery.json
+!ddd4j-javalin-testcontainers/src/main/resources/keycloak/ddd4j-test-realm.json
 qodana.yaml
 
 ### Environment and local secrets ###

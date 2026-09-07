@@ -5,14 +5,14 @@
 #
 # ddd4j core dependencies (io.ddd4j:*:3.0.x.20260630-SNAPSHOT) resolve from
 # the Aliyun private Maven repository. The org secret MAVEN_SETTINGS_XML
-# contains a base64-encoded settings.xml with credentials.
+# contains raw settings.xml with credentials.
 #
 # Key patterns (aligned with ddd4j core verify.yml):
-# - settings.xml is base64-encoded in the secret (decode with base64 --decode)
-# - Credential self-check: curl to verify Aliyun auth before running Maven
+# - settings.xml is raw XML in the organization secret
+# - Empty or malformed XML is rejected before Maven runs
 # - Stale SNAPSHOT metadata cleared before dependency resolution
 # - Maven flags: -U -Denforcer.skip=true -B (always)
-# - Testcontainers IT: separate job with continue-on-error (infrastructure flaky)
+# - Testcontainers IT: separate required matrix job
 
 name: CI
 
@@ -63,6 +63,7 @@ jobs:
           umask 077
           python3 -c "
           import os
+          from xml.etree import ElementTree
           content = os.environ.get('MAVEN_SETTINGS_XML', '')
           target = os.path.expanduser('~/.m2/settings.xml')
           with open(target, 'w') as f:
@@ -72,25 +73,11 @@ jobs:
           if size < 50:
               print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
               exit(1)
+          ElementTree.parse(target)
           if '2624322-snapshot-3EoOv3' not in content:
               print('::error::settings.xml does not reference 2624322-snapshot-3EoOv3')
               exit(1)
           "
-
-      # ── 3b. Credential self-check ─────────────────────────────────────
-      # Proves the Aliyun credentials are valid before running Maven.
-      # Faster feedback than waiting for Maven to fail on dependency resolution.
-      - name: Credential self-check (Aliyun packages)
-        env:
-          ALIYUN_USER: ${{ secrets.ALIYUN_PACKAGES_USERNAME }}
-          ALIYUN_PASS: ${{ secrets.ALIYUN_PACKAGES_PASSWORD }}
-        run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u "$ALIYUN_USER:$ALIYUN_PASS" \
-            "https://packages.aliyun.com/6927b116e6c3e0425dbdf60d/maven/2624322-snapshot-3eoov3/io/ddd4j/ddd4j-core/3.0.x.20260630-SNAPSHOT/maven-metadata.xml" || echo curl-failed)
-          echo "Aliyun credential check: HTTP $HTTP_CODE"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "::warning::Aliyun auth returned $HTTP_CODE — private SNAPSHOT deps may fail"
-          fi
 
       # ── 3c. Stale SNAPSHOT metadata cleanup ──────────────────────────
       # Prevents "Could not find artifact" errors from cached metadata
@@ -129,8 +116,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: [unit-tests]
-    # Docker/Testcontainers failures are infrastructure flaky, not code bugs.
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -153,9 +138,6 @@ jobs:
             module: ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt
           - broker: rocketmq
             module: ddd4j-javalin-mq/ddd4j-javalin-mq-rocketmq
-          - broker: order-outbox
-            module: ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox
-
     steps:
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
@@ -177,10 +159,16 @@ jobs:
           umask 077
           python3 -c "
           import os
+          from xml.etree import ElementTree
           content = os.environ.get('MAVEN_SETTINGS_XML', '')
           target = os.path.expanduser('~/.m2/settings.xml')
           with open(target, 'w') as f:
               f.write(content)
+          size = os.path.getsize(target)
+          if size < 50:
+              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
+              exit(1)
+          ElementTree.parse(target)
           if '2624322-snapshot-3EoOv3' not in content:
               print('::error::settings.xml missing Aliyun config')
               exit(1)

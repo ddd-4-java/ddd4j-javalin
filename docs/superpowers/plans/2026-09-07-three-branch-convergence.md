@@ -209,15 +209,15 @@
 - Consumes: ddd4j `3.0.x.20260630-SNAPSHOT`, Javalin `7.2.3`, Maven 4 wrapper.
 - Produces: a JDK 21/Maven 4 branch with no production `<modules>` residue and branch-correct CI.
 
-- [ ] **Step 1: Apply the build contract and verify RED**
+- [x] **Step 1: Apply the build contract and verify RED**
 
   Expected current failure: `integration-it.yml` configures JDK 17 instead of JDK 21. CI publication resolution may also fail while ddd4j 3.0.x remains unpublished.
 
-- [ ] **Step 2: Correct workflows**
+- [x] **Step 2: Correct workflows**
 
   Use JDK 21 and `./mvnw` in both workflows, target only `feature/7.2.x`, consume `MAVEN_SETTINGS_XML`, and remove job-level `continue-on-error`.
 
-- [ ] **Step 3: Validate Maven 4 structure**
+- [x] **Step 3: Validate Maven 4 structure**
 
   ```bash
   rg -n '<modules>|<module>' --glob '**/pom.xml'
@@ -227,7 +227,7 @@
 
   Expected: no actual Maven 3 aggregate elements; comments containing `<module>` are either clarified or excluded from the structural check. All POMs parse.
 
-- [ ] **Step 4: Run the contract and local reactor checks**
+- [x] **Step 4: Run the contract and local reactor checks**
 
   ```bash
   ./mvnw -B -ntp -Denforcer.skip=true \
@@ -400,3 +400,7 @@
 ## Validation Record
 
 - 2026-09-07: Plan created from the approved design. No POM, production source, test, workflow, branch, commit, or remote was changed during planning.
+- 2026-09-07 7.2.x RED: the build contract rejected workflows without XML validation and the IT workflow's JDK 17 configuration; the full suite also reproduced the shared fixed-port defect.
+- 2026-09-07 7.2.x GREEN (local): all POMs retain `4.1.0/<subprojects>`, internal parents use Maven 4 relative-path inference, workflows use JDK 21/Maven 4, dependency tree resolves ddd4j `3.0.x.20260630-SNAPSHOT` and Javalin `7.2.3`, and the full local unit Reactor completed with zero failures/errors/skips.
+- 2026-09-07 7.2.x Maven model correction: every source POM now uses matching 4.1.0 namespace/schema, and internal parents use relative-path inference without duplicate GAV. Maven still reports repeated imported-BOM conflicts originating from the deployed ddd4j 3.0.x model; these are upstream publication/model warnings, not closed by the local Javalin build.
+- 2026-09-07 7.2.x publication gate: clean remote-consumption evidence remains blocked because the latest ddd4j 3.0.x Verify and Deploy runs are red. The populated local Maven repository is not accepted as publication proof.

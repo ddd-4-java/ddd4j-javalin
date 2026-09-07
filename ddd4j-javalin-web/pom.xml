@@ -5,9 +5,6 @@
     <modelVersion>4.1.0</modelVersion>
 
     <parent>
-        <groupId>io.ddd4j.javalin</groupId>
-        <artifactId>ddd4j-javalin-parent</artifactId>
-        <version>${revision}</version>
         <relativePath>../ddd4j-javalin-parent/pom.xml</relativePath>
     </parent>
 

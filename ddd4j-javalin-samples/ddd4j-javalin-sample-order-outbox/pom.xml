@@ -5,9 +5,7 @@
     <modelVersion>4.1.0</modelVersion>
 
     <parent>
-        <groupId>io.ddd4j.javalin</groupId>
-        <artifactId>ddd4j-javalin-samples</artifactId>
-        <version>${revision}</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <artifactId>ddd4j-javalin-sample-order-outbox</artifactId>

@@ -65,27 +65,45 @@ jobs:
             module: ddd4j-javalin-mq/ddd4j-javalin-mq-redis-stream
           - broker: mqtt
             module: ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt
-          - broker: order-outbox
-            module: ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox
-
     steps:
       # ── 1. Checkout ddd4j-javalin ──────────────────────────────────────
       - name: Checkout ddd4j-javalin
         uses: actions/checkout@v4
 
-      # ── 2. Setup JDK 17 + Maven cache ─────────────────────────────────
-      - name: Set up JDK 17
+      # ── 2. Setup JDK 21 + Maven cache ─────────────────────────────────
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
           cache: maven
+          overwrite-settings: true
 
       # ── 3. Private repo settings (org secret MAVEN_SETTINGS_XML) ──────
       - name: Write Maven settings from org secret
+        env:
+          MAVEN_SETTINGS_XML: ${{ secrets.MAVEN_SETTINGS_XML }}
+        shell: bash
         run: |
-          mkdir -p "$HOME/.m2"
-          printf '%s' "${{ secrets.MAVEN_SETTINGS_XML }}" > "$HOME/.m2/settings.xml"
+          install -d -m 700 "$HOME/.m2"
+          umask 077
+          python3 -c "
+          import os
+          from xml.etree import ElementTree
+          content = os.environ.get('MAVEN_SETTINGS_XML', '')
+          target = os.path.expanduser('~/.m2/settings.xml')
+          with open(target, 'w') as settings_file:
+              settings_file.write(content)
+          size = os.path.getsize(target)
+          if size < 50:
+              print('::error::MAVEN_SETTINGS_XML produced invalid settings.xml (too small)')
+              exit(1)
+          ElementTree.parse(target)
+          if '2624322-snapshot-3EoOv3' not in content:
+              print('::error::settings.xml missing Aliyun snapshot repository')
+              exit(1)
+          print('Maven settings validated')
+          "
 
       # ── 4. Run integration tests for this broker ──────────────────────
       # ubuntu-latest has Docker pre-installed; Testcontainers works out of

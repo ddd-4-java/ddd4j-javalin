@@ -37,7 +37,7 @@
 
         <!-- Testcontainers 集成测试镜像版本（对齐 ddd4j-boot mq/README.md §13） -->
         <testcontainers.version>1.20.6</testcontainers.version>
-        <testcontainers-keycloak.version>3.5.1</testcontainers-keycloak.version>
+        <testcontainers-keycloak.version>3.7.0</testcontainers-keycloak.version>
         <wiremock-standalone.version>3.9.1</wiremock-standalone.version>
     </properties>
 

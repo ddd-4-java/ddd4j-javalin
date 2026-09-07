@@ -1,0 +1,402 @@
+# ddd4j-javalin Three-Branch Convergence Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Subagent execution and Git worktrees are prohibited for this change.
+
+**Goal:** Converge the three official ddd4j-javalin branches onto their matching ddd4j/Javalin/Maven/JDK lines and prove them with executable build contracts, full unit tests, Testcontainers round-trips, and branch-correct GitHub Actions.
+
+**Architecture:** Preserve the existing Guice + Javalin adapter design and converge already implemented candidate work instead of rebuilding it. Each branch has an explicit build contract: 6.7.x and 7.1.x use Maven 3/POM 4.0.0, while 7.2.x uses Maven 4/POM 4.1.0; all functional verification is performed against the matching deployed ddd4j line.
+
+**Tech Stack:** Java 17/21, Maven 3/4, Javalin 6.7.0/7.1.0/7.2.3, Google Guice, JUnit 5, AssertJ, Testcontainers 1.20.6, GitHub Actions.
+
+**Spec:** `docs/superpowers/specs/2026-09-07-three-branch-convergence-design.md`
+
+## Global Constraints
+
+- `feature/6.7.x` = `6.7.x.20260630-SNAPSHOT` + ddd4j `1.0.x.20260630-SNAPSHOT` + Javalin `6.7.0` + Maven 3/POM 4.0.0 + JDK 17.
+- `feature/7.1.x` = `7.1.x.20260630-SNAPSHOT` + ddd4j `2.0.x.20260630-SNAPSHOT` + Javalin `7.1.0` + Maven 3/POM 4.0.0 + JDK 17.
+- `feature/7.2.x` = `7.2.x.20260630-SNAPSHOT` + ddd4j `3.0.x.20260630-SNAPSHOT` + Javalin `7.2.3` + Maven 4/POM 4.1.0 + JDK 21.
+- Maven 3 branches use `<modules>/<module>`; only the Maven 4 branch uses `<subprojects>/<subproject>`.
+- Keep Testcontainers at `1.20.6`; do not combine this convergence with a Testcontainers 2.x upgrade.
+- Never use, create, simulate, or depend on a Git worktree.
+- Preserve the dirty `ddd4j-boot` checkout; it is read-only reference material.
+- Do not push without explicit authorization. Local commits are required before switching official branches and therefore have a separate authorization gate.
+- Use a fresh temporary Maven local repository for publication-consumption proof; a developer's populated `~/.m2` is not release evidence.
+- Treat source/POM checks, dependency resolution, unit tests, container IT, GitHub Actions, and remote SHA equality as separate evidence levels.
+
+---
+
+### Task 1: Add an executable build-line contract
+
+**Files:**
+- Create: `ddd4j-javalin-testcontainers/src/test/java/io/ddd4j/javalin/testcontainers/BuildLineContractTest.java`
+- Modify: `ddd4j-javalin-testcontainers/pom.xml`
+
+**Interfaces:**
+- Consumes: root `pom.xml`, `ddd4j-javalin-dependencies/pom.xml`, `.mvn/wrapper/maven-wrapper.properties`, `.github/workflows/ci.yml`, `.github/workflows/integration-it.yml`.
+- Produces: a JUnit 5 contract that derives the line from root `<revision>` and rejects incompatible ddd4j, Javalin, Maven model, aggregate element, wrapper, JDK, or workflow branch combinations.
+
+- [ ] **Step 1: Write the failing test for the current 6.7.x mismatch**
+
+  Add a table-driven test with literal expectations:
+
+  ```java
+  private static final Map<String, BuildLine> LINES = Map.of(
+          "6.7.x.20260630-SNAPSHOT", new BuildLine("1.0.x.20260630-SNAPSHOT", "6.7.0", "4.0.0", "modules", "17", "3."),
+          "7.1.x.20260630-SNAPSHOT", new BuildLine("2.0.x.20260630-SNAPSHOT", "7.1.0", "4.0.0", "modules", "17", "3."),
+          "7.2.x.20260630-SNAPSHOT", new BuildLine("3.0.x.20260630-SNAPSHOT", "7.2.3", "4.1.0", "subprojects", "21", "4.")
+  );
+  ```
+
+  Parse POMs with JDK DOM APIs, not regex. Assert the root parent and `<ddd4j.version>` equal the expected ddd4j version, the dependencies POM exposes one unambiguous runtime Javalin property, and the aggregation/model match the line.
+
+- [ ] **Step 2: Run the contract and verify RED**
+
+  Run:
+
+  ```bash
+  mvn -B -ntp -Denforcer.skip=true \
+    -pl ddd4j-javalin-testcontainers -am \
+    -DskipTests=false -Dsurefire.skip=false \
+    -Dtest=BuildLineContractTest test
+  ```
+
+  Expected on the current formal 6.7.x branch: FAIL because the root parent/`ddd4j.version` is `2.0.x.20260730-SNAPSHOT`, not `1.0.x.20260630-SNAPSHOT`. If dependency resolution prevents the test JVM from starting, capture that as the earlier publication/configuration failure and run the test in the 1.0.x candidate after Task 2 establishes its reactor.
+
+- [ ] **Step 3: Add wrapper and workflow assertions**
+
+  Assert observable configuration contracts:
+
+  - Maven 3 lines' wrapper distribution contains `/apache-maven/3.`.
+  - Maven 4 line's wrapper distribution contains `/apache-maven/4.`.
+  - CI and IT YAML contain the current line's exact official branch and exact JDK.
+  - Both workflows consume `secrets.MAVEN_SETTINGS_XML` through an environment variable.
+  - Neither workflow contains job-level `continue-on-error: true`.
+
+- [ ] **Step 4: Re-run to preserve the expected RED state**
+
+  Use the command from Step 2. Record the exact failing assertions; failures caused only by typos or inability to locate the repository root must be fixed before proceeding.
+
+### Task 2: Converge `feature/6.7.x` with the 1.0.x retarget candidate
+
+**Files:**
+- Modify: `pom.xml`
+- Modify: `ddd4j-javalin-dependencies/pom.xml`
+- Modify: `ddd4j-javalin-bom/pom.xml`
+- Modify: `.mvn/wrapper/maven-wrapper.properties`
+- Modify: `.github/workflows/ci.yml`
+- Modify: `.github/workflows/integration-it.yml`
+- Review/merge: `ddd4j-javalin-guice-bridge/**`
+- Review/merge: candidate changes under `ddd4j-javalin-{auth,cache,core,data,extensions,mq,samples,testcontainers,web}/**`
+
+**Interfaces:**
+- Consumes: `opt/retarget-1.0.x`, formal `feature/6.7.x`, ddd4j `feature/1.0.x` deployed artifacts.
+- Produces: official `feature/6.7.x` with the 1.0.x compatibility bridge and later formal-branch auth/Web/test fixes.
+
+- [ ] **Step 1: Create a commit and conflict ledger without changing branches**
+
+  Run:
+
+  ```bash
+  git log --left-right --cherry-pick --oneline feature/6.7.x...opt/retarget-1.0.x
+  git diff --name-status feature/6.7.x..opt/retarget-1.0.x
+  git merge-tree "$(git merge-base feature/6.7.x opt/retarget-1.0.x)" feature/6.7.x opt/retarget-1.0.x
+  ```
+
+  Classify each unique commit/file as candidate-required, formal-required, obsolete because upstream 1.0.x now supplies it, or documentation-only. Save the classification in the plan's validation record; do not create another specification.
+
+- [ ] **Step 2: Stop for local commit authorization**
+
+  The repository currently contains the approved spec and plan as untracked changes. Obtain explicit authorization before making the local documentation checkpoint or any merge/cherry-pick commit. Do not stash, reset, clean, or use a worktree to bypass this gate.
+
+- [ ] **Step 3: Establish the integrated 6.7.x branch**
+
+  After authorization, commit the approved spec/plan, integrate the candidate history into `feature/6.7.x`, and resolve conflicts according to the ledger. Preserve:
+
+  - root/managed ddd4j version `1.0.x.20260630-SNAPSHOT`;
+  - Javalin runtime `6.7.0` with a single clearly named runtime property;
+  - Maven 3 `4.0.0/<modules>` structure;
+  - JDK 17 build target;
+  - Guice bridge types only when absent from the newly deployed 1.0.x artifacts.
+
+- [ ] **Step 4: Run the build contract and verify GREEN**
+
+  Run the Task 1 focused command. Expected: `BuildLineContractTest` PASS.
+
+- [ ] **Step 5: Prove resolved versions**
+
+  Run with Maven 3 and the configured settings:
+
+  ```bash
+  mvn -U -B -ntp -Denforcer.skip=true \
+    -pl ddd4j-javalin-web -am \
+    dependency:tree \
+    -Dincludes=io.ddd4j:*,io.javalin:javalin
+  ```
+
+  Expected: only ddd4j `1.0.x.20260630-SNAPSHOT` and Javalin `6.7.0`; no ddd4j 2.x/3.x or Javalin 7.x artifact.
+
+- [ ] **Step 6: Run full unit tests**
+
+  ```bash
+  mvn -U -B -ntp -Denforcer.skip=true test \
+    -DskipTests=false -Dsurefire.skip=false
+  ```
+
+  Expected: BUILD SUCCESS with actual executed-test counts; zero failures/errors. Do not reuse the historical 142-test result as current evidence.
+
+### Task 3: Restore `feature/7.1.x` to Maven 3 and ddd4j 2.0.x
+
+**Files:**
+- Modify: every tracked `**/pom.xml` containing Maven model/schema or aggregate elements
+- Modify: `.mvn/wrapper/maven-wrapper.properties`
+- Modify: `.github/workflows/ci.yml`
+- Modify: `.github/workflows/integration-it.yml`
+- Modify: `README.md`
+- Modify: `docs/javalin-version-matrix.md`
+
+**Interfaces:**
+- Consumes: integrated shared tests/fixes from Task 2 where source-compatible, ddd4j `2.0.x.20260630-SNAPSHOT`.
+- Produces: Javalin 7.1.0 adapter built entirely with Maven 3/POM 4.0.0 semantics.
+
+- [ ] **Step 1: Apply the build contract and verify RED on 7.1.x**
+
+  Expected failures:
+
+  - ddd4j version is `2.0.x.20260730-SNAPSHOT`;
+  - POMs use `modelVersion 4.1.0` and `<subprojects>`;
+  - wrapper points at Maven 4;
+  - workflows listen to `feature/7.2.x` and describe ddd4j 3.0.x.
+
+- [ ] **Step 2: Convert all POMs mechanically to Maven 3 model**
+
+  For every production POM:
+
+  ```xml
+  <project xmlns="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+      <modelVersion>4.0.0</modelVersion>
+  </project>
+  ```
+
+  Replace `<subprojects>/<subproject>` with `<modules>/<module>` without changing module order or membership. Validate every POM with `xmllint --noout`.
+
+- [ ] **Step 3: Correct versions and Maven wrapper**
+
+  Set root parent and `<ddd4j.version>` to `2.0.x.20260630-SNAPSHOT`, keep project revision `7.1.x.20260630-SNAPSHOT`, keep Javalin `7.1.0`, and select the Maven 3 wrapper version proven by the current ddd4j 2.0.x workflow/wrapper rather than inventing a version.
+
+- [ ] **Step 4: Correct both workflows**
+
+  Make both workflows explicitly target `feature/7.1.x`, JDK 17, Maven 3, ddd4j 2.0.x, and raw-XML `MAVEN_SETTINGS_XML`. Remove 7.2.x/3.0.x comments and job-level `continue-on-error`.
+
+- [ ] **Step 5: Run the build contract and verify GREEN**
+
+  Execute the focused Task 1 test with Maven 3. Expected: PASS.
+
+- [ ] **Step 6: Prove dependency resolution and full tests**
+
+  Run the Task 2 dependency-tree and unit-test commands. Expected: only ddd4j `2.0.x.20260630-SNAPSHOT`, Javalin `7.1.0`, and zero test failures/errors.
+
+### Task 4: Harden the Maven 4 `feature/7.2.x` line
+
+**Files:**
+- Modify: `.github/workflows/ci.yml`
+- Modify: `.github/workflows/integration-it.yml`
+- Modify: `.mvn/wrapper/maven-wrapper.properties` only if it does not match the ddd4j 3.0.x wrapper
+- Modify: POMs only when the contract finds a real Maven 3 residue
+
+**Interfaces:**
+- Consumes: ddd4j `3.0.x.20260630-SNAPSHOT`, Javalin `7.2.3`, Maven 4 wrapper.
+- Produces: a JDK 21/Maven 4 branch with no production `<modules>` residue and branch-correct CI.
+
+- [ ] **Step 1: Apply the build contract and verify RED**
+
+  Expected current failure: `integration-it.yml` configures JDK 17 instead of JDK 21. CI publication resolution may also fail while ddd4j 3.0.x remains unpublished.
+
+- [ ] **Step 2: Correct workflows**
+
+  Use JDK 21 and `./mvnw` in both workflows, target only `feature/7.2.x`, consume `MAVEN_SETTINGS_XML`, and remove job-level `continue-on-error`.
+
+- [ ] **Step 3: Validate Maven 4 structure**
+
+  ```bash
+  rg -n '<modules>|<module>' --glob '**/pom.xml'
+  rg -n '<subprojects>|<subproject>' --glob '**/pom.xml'
+  find . -name pom.xml -print0 | xargs -0 -n1 xmllint --noout
+  ```
+
+  Expected: no actual Maven 3 aggregate elements; comments containing `<module>` are either clarified or excluded from the structural check. All POMs parse.
+
+- [ ] **Step 4: Run the contract and local reactor checks**
+
+  ```bash
+  ./mvnw -B -ntp -Denforcer.skip=true \
+    -pl ddd4j-javalin-testcontainers -am \
+    -DskipTests=false -Dsurefire.skip=false \
+    -Dtest=BuildLineContractTest test
+  ```
+
+  Expected: configuration contract PASS. If parent resolution fails, record publication gate BLOCKED separately.
+
+- [ ] **Step 5: Prove clean-repository consumption after upstream deploy**
+
+  Run:
+
+  ```bash
+  maven_repo_dir="$(mktemp -d /tmp/ddd4j-javalin-m2.XXXXXX)"
+  ./mvnw -U -B -ntp -Denforcer.skip=true \
+    -Dmaven.repo.local="$maven_repo_dir" \
+    -pl ddd4j-javalin-web -am dependency:tree \
+    -Dincludes=io.ddd4j:*,io.javalin:javalin
+  ```
+
+  Then run the full Maven 4 unit suite with the same `-Dmaven.repo.local` value. Remove only that validated temporary directory after recording results.
+
+### Task 5: Align Testcontainers fixtures with the module catalog
+
+**Files:**
+- Modify: `ddd4j-javalin-testcontainers/pom.xml`
+- Modify: `ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/**/*TestContainerFixture.java`
+- Modify: `ddd4j-javalin-testcontainers/src/test/java/io/ddd4j/javalin/testcontainers/FixtureContractTest.java`
+- Modify: affected `**/*IT.java`
+
+**Interfaces:**
+- Consumes: Testcontainers BOM 1.20.6, existing pinned images, official/community module classifications from `https://testcontainers.com/modules/`.
+- Produces: centralized fixtures with pinned image tags and real consumer-facing round-trip assertions.
+
+- [ ] **Step 1: Write failing fixture contract cases**
+
+  For each fixture, instantiate the real container type and assert its configured Docker image name literal. Add negative assertions that no fixture uses `latest` or an unqualified major-less tag. The test must fail if a production change selects the wrong image family/tag.
+
+- [ ] **Step 2: Verify RED for current gaps**
+
+  Expected failures should identify any unpinned image, wrong container type, duplicated per-IT container configuration, or the SQS fixture still using a plain `GenericContainer` when `LocalStackContainer` is compatible with 1.20.6.
+
+- [ ] **Step 3: Apply minimal fixture corrections**
+
+  Prefer module-specific Java container classes available in 1.20.6 for MySQL, PostgreSQL, MariaDB, MongoDB, Kafka, RabbitMQ, and LocalStack. Retain `GenericContainer` for services without a compatible 1.20.6 module wrapper. Keep the currently proven ARM64-compatible broker tags unless a focused container startup test proves they are invalid.
+
+- [ ] **Step 4: Verify fixture contract GREEN**
+
+  On `feature/6.7.x` and `feature/7.1.x`, run:
+
+  ```bash
+  mvn -B -ntp -Denforcer.skip=true \
+    -pl ddd4j-javalin-testcontainers -am \
+    -DskipTests=false -Dsurefire.skip=false \
+    -Dtest=FixtureContractTest test
+  ```
+
+  On `feature/7.2.x`, run the same arguments through `./mvnw`.
+
+- [ ] **Step 5: Audit disabled tests**
+
+  Ensure ONS and TDMQ are explicitly disabled with managed-service reasons. Ensure Mica is either actually annotated `@Disabled` with a current issue reason or is executed; a comment saying it is disabled is insufficient.
+
+### Task 6: Execute real container round-trips on each branch
+
+**Files:**
+- Test: `ddd4j-javalin-data/**/src/test/**/*IT.java`
+- Test: `ddd4j-javalin-auth/**/src/test/**/*IT.java`
+- Test: `ddd4j-javalin-mq/**/src/test/**/*IT.java`
+- Test: `ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/test/**/*IT.java`
+
+**Interfaces:**
+- Consumes: centralized fixtures from Task 5 and the matching line's ddd4j clients.
+- Produces: per-service evidence for startup, request/command, persistence/broker side effect, response/consume, and cleanup.
+
+- [ ] **Step 1: Run database and outbox IT**
+
+  Run MySQL CRUD and PostgreSQL outbox modules with `-Pjavalin-integration-tests -am`. Expected: actual SQL write/read/transaction assertions, not only container startup.
+
+- [ ] **Step 2: Run auth IT**
+
+  Run Sa-Token, Security, and Shiro Keycloak IT separately. Expected: token acquisition plus an allow/deny decision through the adapter.
+
+- [ ] **Step 3: Run broker IT serially**
+
+  Execute Kafka, RabbitMQ, Artemis, RocketMQ, Pulsar, NATS, SQS, Redis Stream, and MQTT in separate Maven invocations. For each, require publish → broker → consume → acknowledgment assertions.
+
+- [ ] **Step 4: Record failures without blanket exemptions**
+
+  Classify failures as code defect, image/platform incompatibility, upstream client defect, private artifact resolution, or transient infrastructure. Only a reproducible upstream defect may justify an individual `@Disabled`; never enable job-level `continue-on-error`.
+
+### Task 7: Synchronize documentation and validation records
+
+**Files:**
+- Modify: `README.md`
+- Modify: `docs/architecture.md`
+- Modify: `docs/javalin-version-matrix.md`
+- Modify: `docs/testcontainers-guide.md`
+- Create: `docs/superpowers/reports/2026-09-07-three-branch-convergence-status.md`
+- Modify: this plan's checkbox/status and append a validation record
+
+**Interfaces:**
+- Consumes: actual final POMs, dependency trees, test reports, container runs, and CI URLs.
+- Produces: source-backed documentation with no stale 6.3.x/7.2.2/2.0.x.20260730 claims.
+
+- [ ] **Step 1: Update version and Maven matrices**
+
+  Document the exact matrix from Global Constraints and explicitly explain why 7.1.x is Maven 3 while 7.2.x is Maven 4.
+
+- [ ] **Step 2: Correct Testcontainers wording**
+
+  Distinguish Testcontainers official modules, community modules, and images used through `GenericContainer`. Do not call every image “officially supported by Testcontainers.”
+
+- [ ] **Step 3: Record evidence by layer**
+
+  For each branch record:
+
+  - branch and commit SHA;
+  - POM/model validation;
+  - resolved ddd4j/Javalin versions;
+  - unit test counts/failures/skips;
+  - each container IT result;
+  - GitHub Actions run URL and conclusion;
+  - unresolved publication or platform blockers.
+
+- [ ] **Step 4: Run documentation consistency scan**
+
+  ```bash
+  rg -n 'feature/6\.3\.x|Javalin 7\.2\.2|2\.0\.x\.20260730|feature/7\.2\.x' \
+    README.md docs .github/workflows
+  ```
+
+  Review every hit; retain only explicitly labeled history.
+
+### Task 8: Final verification and remote execution gate
+
+**Files:**
+- No new production files; verification only.
+
+**Interfaces:**
+- Consumes: completed Tasks 1–7.
+- Produces: final completion report or an explicit blocked report.
+
+- [ ] **Step 1: Run branch-local static gates**
+
+  On each official branch run `git diff --check`, all-POM XML validation, forbidden Maven model/aggregate residue scan, and the focused build contract.
+
+- [ ] **Step 2: Run fresh full tests**
+
+  Run the complete unit suite and all required Testcontainers IT with the line's prescribed Maven/JDK. Read complete summaries and count failures/errors/skips.
+
+- [ ] **Step 3: Obtain push authorization**
+
+  Before pushing, show the exact local commits/files for all three branches and ask for explicit authorization. Do not infer push permission from implementation approval.
+
+- [ ] **Step 4: Trigger and wait for GitHub Actions**
+
+  After authorized push, wait for the final SHA's CI and integration workflows. A workflow file existing locally is not completion evidence.
+
+- [ ] **Step 5: Compare local and remote SHAs**
+
+  Compare each official branch against both configured remotes with `git ls-remote --heads`. Report any divergence without force-pushing.
+
+- [ ] **Step 6: Complete the specification status only with evidence**
+
+  Mark the spec implemented only when all mandatory gates pass. If ddd4j 3.0.x remains unpublished or a required CI job is red, leave the spec/plan incomplete and report the exact blocker.
+
+## Validation Record
+
+- 2026-09-07: Plan created from the approved design. No POM, production source, test, workflow, branch, commit, or remote was changed during planning.

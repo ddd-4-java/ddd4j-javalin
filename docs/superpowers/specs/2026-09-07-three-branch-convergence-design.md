@@ -191,4 +191,3 @@ flowchart LR
 | 容器并行导致 ARM64/OOM 不稳定 | 按 broker 分批串行执行；保留已有内存和 readiness 策略。 |
 | 3.0.x 尚未成功 deploy | 7.2.x 本地结构验证可继续，远程消费/CI 完成状态保持阻塞，直到上游 deploy 有成功证据。 |
 | 私服凭据泄漏 | workflow 不打印 settings；另行轮换本地 remote URL 中暴露过的 Codeup 凭据。 |
-

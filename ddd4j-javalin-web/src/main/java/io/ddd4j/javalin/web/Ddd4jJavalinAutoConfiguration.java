@@ -100,8 +100,15 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
             return null;
         }
         String cacheName = properties.getIdempotencyCacheName();
+        long ttlSeconds = Objects.requireNonNull(
+                properties.getIdempotencyTtl(), "idempotencyTtl must not be null").getSeconds();
+        if (ttlSeconds <= 0) {
+            throw new IllegalArgumentException("idempotencyTtl must be at least one second");
+        }
         if (Objects.isNull(CacheKit.getCache(cacheName))) {
-            CacheKit.register(cacheName, CaffeineCache.create(CacheConfig.builder(cacheName).build()));
+            CacheKit.register(cacheName, CaffeineCache.create(CacheConfig.builder(cacheName)
+                    .expireAfterWriteSeconds(ttlSeconds)
+                    .build()));
         }
         return new WebIdempotencyLifecycle(
                 new CacheIdempotencyGuard(cacheName),

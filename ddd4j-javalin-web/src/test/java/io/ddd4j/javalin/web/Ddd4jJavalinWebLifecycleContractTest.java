@@ -3,6 +3,7 @@ package io.ddd4j.javalin.web;
 import com.google.inject.Guice;
 import io.ddd4j.cache.subject.InMemorySubject;
 import io.ddd4j.cache.subject.InMemorySubjectProvider;
+import io.ddd4j.cache.CacheKit;
 import io.ddd4j.core.auth.AuthRequest;
 import io.ddd4j.core.constant.SpiKeys;
 import io.ddd4j.core.context.BaseContext;
@@ -17,11 +18,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * ddd4j Javalin 请求生命周期的消费者行为契约。
@@ -316,5 +319,76 @@ class Ddd4jJavalinWebLifecycleContractTest {
         } finally {
             app.stop();
         }
+    }
+
+    /**
+     * 自定义幂等缓存名必须驱动真实 CacheKit 注册。
+     */
+    @Test
+    void shouldRegisterConfiguredIdempotencyCache() {
+        String cacheName = "contract-custom-idempotency";
+        CacheKit.unregister(cacheName);
+        Ddd4jJavalinProperties properties = new Ddd4jJavalinProperties();
+        properties.setIdempotencyCacheName(cacheName);
+
+        try {
+            Guice.createInjector(new Ddd4jJavalinAutoConfiguration(properties))
+                    .getInstance(Ddd4jJavalinWeb.class);
+            assertThat(CacheKit.getCache(cacheName)).isNotNull();
+        } finally {
+            CacheKit.unregister(cacheName);
+        }
+    }
+
+    /**
+     * 已完成的幂等键在配置 TTL 到期后必须允许再次执行。
+     *
+     * @throws Exception HTTP 请求失败
+     */
+    @Test
+    void shouldExpireIdempotencyKeyUsingConfiguredTtl() throws Exception {
+        AtomicInteger invocations = new AtomicInteger();
+        Ddd4jJavalinProperties properties = new Ddd4jJavalinProperties();
+        properties.setDefaultAuthenticationMode(AuthenticationMode.DISABLED);
+        properties.setIdempotencyCacheName("contract-short-ttl");
+        properties.setIdempotencyTtl(Duration.ofSeconds(1));
+        Ddd4jJavalinWeb web = Guice.createInjector(new Ddd4jJavalinAutoConfiguration(properties))
+                .getInstance(Ddd4jJavalinWeb.class);
+        Javalin app = Javalin.create(web::configure);
+        app.post("/orders", context -> context.result(String.valueOf(invocations.incrementAndGet())));
+        app.start("127.0.0.1", 0);
+
+        try {
+            URI uri = URI.create("http://127.0.0.1:" + app.port() + "/orders");
+            HttpRequest request = HttpRequest.newBuilder(uri)
+                    .header("Idempotency-Key", "short-lived-key")
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpClient client = HttpClient.newHttpClient();
+
+            assertThat(client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(200);
+            assertThat(client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(409);
+            Thread.sleep(1_200L);
+            assertThat(client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(200);
+            assertThat(invocations).hasValue(2);
+        } finally {
+            app.stop();
+            CacheKit.unregister("contract-short-ttl");
+        }
+    }
+
+    /**
+     * 默认本地缓存不支持亚秒 TTL，必须在装配期显式拒绝。
+     */
+    @Test
+    void shouldRejectSubSecondIdempotencyTtl() {
+        Ddd4jJavalinProperties properties = new Ddd4jJavalinProperties();
+        properties.setIdempotencyCacheName("contract-invalid-ttl");
+        properties.setIdempotencyTtl(Duration.ofMillis(500));
+
+        assertThatThrownBy(() -> Guice.createInjector(new Ddd4jJavalinAutoConfiguration(properties))
+                .getInstance(Ddd4jJavalinWeb.class))
+                .hasRootCauseInstanceOf(IllegalArgumentException.class)
+                .hasStackTraceContaining("idempotencyTtl must be at least one second");
     }
 }

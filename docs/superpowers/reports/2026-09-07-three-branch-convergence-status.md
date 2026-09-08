@@ -35,3 +35,14 @@ ONS、TDMQ 是需要外部凭据的托管服务，不纳入本地容器验收；
 ## 结论
 
 本地代码、版本矩阵、Maven 模型、单元测试和可运行容器 IT 已收敛，双远端同步已完成。远端验收仍由两项外部门禁阻塞：GitHub Actions 账户计费/额度，以及 ddd4j 3.0.x 成功部署后的空白 Maven 仓库消费验证。
+
+## 2026-09-09 Phase A 本地检查点
+
+CodeGraph 能力审计后，原规格已追加 Phase A-C。Phase A 已完成第一批运行时闭环：
+
+- 6.7.x 补齐 Javalin 6 请求上下文、认证、Subject、Request/Trace ID、异常翻译、幂等和清理生命周期。
+- 三线生产启动器默认安装完整 Core Guice Runtime，并在 Javalin stop 时撤销 SPI。
+- 三线 Web 装配增加认证模式、可信代理和可关闭的默认幂等防护。
+- 本地 clean test：6.7.x 91 tests、7.1.x 77 tests、7.2.x 71 tests，均为零 failure/error/skip。
+
+该检查点尚未 push 或重新发布；自定义幂等 cache/TTL、未使用 server properties 以及 Phase B/C 仍未完成。

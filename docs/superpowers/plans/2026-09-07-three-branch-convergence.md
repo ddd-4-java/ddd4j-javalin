@@ -446,12 +446,12 @@
   Add independent behavior tests for authentication mode, trusted proxy selection, idempotency enable/disable/cache/TTL,
   request IDs, trace IDs, duplicate request conflict and cleanup. Remove or implement every currently unused property.
 
-- [ ] **Step 6: Apply compatible Phase A behavior to 7.1.x and 7.2.x**
+- [x] **Step 6: Apply compatible Phase A behavior to 7.1.x and 7.2.x**
 
   Reuse the upstream complete Javalin adapter on 7.x; change only the Guice composition, properties and tests. Preserve
   Maven 3/JDK 17 for 7.1.x and Maven 4/JDK 21 for 7.2.x.
 
-- [ ] **Step 7: Run focused and full verification on all three branches**
+- [x] **Step 7: Run focused and full verification on all three branches**
 
   Run Web lifecycle contracts, core contracts, full unit reactors and affected real HTTP integration tests separately.
 
@@ -476,4 +476,7 @@
 - 2026-09-09 6.7.x dependency gate: upstream ddd4j 1.0.x build 17 consumer BOM stopped managing the standard `mybatis-plus-jsqlparser`; the Javalin JDK 17 line now centrally pins the upstream-compatible 3.5.9 version.
 - 2026-09-09 6.7.x Web GREEN: real random-port HTTP contracts cover no-token 401, valid-token Subject binding, Request/Trace ID propagation, ThreadContext cleanup, configurable authentication mode, trusted forwarded client IP, duplicate idempotency 409 and disabled-idempotency behavior.
 - 2026-09-09 6.7.x Runtime GREEN: production bootstrap installs the complete core Guice module, registers CommandBus, and closes the Guice runtime on Javalin stop.
+- 2026-09-09 override contract: a business extra module can replace the default SubjectProvider through `Modules.override`; plain module ordering previously failed with duplicate bindings.
 - 2026-09-09 6.7.x regression: the 52-module clean unit reactor passed with 91 tests, zero failures/errors/skips. Custom idempotency cache/TTL and unused server-property decisions remain open in Task 9 Step 5.
+- 2026-09-09 7.1.x compatibility: retained Maven 3/JDK 17 and the upstream Javalin 7 adapter; the full clean reactor passed 77 tests with zero failures/errors/skips (`3a0ea69`).
+- 2026-09-09 7.2.x compatibility: retained Maven 4/POM 4.1.0/JDK 21 and the upstream Javalin 7 adapter; the full clean reactor passed 71 tests with zero failures/errors/skips (`ffecb3e`).

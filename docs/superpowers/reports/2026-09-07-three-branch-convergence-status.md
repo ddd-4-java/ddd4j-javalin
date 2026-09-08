@@ -43,6 +43,6 @@ CodeGraph 能力审计后，原规格已追加 Phase A-C。Phase A 已完成第�
 - 6.7.x 补齐 Javalin 6 请求上下文、认证、Subject、Request/Trace ID、异常翻译、幂等和清理生命周期。
 - 三线生产启动器默认安装完整 Core Guice Runtime，并在 Javalin stop 时撤销 SPI。
 - 三线 Web 装配增加认证模式、可信代理和可关闭的默认幂等防护。
-- 本地 clean test：6.7.x 91 tests、7.1.x 77 tests、7.2.x 71 tests，均为零 failure/error/skip。
+- 最终本地 clean test：6.7.x 95 tests、7.1.x 80 tests、7.2.x 74 tests，均为零 failure/error/skip。
 
 该检查点尚未 push 或重新发布；自定义幂等 cache/TTL、未使用 server properties 以及 Phase B/C 仍未完成。

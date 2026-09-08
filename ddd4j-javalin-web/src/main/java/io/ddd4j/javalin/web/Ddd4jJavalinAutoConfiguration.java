@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import io.ddd4j.cache.CacheKit;
 import io.ddd4j.cache.local.CaffeineCache;
 import io.ddd4j.core.cache.CacheConfig;
+import io.ddd4j.kit.lang.StrKit;
 import io.ddd4j.web.core.auth.BearerSubjectAuthenticator;
 import io.ddd4j.web.core.auth.PathWebAccessPolicy;
 import io.ddd4j.web.core.context.ClientIpResolver;
@@ -69,8 +70,15 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     @Provides
     @Singleton
     PathWebAccessPolicy pathWebAccessPolicy() {
+        String contextPath = properties.getContextPath();
+        List<String> publicPaths = Arrays.asList(properties.getPublicPaths());
+        if (StrKit.isNotBlank(contextPath) && !"/".equals(contextPath)) {
+            publicPaths = publicPaths.stream()
+                    .map(path -> contextPath + path)
+                    .toList();
+        }
         return new PathWebAccessPolicy(
-                Arrays.asList(properties.getPublicPaths()),
+                publicPaths,
                 properties.getDefaultAuthenticationMode());
     }
 

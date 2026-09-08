@@ -1,9 +1,13 @@
 package io.ddd4j.javalin.web;
 
+import com.google.inject.AbstractModule;
+import io.ddd4j.cache.subject.InMemorySubject;
+import io.ddd4j.cache.subject.InMemorySubjectProvider;
 import io.ddd4j.core.constant.SpiKeys;
 import io.ddd4j.core.context.BaseContext;
 import io.ddd4j.core.context.Contexts;
 import io.ddd4j.core.cqrs.command.CommandBus;
+import io.ddd4j.core.subject.SubjectProvider;
 import io.javalin.Javalin;
 import org.junit.jupiter.api.Test;
 
@@ -57,6 +61,23 @@ class Ddd4jJavalinApplicationTest {
         } finally {
             app.stop();
             BaseContext.remove(SpiKeys.COMMAND_BUS);
+        }
+    }
+
+    @Test
+    void shouldAllowExtraModuleToOverrideDefaultSubjectProvider() {
+        InMemorySubjectProvider provider = new InMemorySubjectProvider(new InMemorySubject(event -> {
+        }));
+        Javalin app = Ddd4jJavalinApplication.run(new String[]{"0"}, "", new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(SubjectProvider.class).toInstance(provider);
+            }
+        });
+        try {
+            assertThat(Contexts.get(SpiKeys.SUBJECT_PROVIDER, SubjectProvider.class)).contains(provider);
+        } finally {
+            app.stop();
         }
     }
 }

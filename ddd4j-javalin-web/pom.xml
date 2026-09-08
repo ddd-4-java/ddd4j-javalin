@@ -26,6 +26,11 @@
     </description>
 
     <dependencies>
+        <!-- ddd4j-javalin 完整 Core Runtime 装配 -->
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-core</artifactId>
+        </dependency>
         <!-- ddd4j web 适配（Javalin 6，applyTo 契约） -->
         <!-- ddd4j runtime guice（提供 Ddd4jGuiceModule） -->
         <dependency>

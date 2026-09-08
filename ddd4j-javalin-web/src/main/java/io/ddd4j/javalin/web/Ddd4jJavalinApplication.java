@@ -1,15 +1,11 @@
 package io.ddd4j.javalin.web;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.Singleton;
-import io.ddd4j.core.i18n.I18nProvider;
-import io.ddd4j.core.subject.SubjectProvider;
 import io.ddd4j.guice.DddAnnotationModule;
-import io.ddd4j.guice.i18n.GuiceI18nProvider;
-import io.ddd4j.guice.subject.GuiceSubjectProvider;
+import io.ddd4j.guice.Ddd4jGuiceRuntime;
+import io.ddd4j.javalin.core.Ddd4jCoreGuiceModule;
 import io.ddd4j.javalin.web.Ddd4jJavalinWeb;
 import io.ddd4j.kit.lang.StrKit;
 import io.javalin.Javalin;
@@ -69,9 +65,13 @@ public final class Ddd4jJavalinApplication {
         Injector injector = Guice.createInjector(modules);
 
         Ddd4jJavalinWeb web = injector.getInstance(Ddd4jJavalinWeb.class);
+        Ddd4jGuiceRuntime runtime = injector.getInstance(Ddd4jGuiceRuntime.class);
         // ddd4j-web-javalin：统一请求生命周期等全部经 configure(config) 装配，
         // 无独立的 applyTo 步骤（与 ddd4j-sample-javalin 的标准用法一致）。
-        Javalin app = Javalin.create((JavalinConfig config) -> web.configure(config));
+        Javalin app = Javalin.create((JavalinConfig config) -> {
+            web.configure(config);
+            config.events.serverStopped(runtime::close);
+        });
         applyHealthEndpoint(app, properties);
         app.start(properties.getHost(), properties.getPort());
 
@@ -87,10 +87,7 @@ public final class Ddd4jJavalinApplication {
                                         Module[] extraModules) {
         Module web = new Ddd4jJavalinAutoConfiguration(properties);
         java.util.List<Module> head = new java.util.ArrayList<>();
-        // The full Ddd4jGuiceModule binds DefaultProjectionService which has no
-        // @Inject constructor in the current ddd4j line. Provide the minimum SPIs manually;
-        // consumers may pass their own Ddd4jGuiceModule via extraModules to override.
-        head.add(new MinimalSpiModule());
+        head.add(Ddd4jCoreGuiceModule.defaults());
         if (StrKit.isNotBlank(basePackages)) {
             head.add(new DddAnnotationModule(basePackages));
         }
@@ -101,19 +98,6 @@ public final class Ddd4jJavalinApplication {
         }
         System.arraycopy(extraModules, 0, all, head.size(), extraModules.length);
         return all;
-    }
-
-    /**
-     * Minimal SPI bindings for the Javalin web layer to start in isolation. See the
-     * corresponding helper inside {@code JavalinTestFixture}（位于 ddd4j-javalin-testcontainers
-     * 模块）for rationale.
-     */
-    private static final class MinimalSpiModule extends AbstractModule {
-        @Override
-        protected void configure() {
-            bind(SubjectProvider.class).to(GuiceSubjectProvider.class).in(Singleton.class);
-            bind(I18nProvider.class).to(GuiceI18nProvider.class).in(Singleton.class);
-        }
     }
 
     private static void applyCliOverrides(Ddd4jJavalinProperties properties, String[] args) {

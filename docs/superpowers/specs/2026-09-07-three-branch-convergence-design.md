@@ -1,7 +1,7 @@
 # ddd4j-javalin 三分支收敛与验证设计
 
 - **日期**：2026-09-07
-- **状态**：待实施（设计已在会话中批准，待文件审阅）
+- **状态**：实施中（版本/构建/发布收敛已完成，运行时能力闭环继续实施）
 - **目标**：将 `feature/6.7.x`、`feature/7.1.x`、`feature/7.2.x` 分别收敛到 ddd4j 1.0.x、2.0.x、3.0.x，并以版本解析、单元测试、Testcontainers round-trip 和 GitHub Actions 形成可复验的三线证据。
 - **规格事实源**：本文件；历史能力矩阵、Testcontainers 和生产就绪文档作为背景资料，不覆盖本文件的三线版本约束。
 
@@ -114,7 +114,7 @@ flowchart TB
 | NATS | `GenericContainer` | `nats:2-alpine` | publish/subscribe |
 | MQTT | `GenericContainer` | `eclipse-mosquitto:2.0` | publish/subscribe |
 | SQS | `LocalStackContainer`，若 1.20.6 API兼容 | `localstack/localstack:3.4` | queue/send/receive/delete |
-| Keycloak | `KeycloakContainer` 社区模块 | `quay.io/keycloak/keycloak:24.0` | realm/token/auth decision |
+| Keycloak | `KeycloakContainer` 社区模块 | `quay.io/keycloak/keycloak:26.2` | realm/token/auth decision |
 | WireMock | 模块或兼容 `GenericContainer` | `wiremock/wiremock:3.5.0` | stubbed HTTP response |
 
 ONS 和 TDMQ 是托管服务，没有本地开源等价镜像，继续作为明确排除项。Mica MQTT 只有在测试方法实际带有 `@Disabled` 或以独立可观察失败记录证明不兼容时才可跳过；注释不能代替禁用机制和测试报告。
@@ -191,3 +191,61 @@ flowchart LR
 | 容器并行导致 ARM64/OOM 不稳定 | 按 broker 分批串行执行；保留已有内存和 readiness 策略。 |
 | 3.0.x 尚未成功 deploy | 7.2.x 本地结构验证可继续，远程消费/CI 完成状态保持阻塞，直到上游 deploy 有成功证据。 |
 | 私服凭据泄漏 | workflow 不打印 settings；另行轮换本地 remote URL 中暴露过的 Codeup 凭据。 |
+
+## 11. 2026-09-08 CodeGraph 能力闭环增量
+
+本节是本规格的后续增量，不创建第二套规格事实源。CodeGraph 对当前三分支、ddd4j 核心以及
+ddd4j-boot 基线的调用级审计表明，已有版本、模块和容器结果不足以证明框架能力对齐。
+
+### 11.1 已确认的架构缺口
+
+1. 生产启动器默认只安装最小 Subject/I18n SPI，没有安装 `Ddd4jCoreGuiceModule`，也没有执行
+   `Ddd4jCoreAutoConfiguration.install`，完整 CommandBus、DomainEventPublisher、Projection 与
+   Guice runtime 生命周期没有进入默认启动链。
+2. `feature/6.7.x` 的本地 `Ddd4jJavalinWeb` 虽注入请求上下文、认证生命周期和异常翻译器，
+   `configure` 却只注册固定 500 handler；请求上下文、认证、Subject、Trace、幂等和清理均未执行。
+3. `feature/7.1.x`、`feature/7.2.x` 复用上游完整 Javalin Web 生命周期，但本仓库始终传入空的
+   idempotency lifecycle，也没有对齐 boot 的认证模式、可信代理、幂等缓存名和 TTL 配置。
+4. `Ddd4jJavalinProperties` 中 contextPath、CORS、上传限制、超时、requestLifecycle 等字段缺少
+   生产调用者；属性存在不能视为功能实现。
+5. 三套 Keycloak IT 只证明容器启动，没有获取 token 或经真实 HTTP 路由验证 allow/deny。
+6. MySQL CRUD 使用测试侧手写 Repository；JPA 缺少真实 Provider/事务 round-trip；External 只绑定
+   properties；Data Logs 以及多个 extension 仍是 POM-only。
+7. Broker transport round-trip 已完成，但使用 `persist=false`，不能证明 Outbox、ACK、重试、死信和恢复。
+
+### 11.2 Phase A：运行时闭环（P0）
+
+Phase A 必须先完成，之后才能继续声明框架能力对齐：
+
+- 默认启动链安装完整 core Guice module，并由一个明确的运行时所有者负责 Injector、SPI 注册、Javalin
+  启停和失败回滚；业务 extra module 仍可按受控规则覆盖默认绑定。
+- 6.7.x 以 Javalin 6 API 实现与上游 Javalin 7 适配器等价的 before/after/exception 生命周期：
+  请求数据归一化、认证、Subject 绑定、Request/Trace ID、异常翻译和成功/失败清理。
+- 三线 Web 装配对齐 boot 的 `defaultAuthenticationMode`、`trustForwardedHeaders`、
+  `idempotencyEnabled`、`idempotencyCacheName`、`idempotencyTtl`；声明但未实现的属性必须落地或移除。
+- 建立三线共享的消费者行为契约，至少覆盖 public 200、protected/no-token 401、valid-token 200、
+  translated error、Request/Trace ID、duplicate idempotency 409、ThreadContext 清理和 readiness。
+
+### 11.3 Phase B：真实框架能力（P1）
+
+- Sa-Token、Security、Shiro 分别通过 Keycloak 获取/验证 token，并经 Javalin 请求验证 allow/deny；
+  容器启动测试单独命名为 smoke，不能冒充认证 IT。
+- MyBatis 使用 ddd4j 公共 Repository 契约执行 MySQL CRUD；JPA 使用 PostgreSQL 验证事务提交和回滚；
+  DataScope、External、Data Logs 以消费者行为为验收边界。
+- PostgreSQL Outbox 测试升级为三条分支共同门禁，验证业务写、事件、读模型与 Outbox 状态。
+
+### 11.4 Phase C：可靠性与扩展治理（P2）
+
+- MQ 增加 `persist=true`，验证 ACK 后状态推进、重试、死信、重复投递幂等和进程恢复。
+- 对每个 POM-only 模块作出可审计裁决：实现适配、证明无需适配而直接复用，或移出 BOM/聚合器；
+  禁止继续以空模块表示能力完成。
+- 保持 Testcontainers 1.20.6 三线兼容基线；镜像升级与 Testcontainers 2.x 迁移另立后续变更。
+- GitHub Actions 只有在 runner 实际执行且最终 SHA 的必需 job 全绿后才算远端验收完成。
+
+### 11.5 增量验收门禁
+
+1. 每个新增行为先有能捕获现有缺陷的 RED 测试，再写最小实现。
+2. 测试必须经过真实 Javalin/Guice/ddd4j 边界，不以源码文本、getter、mock 存在或容器启动代替行为。
+3. `feature/6.7.x` 的 Javalin 6 实现与 7.x 上游实现保持行为等价，但不得引入 Javalin 7 API。
+4. 三线修改必须分别使用规定的 Maven/JDK 验证；3.0.x 线保持 POM 4.1.0 与 `<subprojects>`。
+5. 架构、代码、测试、私仓消费和 CI 继续作为五层独立证据，不互相替代。

@@ -1,7 +1,10 @@
 package io.ddd4j.javalin.web;
 
+import io.ddd4j.web.core.auth.AuthenticationMode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.Duration;
 
 /**
  * Configuration properties for ddd4j-javalin-web, bound from {@code ddd4j.web.javalin.*}
@@ -43,6 +46,21 @@ public class Ddd4jJavalinProperties {
 
     /** Public paths that bypass authentication. */
     private String[] publicPaths = {"/health", "/health/readiness", "/health/liveness"};
+
+    /** Default authentication mode for paths not listed in {@link #publicPaths}. */
+    private AuthenticationMode defaultAuthenticationMode = AuthenticationMode.REQUIRED;
+
+    /** Whether forwarding headers from a trusted reverse proxy may determine the client IP. */
+    private boolean trustForwardedHeaders;
+
+    /** Whether HTTP idempotency-key protection is enabled. */
+    private boolean idempotencyEnabled = true;
+
+    /** Cache name used by the idempotency guard. */
+    private String idempotencyCacheName = "ddd4j-web-idempotency";
+
+    /** Lease duration for an idempotency key. */
+    private Duration idempotencyTtl = Duration.ofMinutes(5);
 
     /** Whether to expose a default {@code /health} endpoint. */
     private boolean healthEndpoint = true;

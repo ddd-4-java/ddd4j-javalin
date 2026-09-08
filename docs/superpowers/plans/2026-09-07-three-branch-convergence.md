@@ -311,7 +311,7 @@
 
   Run MySQL CRUD and PostgreSQL outbox modules with `-Pjavalin-integration-tests -am`. Expected: actual SQL write/read/transaction assertions, not only container startup.
 
-- [x] **Step 2: Run auth IT**
+- [ ] **Step 2: Run auth IT**
 
   Run Sa-Token, Security, and Shiro Keycloak IT separately. Expected: token acquisition plus an allow/deny decision through the adapter.
 
@@ -410,3 +410,70 @@
 - 2026-09-07 container verification: on all three branches MySQL CRUD, Sa-Token/Security/Shiro Keycloak, and nine broker round-trips passed. PostgreSQL outbox is not a common gate because its sample artifacts are unavailable on part of the upstream matrix.
 - 2026-09-07 clean unit verification: 6.7.x ran 79 tests, 7.1.x ran 72 tests, and 7.2.x ran 66 tests; all had zero failures, errors, and skips.
 - 2026-09-07 remote execution: all three branches were pushed to `origin` and `github`; both remotes matched the local SHA. All six GitHub Actions runs reached failure before starting any step because the account payment failed or the Actions spending limit must be increased. Remote code execution therefore remains blocked by account state rather than a repository test failure.
+- 2026-09-08 CodeGraph correction: the three Keycloak tests are container-start smoke tests, not token/allow/deny IT; Task 6 Step 2 is reopened. The 6.7.x local web adapter does not invoke its injected request lifecycle, while the shared production bootstrap bypasses the complete core Guice module on all lines.
+
+### Task 9: Phase A — close the production runtime and Web lifecycle
+
+**Files:**
+- Modify: `ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinApplication.java`
+- Modify: `ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinAutoConfiguration.java`
+- Modify: `ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinProperties.java`
+- Modify on 6.7.x: `ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinWeb.java`
+- Create/modify: `ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/*ContractTest.java`
+
+- [x] **Step 1: Extend the existing specification and plan with the CodeGraph findings**
+
+  Keep `2026-09-07-three-branch-convergence-design.md` as the sole specification source. Reopen any historical
+  checkbox whose expected behavior was not actually tested.
+
+- [x] **Step 2: RED — protected request without token returns 401 on 6.7.x**
+
+  Start a real random-port Javalin application with the production Web module, register a protected route and send
+  a request without Authorization. Expected current result: 200, proving the injected lifecycle is unused.
+
+- [x] **Step 3: GREEN — implement the Javalin 6 request lifecycle**
+
+  Port the framework-neutral behavior from ddd4j's Javalin adapter using only Javalin 6 APIs. Preserve context open,
+  authentication, Subject binding, translated errors, response IDs and success/failure cleanup.
+
+- [x] **Step 4: RED/GREEN — install the complete core runtime from production bootstrap**
+
+  Add a consumer-visible test that starts through `Ddd4jJavalinApplication` and resolves/uses CommandBus,
+  DomainEventPublisher and projection SPI. Replace `MinimalSpiModule` only after the test fails for the expected reason.
+
+- [ ] **Step 5: RED/GREEN — align Web properties and idempotency with boot**
+
+  Add independent behavior tests for authentication mode, trusted proxy selection, idempotency enable/disable/cache/TTL,
+  request IDs, trace IDs, duplicate request conflict and cleanup. Remove or implement every currently unused property.
+
+- [ ] **Step 6: Apply compatible Phase A behavior to 7.1.x and 7.2.x**
+
+  Reuse the upstream complete Javalin adapter on 7.x; change only the Guice composition, properties and tests. Preserve
+  Maven 3/JDK 17 for 7.1.x and Maven 4/JDK 21 for 7.2.x.
+
+- [ ] **Step 7: Run focused and full verification on all three branches**
+
+  Run Web lifecycle contracts, core contracts, full unit reactors and affected real HTTP integration tests separately.
+
+### Task 10: Phase B — replace smoke and test doubles with real framework contracts
+
+- [ ] **Step 1: Auth token and HTTP allow/deny**
+- [ ] **Step 2: MyBatis ddd4j Repository contract on MySQL**
+- [ ] **Step 3: JPA transaction commit/rollback on PostgreSQL**
+- [ ] **Step 4: DataScope, External and Data Logs consumer behavior**
+- [ ] **Step 5: PostgreSQL Outbox as a three-line gate**
+
+### Task 11: Phase C — durability and extension governance
+
+- [ ] **Step 1: MQ persistence, ACK, retry, dead-letter and recovery tests**
+- [ ] **Step 2: Decide every POM-only module: implement, direct-reuse proof, or removal**
+- [ ] **Step 3: Re-run Testcontainers matrix and document explicit managed-service exclusions**
+- [ ] **Step 4: Final local, private-repository and GitHub Actions evidence convergence**
+
+#### Phase A Validation Record
+
+- 2026-09-09 6.7.x RED: protected HTTP request returned 200 instead of 401 because the local Javalin 6 adapter never invoked `WebRequestLifecycle`.
+- 2026-09-09 6.7.x dependency gate: upstream ddd4j 1.0.x build 17 consumer BOM stopped managing the standard `mybatis-plus-jsqlparser`; the Javalin JDK 17 line now centrally pins the upstream-compatible 3.5.9 version.
+- 2026-09-09 6.7.x Web GREEN: real random-port HTTP contracts cover no-token 401, valid-token Subject binding, Request/Trace ID propagation, ThreadContext cleanup, configurable authentication mode, trusted forwarded client IP, duplicate idempotency 409 and disabled-idempotency behavior.
+- 2026-09-09 6.7.x Runtime GREEN: production bootstrap installs the complete core Guice module, registers CommandBus, and closes the Guice runtime on Javalin stop.
+- 2026-09-09 6.7.x regression: the 52-module clean unit reactor passed with 91 tests, zero failures/errors/skips. Custom idempotency cache/TTL and unused server-property decisions remain open in Task 9 Step 5.

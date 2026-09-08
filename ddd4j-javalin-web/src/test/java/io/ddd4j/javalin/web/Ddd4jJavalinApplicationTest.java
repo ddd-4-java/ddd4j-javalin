@@ -1,5 +1,9 @@
 package io.ddd4j.javalin.web;
 
+import io.ddd4j.core.constant.SpiKeys;
+import io.ddd4j.core.context.BaseContext;
+import io.ddd4j.core.context.Contexts;
+import io.ddd4j.core.cqrs.command.CommandBus;
 import io.javalin.Javalin;
 import org.junit.jupiter.api.Test;
 
@@ -40,5 +44,39 @@ class Ddd4jJavalinApplicationTest {
     void shouldRespectCliPortOverride() {
         // Even a non-existent port range should be honoured; we don't actually bind.
         Ddd4jJavalinApplication.run(new String[]{"--port", "0"}, "io.ddd4j.javalin.web").stop();
+    }
+
+    /**
+     * 生产启动入口必须安装并注册完整 Guice CQRS Runtime。
+     */
+    @Test
+    void shouldRegisterCommandBusFromProductionBootstrap() {
+        BaseContext.remove(SpiKeys.COMMAND_BUS);
+        Javalin app = Ddd4jJavalinApplication.run(new String[]{"0"}, "");
+
+        try {
+            assertThat(Contexts.get(SpiKeys.COMMAND_BUS, CommandBus.class)).isPresent();
+        } finally {
+            app.stop();
+            BaseContext.remove(SpiKeys.COMMAND_BUS);
+        }
+    }
+
+    /**
+     * Javalin 停止时必须关闭 Guice Runtime 并撤销全局 SPI。
+     */
+    @Test
+    void shouldUnregisterCommandBusWhenApplicationStops() {
+        BaseContext.remove(SpiKeys.COMMAND_BUS);
+        Javalin app = Ddd4jJavalinApplication.run(new String[]{"0"}, "");
+
+        try {
+            assertThat(Contexts.get(SpiKeys.COMMAND_BUS, CommandBus.class)).isPresent();
+            app.stop();
+            assertThat(Contexts.get(SpiKeys.COMMAND_BUS, CommandBus.class)).isEmpty();
+        } finally {
+            app.stop();
+            BaseContext.remove(SpiKeys.COMMAND_BUS);
+        }
     }
 }

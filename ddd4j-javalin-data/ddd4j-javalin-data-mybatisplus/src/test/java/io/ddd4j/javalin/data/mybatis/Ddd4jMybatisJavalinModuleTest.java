@@ -22,6 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 class Ddd4jMybatisJavalinModuleTest {
 
+    @Test
+    void shouldLoadOneCanonicalRuntimeModule() throws Exception {
+        String resource = "io/ddd4j/guice/Ddd4jMybatisGuiceModule.class";
+        java.util.List<java.net.URL> definitions = java.util.Collections.list(
+                Ddd4jMybatisJavalinModule.class.getClassLoader().getResources(resource));
+        org.junit.jupiter.api.Assertions.assertEquals(1, definitions.size(),
+                "Runtime module must not be shadowed by an adapter copy: " + definitions);
+    }
+
     private static DataSource dataSource;
     private static Injector injector;
 

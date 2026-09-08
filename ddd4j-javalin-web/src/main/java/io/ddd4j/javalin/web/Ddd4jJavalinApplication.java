@@ -3,6 +3,7 @@ package io.ddd4j.javalin.web;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.util.Modules;
 import io.ddd4j.guice.DddAnnotationModule;
 import io.ddd4j.guice.Ddd4jGuiceRuntime;
 import io.ddd4j.javalin.core.Ddd4jCoreGuiceModule;
@@ -90,12 +91,11 @@ public final class Ddd4jJavalinApplication {
             head.add(new DddAnnotationModule(basePackages));
         }
         head.add(web);
-        Module[] all = new Module[head.size() + extraModules.length];
-        for (int i = 0; i < head.size(); i++) {
-            all[i] = head.get(i);
+        Module defaults = Modules.combine(head);
+        if (extraModules.length == 0) {
+            return new Module[]{defaults};
         }
-        System.arraycopy(extraModules, 0, all, head.size(), extraModules.length);
-        return all;
+        return new Module[]{Modules.override(defaults).with(extraModules)};
     }
 
     private static void applyCliOverrides(Ddd4jJavalinProperties properties, String[] args) {

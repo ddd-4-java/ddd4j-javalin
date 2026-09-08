@@ -45,4 +45,4 @@ CodeGraph 能力审计后，原规格已追加 Phase A-C。Phase A 已完成第�
 - 三线 Web 装配增加认证模式、可信代理和可关闭的默认幂等防护。
 - 最终本地 clean test：6.7.x 95 tests、7.1.x 80 tests、7.2.x 74 tests，均为零 failure/error/skip。
 
-该检查点尚未 push 或重新发布；自定义幂等 cache/TTL、未使用 server properties 以及 Phase B/C 仍未完成。
+该检查点尚未 push 或重新发布。Phase A 已补齐自定义幂等 cache/TTL、contextPath、CORS、请求体限制、异步 timeout 和 lifecycle 开关；最终本地 clean test 为 6.7.x 100、7.1.x 85、7.2.x 79，均无失败/错误/跳过。Phase B/C 仍未完成。

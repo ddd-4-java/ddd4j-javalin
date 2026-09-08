@@ -441,7 +441,7 @@
   Add a consumer-visible test that starts through `Ddd4jJavalinApplication` and resolves/uses CommandBus,
   DomainEventPublisher and projection SPI. Replace `MinimalSpiModule` only after the test fails for the expected reason.
 
-- [ ] **Step 5: RED/GREEN — align Web properties and idempotency with boot**
+- [x] **Step 5: RED/GREEN — align Web properties and idempotency with boot**
 
   Add independent behavior tests for authentication mode, trusted proxy selection, idempotency enable/disable/cache/TTL,
   request IDs, trace IDs, duplicate request conflict and cleanup. Remove or implement every currently unused property.
@@ -479,6 +479,7 @@
 - 2026-09-09 override contract: a business extra module can replace the default SubjectProvider through `Modules.override`; plain module ordering previously failed with duplicate bindings.
 - 2026-09-09 idempotency configuration: custom cache names are registered, configured one-second TTL expires completed keys, and sub-second TTL is rejected because the core/Caffeine APIs only support whole seconds. The ddd4j core default Caffeine registration does not honor per-entry TTL, so Javalin configures global expire-after-write on its local fallback.
 - 2026-09-09 final Phase A batch regression after override/TTL changes: 6.7.x ran 95 tests, 7.1.x ran 80 tests, and 7.2.x ran 74 tests; every clean reactor completed with zero failures/errors/skips.
+- 2026-09-09 Phase A complete: explicit properties bootstrap now applies context path (including public-path mapping), CORS, max request size, global future timeout and lifecycle disablement. Final clean regressions ran 100/85/79 tests on 6.7.x/7.1.x/7.2.x with zero failures/errors/skips.
 - 2026-09-09 6.7.x regression: the 52-module clean unit reactor passed with 91 tests, zero failures/errors/skips. Custom idempotency cache/TTL and unused server-property decisions remain open in Task 9 Step 5.
 - 2026-09-09 7.1.x compatibility: retained Maven 3/JDK 17 and the upstream Javalin 7 adapter; the full clean reactor passed 77 tests with zero failures/errors/skips (`3a0ea69`).
 - 2026-09-09 7.2.x compatibility: retained Maven 4/POM 4.1.0/JDK 21 and the upstream Javalin 7 adapter; the full clean reactor passed 71 tests with zero failures/errors/skips (`ffecb3e`).

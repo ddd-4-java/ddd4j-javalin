@@ -21,6 +21,10 @@
     </description>
 
     <dependencies>
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-core</artifactId>
+        </dependency>
         <!-- ddd4j web 适配（Javalin 7） -->
         <dependency>
             <groupId>io.ddd4j</groupId>

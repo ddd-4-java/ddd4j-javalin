@@ -3,18 +3,25 @@ package io.ddd4j.javalin.web;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import io.ddd4j.web.core.auth.AuthenticationMode;
+import io.ddd4j.cache.CacheKit;
+import io.ddd4j.cache.local.CaffeineCache;
+import io.ddd4j.core.cache.CacheConfig;
 import io.ddd4j.web.core.auth.BearerSubjectAuthenticator;
 import io.ddd4j.web.core.auth.PathWebAccessPolicy;
+import io.ddd4j.web.core.context.ClientIpResolver;
+import io.ddd4j.web.core.context.RequestIdGenerator;
 import io.ddd4j.web.core.context.WebRequestContextFactory;
 import io.ddd4j.web.core.context.WebRequestLifecycle;
 import io.ddd4j.web.core.error.DefaultWebExceptionTranslator;
 import io.ddd4j.web.core.error.WebExceptionTranslator;
+import io.ddd4j.web.core.idempotency.CacheIdempotencyGuard;
+import io.ddd4j.web.core.idempotency.WebIdempotencyLifecycle;
 import io.ddd4j.web.javalin.Ddd4jJavalinWeb;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Guice Module that assembles the ddd4j-web-javalin stack: {@link Ddd4jJavalinWeb} plus all
@@ -46,9 +53,17 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
             return;
         }
         bind(Ddd4jJavalinProperties.class).toInstance(properties);
-        bind(WebRequestContextFactory.class).in(Singleton.class);
         bind(WebExceptionTranslator.class).to(DefaultWebExceptionTranslator.class).in(Singleton.class);
         bind(BearerSubjectAuthenticator.class).in(Singleton.class);
+    }
+
+    @Provides
+    @Singleton
+    WebRequestContextFactory webRequestContextFactory() {
+        ClientIpResolver clientIpResolver = properties.isTrustForwardedHeaders()
+                ? ClientIpResolver.trustedProxy()
+                : ClientIpResolver.remoteAddressOnly();
+        return new WebRequestContextFactory(RequestIdGenerator.uuid(), clientIpResolver);
     }
 
     @Provides
@@ -56,7 +71,7 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     PathWebAccessPolicy pathWebAccessPolicy() {
         return new PathWebAccessPolicy(
                 Arrays.asList(properties.getPublicPaths()),
-                AuthenticationMode.REQUIRED);
+                properties.getDefaultAuthenticationMode());
     }
 
     @Provides
@@ -77,7 +92,20 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
             throw new com.google.inject.ProvisionException(
                     "ddd4j.web.javalin.enabled=false; Ddd4jJavalinWeb is not available");
         }
-        return new Ddd4jJavalinWeb(contextFactory, lifecycle, translator, null);
+        return new Ddd4jJavalinWeb(contextFactory, lifecycle, translator, idempotencyLifecycle());
+    }
+
+    private WebIdempotencyLifecycle idempotencyLifecycle() {
+        if (!properties.isIdempotencyEnabled()) {
+            return null;
+        }
+        String cacheName = properties.getIdempotencyCacheName();
+        if (Objects.isNull(CacheKit.getCache(cacheName))) {
+            CacheKit.register(cacheName, CaffeineCache.create(CacheConfig.builder(cacheName).build()));
+        }
+        return new WebIdempotencyLifecycle(
+                new CacheIdempotencyGuard(cacheName),
+                properties.getIdempotencyTtl());
     }
 
     /**

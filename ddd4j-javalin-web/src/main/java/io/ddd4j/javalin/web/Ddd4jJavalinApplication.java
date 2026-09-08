@@ -57,18 +57,43 @@ public final class Ddd4jJavalinApplication {
      */
     @SafeVarargs
     public static Javalin run(String[] args, String basePackages, Module... extraModules) {
-        Objects.requireNonNull(basePackages, "basePackages must not be null");
-
         Ddd4jJavalinProperties properties = new Ddd4jJavalinProperties();
+        return run(properties, args, basePackages, extraModules);
+    }
+
+    /**
+     * 使用显式配置构建 Guice Runtime 并启动 Javalin。
+     *
+     * @param properties   Javalin 服务与 ddd4j Web 生命周期配置
+     * @param args         CLI 参数，端口参数优先于 properties
+     * @param basePackages DDD 注解扫描包
+     * @param extraModules 业务扩展 Guice modules
+     * @return 已启动的 Javalin 实例
+     */
+    @SafeVarargs
+    public static Javalin run(Ddd4jJavalinProperties properties, String[] args,
+                              String basePackages, Module... extraModules) {
+        Objects.requireNonNull(properties, "properties must not be null");
+        Objects.requireNonNull(basePackages, "basePackages must not be null");
         applyCliOverrides(properties, args);
 
         Module[] modules = buildModules(basePackages, properties, extraModules);
         Injector injector = Guice.createInjector(modules);
 
-        Ddd4jJavalinWeb web = injector.getInstance(Ddd4jJavalinWeb.class);
+        Ddd4jJavalinWeb web = properties.isRequestLifecycle()
+                ? injector.getInstance(Ddd4jJavalinWeb.class)
+                : null;
         Ddd4jGuiceRuntime runtime = injector.getInstance(Ddd4jGuiceRuntime.class);
         Javalin app = Javalin.create((JavalinConfig config) -> {
-            web.configure(config);
+            config.router.contextPath = properties.getContextPath();
+            config.http.maxRequestSize = properties.getMaxUploadSizeBytes();
+            config.http.asyncTimeout = properties.getRequestTimeoutMs();
+            if (properties.isCors()) {
+                config.bundledPlugins.enableCors(cors -> cors.addRule(rule -> rule.anyHost()));
+            }
+            if (Objects.nonNull(web)) {
+                web.configure(config);
+            }
             config.events.serverStopped(runtime::close);
         });
         applyHealthEndpoint(app, properties);

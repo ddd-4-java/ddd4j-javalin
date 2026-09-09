@@ -20,6 +20,7 @@ class Ddd4jDataScopeJavalinModuleTest {
         RequiresDataPermissionsValidator validator = injector.getInstance(RequiresDataPermissionsValidator.class);
 
         assertThat(validator).isNotNull();
+        assertThat(validator.isValid("unconfigured", null)).isFalse();
     }
 
     @Test

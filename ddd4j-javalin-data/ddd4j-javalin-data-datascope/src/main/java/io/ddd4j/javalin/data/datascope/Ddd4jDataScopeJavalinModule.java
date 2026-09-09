@@ -22,7 +22,7 @@ public class Ddd4jDataScopeJavalinModule extends AbstractModule {
     private final DataScopeProvider provider;
 
     public Ddd4jDataScopeJavalinModule() {
-        this(DataScopeProvider.nonNullAllowed());
+        this((dataType, data) -> false);
     }
 
     public Ddd4jDataScopeJavalinModule(DataScopeProvider provider) {

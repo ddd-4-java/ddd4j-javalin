@@ -23,8 +23,8 @@ public final class OidcHttpAuthentication {
         Objects.requireNonNull(provider, "provider must not be null");
         Set<String> allowed = Objects.isNull(publicPaths)
                 ? Collections.emptySet() : Collections.unmodifiableSet(new HashSet<>(publicPaths));
-        app.unsafe.routes.beforeMatched(context -> authenticate(context, provider, allowed));
-        app.unsafe.routes.afterMatched(OidcHttpAuthentication::closeScope);
+        app.beforeMatched(context -> authenticate(context, provider, allowed));
+        app.afterMatched(OidcHttpAuthentication::closeScope);
     }
 
     private static void authenticate(Context context, OidcSubjectProvider provider, Set<String> publicPaths) {

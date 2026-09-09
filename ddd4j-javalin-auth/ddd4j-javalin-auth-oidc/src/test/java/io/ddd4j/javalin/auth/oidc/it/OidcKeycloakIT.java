@@ -37,7 +37,7 @@ class OidcKeycloakIT {
             Javalin app = Javalin.create();
             try {
                 OidcHttpAuthentication.register(app, provider, Set.of("/health"));
-                app.unsafe.routes.get("/protected", context -> context.result(provider.getSubject().getLoginIdAsString()));
+                app.get("/protected", context -> context.result(provider.getSubject().getLoginIdAsString()));
                 app.start(0);
 
                 assertEquals(401, get(app, null).statusCode());

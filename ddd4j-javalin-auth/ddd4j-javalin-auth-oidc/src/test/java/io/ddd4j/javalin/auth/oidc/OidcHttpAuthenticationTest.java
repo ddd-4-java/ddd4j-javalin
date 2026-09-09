@@ -38,8 +38,8 @@ class OidcHttpAuthenticationTest {
         });
         app = Javalin.create();
         OidcHttpAuthentication.register(app, provider, Set.of("/public"));
-        app.unsafe.routes.get("/public", context -> context.result("public"));
-        app.unsafe.routes.get("/secure", context -> context.result(provider.getSubject().getLoginIdAsString()));
+        app.get("/public", context -> context.result("public"));
+        app.get("/secure", context -> context.result(provider.getSubject().getLoginIdAsString()));
         app.start(0);
 
         assertEquals(200, get("/public", null).statusCode());

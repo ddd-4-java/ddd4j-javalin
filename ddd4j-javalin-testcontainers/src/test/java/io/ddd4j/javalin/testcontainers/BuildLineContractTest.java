@@ -116,9 +116,7 @@ class BuildLineContractTest {
         Set<String> approvedPomOnly = Set.of(
                 "ddd4j-javalin-auth", "ddd4j-javalin-bom", "ddd4j-javalin-data",
                 "ddd4j-javalin-ddd", "ddd4j-javalin-dependencies", "ddd4j-javalin-extensions",
-                "ddd4j-javalin-extensions/ddd4j-javalin-extension-akka",
                 "ddd4j-javalin-extensions/ddd4j-javalin-extension-excel",
-                "ddd4j-javalin-extensions/ddd4j-javalin-extension-jackson",
                 "ddd4j-javalin-extensions/ddd4j-javalin-extension-monitor",
                 "ddd4j-javalin-extensions/ddd4j-javalin-extension-pf4j",
                 "ddd4j-javalin-mq", "ddd4j-javalin-parent", "ddd4j-javalin-samples");

@@ -15,13 +15,9 @@
     <description>Ddd4j Javalin 跨领域扩展聚合：对齐 ddd4j-boot-extensions，复用 ddd4j-extensions 通用实现。</description>
 
     <modules>
-        <!-- 中档 7.1.x（core 2.0.x）：akka/jackson/pf4j 三扩展的上游构件
-             （ddd4j-extension-*:2.0.x）不存在，排除聚合；恢复消费 3.0.x 的高档线不受影响 -->
-        <!-- <module>ddd4j-javalin-extension-akka</module> -->
         <module>ddd4j-javalin-extension-excel</module>
-        <!-- <module>ddd4j-javalin-extension-jackson</module> -->
         <module>ddd4j-javalin-extension-monitor</module>
-        <!-- <module>ddd4j-javalin-extension-pf4j</module> -->
+        <module>ddd4j-javalin-extension-pf4j</module>
         <module>ddd4j-javalin-extension-qlexpress</module>
         <module>ddd4j-javalin-extension-qrcode</module>
         <module>ddd4j-javalin-extension-validation</module>

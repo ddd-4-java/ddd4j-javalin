@@ -12,6 +12,10 @@ import io.ddd4j.mq.listener.MQListener;
 import io.ddd4j.mq.nats.NatsMQClient;
 import io.ddd4j.mq.nats.NatsProperties;
 import io.ddd4j.mq.serialization.JsonMQEventSerialization;
+import io.nats.client.Connection;
+import io.nats.client.Nats;
+import io.nats.client.api.StorageType;
+import io.nats.client.api.StreamConfiguration;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -27,11 +31,10 @@ import static org.awaitility.Awaitility.await;
 
 /**
  * Integration test for {@link Ddd4jNatsMqGuiceModule} against a real NATS server
- * ({@code nats:2-alpine}, core NATS without JetStream) brought up by Testcontainers.
+ * ({@code nats:2-alpine} with JetStream enabled) brought up by Testcontainers.
  *
  * <p>Verifies a real publish → broker → consume round trip through {@link NatsMQClient}:
- * the adapter tries JetStream first and transparently falls back to core NATS
- * publish/subscribe when JetStream is not enabled on the server.
+ * the test provisions a file-backed stream before the adapter subscribes and publishes.
  */
 @Tag("integration")
 @JunitJupiterTestContainers
@@ -43,6 +46,7 @@ class Ddd4jNatsMqIT {
     @SuppressWarnings("resource")
     private static final GenericContainer<?> NATS = new GenericContainer<>(
             DockerImageName.parse("nats:2-alpine"))
+            .withCommand("-js")
             .withExposedPorts(4222);
 
     @Test
@@ -66,12 +70,23 @@ class Ddd4jNatsMqIT {
         }
     }
 
+    private static void createStream(String server) throws Exception {
+        try (Connection connection = Nats.connect(server)) {
+            connection.jetStreamManagement().addStream(StreamConfiguration.builder()
+                    .name("DDD4J_IT")
+                    .subjects(TOPIC + ".>")
+                    .storageType(StorageType.File)
+                    .build());
+        }
+    }
+
     @Test
     void shouldPublishAndConsumeRoundTrip() throws Exception {
         NATS.start();
         try {
             NatsProperties brokerProps = new NatsProperties();
             brokerProps.setServers("nats://" + NATS.getHost() + ":" + NATS.getMappedPort(4222));
+            createStream(brokerProps.getServers());
             MQProperties mqProps = new MQProperties();
             mqProps.setEnabled(true);
             mqProps.setBroker("nats");

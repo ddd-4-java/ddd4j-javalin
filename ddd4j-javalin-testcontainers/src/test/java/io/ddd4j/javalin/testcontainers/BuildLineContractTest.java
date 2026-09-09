@@ -149,6 +149,14 @@ class BuildLineContractTest {
         }
     }
 
+    /** 测试运行时必须提供唯一 SLF4J provider，避免静默降级为 NOP 日志。 */
+    @Test
+    void shouldProvideTestLoggingBinding() throws Exception {
+        Document rootPom = parse(repositoryRoot().resolve("pom.xml"));
+        assertEquals(1, dependencyCount(rootPom, "org.slf4j", "slf4j-simple", "test"),
+                "测试运行时必须提供一个 SLF4J binding/provider");
+    }
+
     @Test
     void shouldGovernEveryPomOnlyModuleExplicitly() throws Exception {
         Path root = repositoryRoot();
@@ -227,6 +235,20 @@ class BuildLineContractTest {
     private static String text(Element element, String name) {
         NodeList values = element.getElementsByTagName(name);
         return values.item(0).getTextContent().trim();
+    }
+
+    private static int dependencyCount(Document document, String groupId, String artifactId, String scope) {
+        int count = 0;
+        NodeList dependencies = document.getElementsByTagName("dependency");
+        for (int index = 0; index < dependencies.getLength(); index++) {
+            Element dependency = (Element) dependencies.item(index);
+            if (groupId.equals(text(dependency, "groupId"))
+                    && artifactId.equals(text(dependency, "artifactId"))
+                    && scope.equals(text(dependency, "scope"))) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private record BuildLine(String ddd4jVersion,

@@ -126,6 +126,15 @@
         </pluginRepository>
     </pluginRepositories>
 
+    <dependencies>
+        <!-- 测试必须显式提供 SLF4J provider，避免日志静默回退 NOP。 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <pluginManagement>
             <plugins>

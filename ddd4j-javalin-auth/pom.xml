@@ -20,6 +20,7 @@
 
     <modules>
         <module>ddd4j-javalin-auth-core</module>
+        <module>ddd4j-javalin-auth-oidc</module>
         <module>ddd4j-javalin-auth-license</module>
         <module>ddd4j-javalin-auth-satoken</module>
         <module>ddd4j-javalin-auth-security</module>

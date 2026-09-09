@@ -17,9 +17,8 @@ import java.util.Objects;
  * {@link ExternalProperties} and {@link SequenceProperties} configuration holders so that
  * downstream modules (REST client, region cache, IP/weather templates) can be injected.
  *
- * <p>The actual bean assembly (RestClient / IpRegionTemplate / WeatherTemplate) is left to
- * ddd4j-data-external's own Guice integration; this module only ensures the property
- * holders exist in the Javalin Guice context.
+ * <p>Provides configured properties, a validated {@link GlobalSequence}, and an explicitly
+ * injectable {@link IpRegionTemplate}. The default region implementation is offline-only.
  */
 public class Ddd4jExternalJavalinModule extends AbstractModule {
 

@@ -7,7 +7,6 @@ import io.ddd4j.javalin.data.mybatis.TestUserMapper;
 import io.ddd4j.javalin.data.mybatis.TestUserRepository;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
 import io.ddd4j.javalin.testcontainers.database.MySqlTestContainerFixture;
-import org.apache.ibatis.session.SqlSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -20,11 +19,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Integration test for {@link Ddd4jMybatisJavalinModule} against a real MySQL 8 instance
+ * Integration test for {@link Ddd4jMybatisJavalinModule} and the real ddd4j
+ * {@code BaseRepositoryImpl} against a real MySQL 8 instance
  * brought up by Testcontainers. The complementary unit-level test
  * {@code Ddd4jMybatisJavalinModuleTest} uses an H2 in-memory database for fast feedback.
  *
@@ -65,37 +64,28 @@ class Ddd4jMybatisJavalinMySqlIT {
         }
 
         Ddd4jMybatisJavalinModule module = new Ddd4jMybatisJavalinModule(dataSource)
-                .addMapper(TestUserMapper.class);
+                .bindRepository(TestUserRepository.class, TestUserMapper.class);
         injector = Guice.createInjector(module);
-
-        // Wire the TestUserRepository manually against the SqlSession because
-        // Ddd4jMybatisJavalinModule is a thin bridge over the core
-        // ddd4j-data-mybatisplus (which exposes BaseRepositoryImpl).
-        SqlSession sqlSession = injector.getInstance(SqlSession.class);
-        TestUserRepository repo = new TestUserRepository(sqlSession, TestUserMapper.class);
-        // Stash the repo via a small Guice module so injector.getInstance resolves it.
-        injector = injector.createChildInjector(binder ->
-                binder.bind(TestUserRepository.class).toInstance(repo));
+        module.initRepositories(injector);
     }
 
     @AfterAll
     static void tearDown() {
         if (injector != null) {
-            injector.getInstance(SqlSession.class).close();
+            injector.getInstance(org.apache.ibatis.session.SqlSession.class).close();
         }
         MYSQL.stop();
     }
 
     @Test
     void shouldResolveCoreContracts() {
-        assertNotNull(injector.getInstance(SqlSession.class), "SqlSession must be available");
+        assertNotNull(injector.getInstance(org.apache.ibatis.session.SqlSession.class), "SqlSession must be available");
     }
 
     @Test
     void shouldExecuteFullCrudFlowAgainstMysql() {
         TestUserRepository repo = injector.getInstance(TestUserRepository.class);
         assertNotNull(repo);
-        assertNotNull(repo.getMapper());
 
         // CREATE
         TestUserRepository.TestUserModel user = new TestUserRepository.TestUserModel();
@@ -106,30 +96,29 @@ class Ddd4jMybatisJavalinMySqlIT {
         assertNotNull(user.getId());
 
         // READ
-        TestUserRepository.TestUserModel found = repo.selectById(user.getId());
-        assertNotNull(found);
+        TestUserRepository.TestUserModel found = repo.findById(user.getId()).orElseThrow();
         assertEquals("alice", found.getUsername());
         assertEquals("alice@example.com", found.getEmail());
 
         // UPDATE
         found.setEmail("alice@updated.com");
-        TestUserRepository.TestUserModel updated = repo.update(found);
+        TestUserRepository.TestUserModel updated = repo.updateById(found);
         assertNotNull(updated);
-        TestUserRepository.TestUserModel reloaded = repo.selectById(found.getId());
+        TestUserRepository.TestUserModel reloaded = repo.findById(found.getId()).orElseThrow();
         assertEquals("alice@updated.com", reloaded.getEmail());
 
         // LIST
         TestUserRepository.TestUserQuery query = new TestUserRepository.TestUserQuery();
-        List<TestUserRepository.TestUserModel> list = repo.list(query);
+        List<TestUserRepository.TestUserModel> list = repo.findList(query);
         assertFalse(list.isEmpty());
 
         // PAGE
-        TestUserRepository.Page<TestUserRepository.TestUserModel> page = repo.page(query);
+        io.ddd4j.core.api.Page<TestUserRepository.TestUserModel> page = repo.page(query);
         assertNotNull(page);
-        assertTrue(page.total() >= 1);
+        assertTrue(page.getTotal() >= 1);
 
         // DELETE
-        assertTrue(repo.delete(user.getId()));
-        assertNull(repo.selectById(user.getId()));
+        repo.deleteById(user.getId());
+        assertTrue(repo.findById(user.getId()).isEmpty());
     }
 }

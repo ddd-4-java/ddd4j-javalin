@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -143,6 +144,43 @@ class BuildLineContractTest {
             assertTrue(workflow.contains("ElementTree.parse(target)"), workflowName + " 未解析校验 settings.xml");
             assertFalse(workflow.contains("continue-on-error: true"),
                     workflowName + " 不得整体忽略失败");
+        }
+    }
+
+    @Test
+    void shouldGovernEveryPomOnlyModuleExplicitly() throws Exception {
+        Path root = repositoryRoot();
+        Set<String> approvedPomOnly = Set.of(
+                "ddd4j-javalin-auth", "ddd4j-javalin-bom", "ddd4j-javalin-data",
+                "ddd4j-javalin-ddd", "ddd4j-javalin-dependencies", "ddd4j-javalin-extensions",
+                "ddd4j-javalin-extensions/ddd4j-javalin-extension-akka",
+                "ddd4j-javalin-extensions/ddd4j-javalin-extension-excel",
+                "ddd4j-javalin-extensions/ddd4j-javalin-extension-jackson",
+                "ddd4j-javalin-extensions/ddd4j-javalin-extension-monitor",
+                "ddd4j-javalin-extensions/ddd4j-javalin-extension-pf4j",
+                "ddd4j-javalin-mq", "ddd4j-javalin-parent", "ddd4j-javalin-samples");
+        try (var paths = Files.walk(root)) {
+            Set<String> actual = paths.filter(path -> path.getFileName().toString().equals("pom.xml"))
+                    .filter(path -> !path.equals(root.resolve("pom.xml")))
+                    .filter(path -> !path.toString().contains("/target/"))
+                    .filter(path -> {
+                        Path sources = path.getParent().resolve("src/main/java");
+                        if (!Files.isDirectory(sources)) {
+                            return true;
+                        }
+                        try (var javaFiles = Files.walk(sources)) {
+                            return javaFiles.noneMatch(file -> file.toString().endsWith(".java"));
+                        } catch (Exception exception) {
+                            throw new IllegalStateException(exception);
+                        }
+                    })
+                    .map(path -> root.relativize(path.getParent()).toString())
+                    .collect(java.util.stream.Collectors.toSet());
+            assertEquals(approvedPomOnly, actual, "POM-only module governance inventory drifted");
+            for (String module : actual) {
+                assertEquals("pom", text(parse(root.resolve(module).resolve("pom.xml")), "packaging"),
+                        "POM-only module must explicitly use pom packaging: " + module);
+            }
         }
     }
 

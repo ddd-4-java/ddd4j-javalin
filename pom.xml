@@ -5,7 +5,7 @@
     <!-- POM的模型版本 -->
     <modelVersion>4.1.0</modelVersion>
 
-    <!-- Inherit defaults from Ddd4j 2.0.x -->
+    <!-- Inherit defaults from ddd4j 3.0.x. -->
     <parent>
         <groupId>io.ddd4j</groupId>
         <artifactId>ddd4j-parent</artifactId>
@@ -63,13 +63,13 @@
         <revision>7.2.x.20260630-SNAPSHOT</revision>
         <ddd4j.version>3.0.x.20260630-SNAPSHOT</ddd4j.version>
         <ddd4j-javalin.version>${revision}</ddd4j-javalin.version>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <!-- JaCoCo：quality profile 激活时经 jacoco.agent.argLine 拼入 surefire argLine
              （继承链存在字面量 argLine，configuration 合并不可靠，property 拼接 100% 生效） -->
         <jacoco.version>0.8.12</jacoco.version>
         <jacoco.agent.argLine></jacoco.agent.argLine>
         <!-- Maven Plugin versions -->
-        <maven.version>3.6.3</maven.version>
+        <maven.version>4.0.0-rc-6</maven.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>

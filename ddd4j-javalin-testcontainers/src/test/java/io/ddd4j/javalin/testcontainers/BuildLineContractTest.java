@@ -29,11 +29,11 @@ class BuildLineContractTest {
 
     private static final Map<String, BuildLine> LINES = Map.of(
             "6.7.x.20260630-SNAPSHOT",
-            new BuildLine("1.0.x.20260630-SNAPSHOT", "6.7.0", "4.0.0", "modules", "17", "3."),
+            new BuildLine("1.0.x.20260630-SNAPSHOT", "6.7.0", "4.0.0", "modules", "17", "3.9.16"),
             "7.1.x.20260630-SNAPSHOT",
-            new BuildLine("2.0.x.20260630-SNAPSHOT", "7.1.0", "4.0.0", "modules", "17", "3."),
+            new BuildLine("2.0.x.20260630-SNAPSHOT", "7.1.0", "4.0.0", "modules", "17", "3.9.16"),
             "7.2.x.20260630-SNAPSHOT",
-            new BuildLine("3.0.x.20260630-SNAPSHOT", "7.2.3", "4.1.0", "subprojects", "21", "4."));
+            new BuildLine("3.0.x.20260630-SNAPSHOT", "7.2.3", "4.1.0", "subprojects", "21", "4.0.0-rc-6"));
 
     /**
      * 校验当前发布线的版本与 Maven 聚合模型。
@@ -48,6 +48,8 @@ class BuildLineContractTest {
         assertTrue(LINES.containsKey(revision), "未登记的发布线 revision: " + revision);
         assertEquals(expected.ddd4jVersion(), parentVersion(rootPom), "根 parent 版本与发布线不匹配");
         assertEquals(expected.ddd4jVersion(), property(rootPom, "ddd4j.version"), "ddd4j.version 与发布线不匹配");
+        assertEquals(expected.jdkVersion(), property(rootPom, "java.version"), "java.version 与发布线不匹配");
+        assertEquals(expected.mavenVersion(), property(rootPom, "maven.version"), "maven.version 与 Wrapper 不匹配");
         assertEquals(expected.modelVersion(), text(rootPom, "modelVersion"), "根 POM modelVersion 不匹配");
         assertEquals(1, rootPom.getElementsByTagName(expected.aggregateElement()).getLength(), "根 POM 聚合元素不匹配");
 
@@ -131,7 +133,7 @@ class BuildLineContractTest {
         String branch = "feature/" + revision.substring(0, revision.indexOf(".20260630-SNAPSHOT"));
 
         String wrapper = Files.readString(root.resolve(".mvn/wrapper/maven-wrapper.properties"));
-        assertTrue(wrapper.contains("/apache-maven/" + expected.mavenMajor()), "Maven Wrapper 主版本不匹配");
+        assertTrue(wrapper.contains("/apache-maven/" + expected.mavenVersion() + "/"), "Maven Wrapper 版本不匹配");
 
         for (String workflowName : List.of("ci.yml", "integration-it.yml")) {
             String workflow = Files.readString(root.resolve(".github/workflows").resolve(workflowName));
@@ -232,6 +234,6 @@ class BuildLineContractTest {
                              String modelVersion,
                              String aggregateElement,
                              String jdkVersion,
-                             String mavenMajor) {
+                             String mavenVersion) {
     }
 }

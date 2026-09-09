@@ -457,18 +457,18 @@
 
 ### Task 10: Phase B — replace smoke and test doubles with real framework contracts
 
-- [ ] **Step 1: Add shared OIDC module contracts and reactor wiring**
+- [x] **Step 1: Add shared OIDC module contracts and reactor wiring**
 
   Add `ddd4j-javalin-auth-oidc` to auth aggregation and BOM on all three lines. Start with compile-failing tests for
   `OidcProperties`, `OidcTokenVerifier`, `OidcSubjectProvider` and `Ddd4jOidcJavalinModule`; add Nimbus only after the
   public API and security invariants are fixed by tests.
 
-- [ ] **Step 2: Verify JWT security and claim mapping**
+- [x] **Step 2: Verify JWT security and claim mapping**
 
   Use locally generated RSA/JWKS fixtures to prove signature, issuer, audience, exp, nbf, algorithm allowlist,
   bounded clock skew, roles/permissions mapping, invalid-token 401 and JWKS-unavailable 503. Do not use mocks for JWT verification.
 
-- [ ] **Step 3: Keycloak token and HTTP allow/deny on all lines**
+- [x] **Step 3: Keycloak token and HTTP allow/deny on all lines**
 
   Obtain a real RS256 access token from the Testcontainers realm public client, call a protected Javalin route and
   assert Principal visibility plus 200. Missing/tampered token must return 401 and ThreadContext must be empty afterward.
@@ -500,6 +500,7 @@
 - 2026-09-09 idempotency configuration: custom cache names are registered, configured one-second TTL expires completed keys, and sub-second TTL is rejected because the core/Caffeine APIs only support whole seconds. The ddd4j core default Caffeine registration does not honor per-entry TTL, so Javalin configures global expire-after-write on its local fallback.
 - 2026-09-09 final Phase A batch regression after override/TTL changes: 6.7.x ran 95 tests, 7.1.x ran 80 tests, and 7.2.x ran 74 tests; every clean reactor completed with zero failures/errors/skips.
 - 2026-09-09 Phase A complete: explicit properties bootstrap now applies context path (including public-path mapping), CORS, max request size, global future timeout and lifecycle disablement. Final clean regressions ran 100/85/79 tests on 6.7.x/7.1.x/7.2.x with zero failures/errors/skips.
+- 2026-09-09 Phase B OIDC Steps 1-3: added the shared `ddd4j-javalin-auth-oidc` reactor/BOM module on all three lines. Local RSA/JWKS tests cover issuer, audience, expiry, nbf, RS256 verification and allowlisted principal mapping; HTTP contracts cover public/protected paths, generic 401, provider-unavailable 503 and request-scope cleanup. A real Keycloak 26.2 token was obtained through the realm public client and accepted by protected Javalin 6.7.0, 7.1.0 and 7.2.3 routes. Each OIDC module ran 8 unit tests plus one Keycloak IT with zero failures/errors/skips. Full unit reactors passed on all three lines; upstream Maven 4 effective-model warnings on 7.2.x remain unchanged.
 - 2026-09-09 6.7.x regression: the 52-module clean unit reactor passed with 91 tests, zero failures/errors/skips. Custom idempotency cache/TTL and unused server-property decisions remain open in Task 9 Step 5.
 - 2026-09-09 7.1.x compatibility: retained Maven 3/JDK 17 and the upstream Javalin 7 adapter; the full clean reactor passed 77 tests with zero failures/errors/skips (`3a0ea69`).
 - 2026-09-09 7.2.x compatibility: retained Maven 4/POM 4.1.0/JDK 21 and the upstream Javalin 7 adapter; the full clean reactor passed 71 tests with zero failures/errors/skips (`ffecb3e`).

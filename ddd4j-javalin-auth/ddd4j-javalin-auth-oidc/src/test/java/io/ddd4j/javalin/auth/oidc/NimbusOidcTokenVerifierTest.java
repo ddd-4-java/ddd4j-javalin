@@ -64,6 +64,7 @@ class NimbusOidcTokenVerifierTest {
         assertEquals("user-42", principal.getUserId());
         assertEquals("tenant-7", principal.getOrgId());
         assertEquals(Set.of("order:read"), principal.getPerms());
+        assertEquals("admin", principal.getRoles().get(0).getRoleCode());
     }
 
     @Test
@@ -85,6 +86,7 @@ class NimbusOidcTokenVerifierTest {
                 .notBeforeTime(Date.from(Instant.now().minusSeconds(5)))
                 .claim("tenant_id", "tenant-7")
                 .claim("permissions", Set.of("order:read"))
+                .claim("roles", Set.of("admin"))
                 .build();
         SignedJWT jwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(rsaKey.getKeyID()).build(), claims);
         jwt.sign(new RSASSASigner(rsaKey));

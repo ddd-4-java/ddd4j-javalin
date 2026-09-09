@@ -87,6 +87,11 @@
             </dependency>
             <dependency>
                 <groupId>io.ddd4j.javalin</groupId>
+                <artifactId>ddd4j-javalin-auth-oidc</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.ddd4j.javalin</groupId>
                 <artifactId>ddd4j-javalin-auth-license</artifactId>
                 <version>${revision}</version>
             </dependency>

@@ -488,14 +488,14 @@
 - [x] **Step 2: Decide every POM-only module: implement, direct-reuse proof, or removal**
 - [x] **Step 3: Re-run Testcontainers matrix and document explicit managed-service exclusions**
 - [ ] **Step 4: Final local, private-repository and GitHub Actions evidence convergence**
-- [ ] **Step 5: Close protocol-specific durability evidence for every remaining MQ adapter**
+- [x] **Step 5: Close protocol-specific durability evidence for every remaining MQ adapter**
 
   RabbitMQ is the reference but not a forced semantic template. For ActiveMQ, Kafka, NATS, Pulsar, Redis Stream,
   RocketMQ, SQS and MQTT, document each protocol's publish durability, success confirmation, ACK/NACK or equivalent,
   retry/requeue, dead-letter and restart recovery semantics. Add real fault-injection tests where the protocol supports
   them; explicitly fail closed or document unsupported operations instead of inferring parity from a happy-path round-trip.
 
-- [ ] **Step 6: Eliminate the ddd4j 3.0.x Maven 4 effective-model warning debt**
+- [x] **Step 6: Eliminate the ddd4j 3.0.x Maven 4 effective-model warning debt**
 
   Keep the existing exact conflict allowlist as a migration guard, but do not treat it as zero-warning completion.
   Split or layer the current 64 imported ecosystem BOMs so consumers do not receive thousands of ignored-import
@@ -528,3 +528,5 @@
 - 2026-09-10 full local matrix: final branch-correct runs executed 158 tests on 6.7.x, 136 on 7.1.x and 131 on 7.2.x, with zero failures/errors and four explicit skips per line (ONS, TDMQ and two Mica cases). MySQL Repository, PostgreSQL JPA, OIDC Keycloak, every supported broker and PostgreSQL Outbox were observed. The 7.2.x Outbox gate was also run explicitly with `-DskipTests=false`: three tests passed.
 - 2026-09-10 private-repository closure: ddd4j 1.0/2.0/3.0 now publish POM, main JAR, sources and javadoc with valid SNAPSHOT metadata. The five shared sample-order artifacts and their parent POM were published on every line after the clean-cache Javalin reactor exposed the obsolete sample deploy exclusion. A Maven 4 build using a fresh local repository then completed dependency resolution and the entire 52-module unit reactor successfully.
 - 2026-09-10 remaining external gate: repository workflow configuration still validates `MAVEN_SETTINGS_XML`, but the latest GitHub jobs have zero executed steps and an account annotation stating that recent payments failed or the Actions spending limit must be increased. Task 8 Step 6 and Phase C Step 4 remain open until final pushed SHAs execute successfully in GitHub Actions.
+- 2026-09-10 Phase C Step 5 closure: Kafka now waits for broker confirmation and seeks without committing on consumer failure; NATS requires JetStream and the real container provisions a file-backed stream; Pulsar and RocketMQ wait for broker send results; MQTT uses manual ACK; Redis Stream uses synchronous XADD, ACK-after-handler and pending-first recovery. ActiveMQ and SQS retain their synchronous publish plus recover/visibility-reset contracts. The final branch-correct Testcontainers matrices executed 159/137/137 tests on 6.7.x/7.1.x/7.2.x with zero failures/errors and four governed skips per line.
+- 2026-09-10 Phase C Step 6 closure: ddd4j 3.0.x replaced 64 inherited ecosystem BOM imports with explicit managed coordinates, converted all internal Model 4.1 parents to fixed GAV lookup, and added executable parent/effective-model gates. A clean Maven 4 debug validation reports zero `io.ddd4j` effective-model summaries and no imported BOMs; remaining summaries belong to third-party SmallRye, Narayana and Pulsar POMs. Quarkus test and augmentation are preserved through an explicit Mandrel builder setting, and the 121-module clean test plus resumed full install both completed successfully.

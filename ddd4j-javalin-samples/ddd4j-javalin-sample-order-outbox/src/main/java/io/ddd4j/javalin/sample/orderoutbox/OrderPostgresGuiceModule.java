@@ -40,7 +40,7 @@ public class OrderPostgresGuiceModule extends AbstractModule {
     @Provides
     @Singleton
     ObjectMapper objectMapper() {
-        return new ObjectMapper().findAndRegisterModules();
+        return new ObjectMapper();
     }
 
     @Provides

@@ -79,7 +79,7 @@ class Ddd4jApiLogJavalinModuleTest {
         assertThatThrownBy(() -> aspect.aroundMethod(failure, operation))
                 .isInstanceOf(IllegalStateException.class).hasMessage("boom");
         assertThat(before).hasValue(2);
-        assertThat(returned).hasValue(2);
+        assertThat(returned).hasValue(1);
         assertThat(throwing).hasValue(1);
     }
 

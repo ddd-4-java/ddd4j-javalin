@@ -477,7 +477,7 @@
   semantics unless they actually install an OIDC bridge; do not claim the native providers directly validate Keycloak JWT.
 
 - [x] **Step 5: MyBatis ddd4j Repository contract on MySQL**
-- [ ] **Step 6: JPA transaction commit/rollback on PostgreSQL**
+- [x] **Step 6: JPA transaction commit/rollback on PostgreSQL**
 - [ ] **Step 7: DataScope, External and Data Logs consumer behavior**
 - [ ] **Step 8: PostgreSQL Outbox as a three-line gate**
 
@@ -501,6 +501,7 @@
 - 2026-09-09 Phase B OIDC Steps 1-3: added the shared `ddd4j-javalin-auth-oidc` reactor/BOM module on all three lines. Local RSA/JWKS tests cover issuer, audience, expiry, nbf, RS256 verification and allowlisted principal mapping; HTTP contracts cover public/protected paths, generic 401, provider-unavailable 503 and request-scope cleanup. A real Keycloak 26.2 token was obtained through the realm public client and accepted by protected Javalin 6.7.0, 7.1.0 and 7.2.3 routes. Each OIDC module ran 9 unit tests plus one Keycloak IT with zero failures/errors/skips. Full unit reactors passed on all three lines; upstream Maven 4 effective-model warnings on 7.2.x remain unchanged.
 - 2026-09-09 Phase B auth boundary: renamed the Sa-Token, Spring Security and Shiro Keycloak checks to `*KeycloakSmokeIT` and removed references to a nonexistent sample bridge. These tests prove only container-fixture compatibility; only `ddd4j-javalin-auth-oidc` claims real token/JWKS/HTTP behavior.
 - 2026-09-09 Phase B MyBatis RED/GREEN: replaced the hand-written repository and child injector with the real ddd4j `BaseRepositoryImpl` plus `bindRepository/initRepositories`. The first MySQL run failed because upstream `BaseRepositoryImpl` resolved generic index 0 as the domain type; ddd4j now overrides M/P/Q resolution at indexes 1/2/3 on all three lines. After local installation, the Javalin MySQL CRUD, query, pagination and delete contract passed.
+- 2026-09-09 Phase B JPA RED/GREEN: added `JpaTransactionTemplate` and a real PostgreSQL RESOURCE_LOCAL contract. Successful callbacks commit, failing callbacks roll back, and every invocation closes its EntityManager. The JPA module accepts explicit provider properties and centrally pins Jakarta-compatible JAXB runtime 4.0.6 for Hibernate bootstrap.
 - 2026-09-09 6.7.x regression: the 52-module clean unit reactor passed with 91 tests, zero failures/errors/skips. Custom idempotency cache/TTL and unused server-property decisions remain open in Task 9 Step 5.
 - 2026-09-09 7.1.x compatibility: retained Maven 3/JDK 17 and the upstream Javalin 7 adapter; the full clean reactor passed 77 tests with zero failures/errors/skips (`3a0ea69`).
 - 2026-09-09 7.2.x compatibility: retained Maven 4/POM 4.1.0/JDK 21 and the upstream Javalin 7 adapter; the full clean reactor passed 71 tests with zero failures/errors/skips (`ffecb3e`).

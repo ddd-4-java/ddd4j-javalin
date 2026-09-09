@@ -16,6 +16,7 @@
 
     <subprojects>
         <subproject>ddd4j-javalin-auth-core</subproject>
+        <subproject>ddd4j-javalin-auth-oidc</subproject>
         <subproject>ddd4j-javalin-auth-license</subproject>
         <subproject>ddd4j-javalin-auth-satoken</subproject>
         <subproject>ddd4j-javalin-auth-security</subproject>

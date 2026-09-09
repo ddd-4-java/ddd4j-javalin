@@ -15,6 +15,7 @@ import io.ddd4j.sample.order.jdbc.JdbcOutboxPort;
 import io.ddd4j.sample.order.jdbc.TransactionalOutboxPublisher;
 import io.javalin.Javalin;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -85,6 +86,18 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
     static void tearDownContainer() {
         if (POSTGRES.isRunning()) {
             POSTGRES.stop();
+        }
+    }
+
+    @BeforeEach
+    void cleanDatabase() {
+        DataSource dataSource = injector.getInstance(DataSource.class);
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.execute("TRUNCATE TABLE sample_order_lines, sample_order_outbox, "
+                    + "sample_order_read_models, sample_orders CASCADE");
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to clean Order Outbox schema", exception);
         }
     }
 

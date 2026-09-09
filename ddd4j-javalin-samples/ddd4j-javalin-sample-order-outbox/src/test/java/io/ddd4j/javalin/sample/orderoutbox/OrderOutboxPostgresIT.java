@@ -97,7 +97,7 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
                 .POST(HttpRequest.BodyPublishers.ofString(
                         "{\"orderNo\":\"ORDER-PG-001\",\"buyerId\":\"buyer-1\",\"buyerName\":\"Alice\"}"))
                 .build());
-        assertThat(create.statusCode()).isEqualTo(200);
+        assertThat(create.statusCode()).withFailMessage(create.body()).isEqualTo(200);
         JsonNode created = JSON.readTree(create.body());
         String orderId = created.path("data").path("id").asText();
         assertThat(orderId).isNotBlank();

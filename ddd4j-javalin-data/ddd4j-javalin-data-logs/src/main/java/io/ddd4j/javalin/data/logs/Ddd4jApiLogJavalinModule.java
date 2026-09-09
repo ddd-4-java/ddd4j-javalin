@@ -22,9 +22,19 @@ import io.ddd4j.data.logs.aspect.ApiOperationLogAspect;
  */
 public class Ddd4jApiLogJavalinModule extends AbstractModule {
 
+    private final ApiOperationLogProvider provider;
+
+    public Ddd4jApiLogJavalinModule() {
+        this(new DefaultApiOperationLogProvider());
+    }
+
+    public Ddd4jApiLogJavalinModule(ApiOperationLogProvider provider) {
+        this.provider = java.util.Objects.requireNonNull(provider, "provider must not be null");
+    }
+
     @Override
     protected void configure() {
-        bind(ApiOperationLogProvider.class).to(DefaultApiOperationLogProvider.class).in(Singleton.class);
+        bind(ApiOperationLogProvider.class).toInstance(provider);
     }
 
     @Provides

@@ -5,6 +5,10 @@
     {
       "username": "test-user",
       "enabled": true,
+      "firstName": "Test",
+      "lastName": "User",
+      "email": "test-user@example.invalid",
+      "emailVerified": true,
       "credentials": [
         {
           "type": "password",
@@ -20,6 +24,20 @@
       "enabled": true,
       "publicClient": true,
       "directAccessGrantsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "ddd4j-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "ddd4j-test-client",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "false"
+          }
+        }
+      ],
       "redirectUris": [
         "*"
       ]

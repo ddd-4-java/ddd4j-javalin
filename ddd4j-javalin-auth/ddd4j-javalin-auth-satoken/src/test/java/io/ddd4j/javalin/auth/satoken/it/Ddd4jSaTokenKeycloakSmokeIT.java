@@ -9,21 +9,18 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Skeleton integration test that verifies a {@link KeycloakContainer} can be started by the
- * {@link KeycloakTestContainerFixture}. The full OAuth2 / OIDC login round-trip
- * (acquiring a token from the realm, exchanging it for a sa-token session) is left to the
- * sample layer ({@code ddd4j-javalin-sample-keycloak}) where the consumer wiring lives.
+ * Keycloak 容器夹具冒烟测试，不代表 Sa-Token 已安装 OIDC token/session bridge。
  *
  * <p>This class exists to:
  * <ul>
  *   <li>Prove the {@code ddd4j-javalin-auth-satoken} module compiles against the
  *       Testcontainers Keycloak artifact (catches API drift early)</li>
- *   <li>Document the integration-test pattern for downstream consumers</li>
+ *   <li>明确真实 OIDC token 验证仅由 {@code ddd4j-javalin-auth-oidc} 的 Keycloak IT 证明</li>
  * </ul>
  */
 @Tag("integration")
 @JunitJupiterTestContainers
-class Ddd4jSaTokenKeycloakIT {
+class Ddd4jSaTokenKeycloakSmokeIT {
 
     @SuppressWarnings("resource")
     private static final KeycloakContainer KEYCLOAK = new KeycloakTestContainerFixture().newContainer();

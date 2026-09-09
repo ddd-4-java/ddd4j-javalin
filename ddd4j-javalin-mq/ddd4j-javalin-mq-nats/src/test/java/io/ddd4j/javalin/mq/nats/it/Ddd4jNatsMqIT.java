@@ -4,8 +4,13 @@ import com.google.inject.Module;
 import io.ddd4j.javalin.mq.nats.Ddd4jNatsMqGuiceModule;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
 import io.ddd4j.javalin.testcontainers.messaging.AbstractMqIntegrationTest;
+import io.ddd4j.mq.MQProperties;
 import io.ddd4j.mq.nats.NatsMQClient;
 import io.ddd4j.mq.nats.NatsProperties;
+import io.nats.client.Connection;
+import io.nats.client.Nats;
+import io.nats.client.api.StorageType;
+import io.nats.client.api.StreamConfiguration;
 import org.junit.jupiter.api.Tag;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -13,10 +18,9 @@ import org.testcontainers.utility.DockerImageName;
 import java.time.Duration;
 
 /**
- * Integration test for {@link Ddd4jNatsMqGuiceModule} against a real NATS server
- * ({@code nats:2-alpine}, core NATS without JetStream) brought up by Testcontainers.
- * 公共骨架继承自 {@link AbstractMqIntegrationTest}：适配层优先尝试 JetStream，
- * 服务端未启用时透明回退到 core NATS publish/subscribe。
+ * NATS JetStream 真实容器往返契约。
+ *
+ * <p>启动持久化 JetStream，并在消费者初始化前显式预建 file-backed stream。</p>
  */
 @Tag("integration")
 @JunitJupiterTestContainers
@@ -25,6 +29,7 @@ class Ddd4jNatsMqIT extends AbstractMqIntegrationTest<NatsProperties, NatsMQClie
     @SuppressWarnings("resource")
     private static final GenericContainer<?> NATS = new GenericContainer<>(
             DockerImageName.parse("nats:2-alpine"))
+            .withCommand("-js")
             .withExposedPorts(4222);
 
     @Override
@@ -65,8 +70,18 @@ class Ddd4jNatsMqIT extends AbstractMqIntegrationTest<NatsProperties, NatsMQClie
     }
 
     @Override
+    protected void preInit(NatsMQClient client, NatsProperties props, MQProperties mqProps) throws Exception {
+        try (Connection connection = Nats.connect(props.getServers())) {
+            connection.jetStreamManagement().addStream(StreamConfiguration.builder()
+                    .name("DDD4J_IT")
+                    .subjects(topicName() + ".>")
+                    .storageType(StorageType.File)
+                    .build());
+        }
+    }
+
+    @Override
     protected Duration consumerSettleDelay() {
-        // core NATS subscribe 同步完成，无需额外等待
         return Duration.ZERO;
     }
 

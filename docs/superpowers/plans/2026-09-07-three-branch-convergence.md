@@ -457,11 +457,31 @@
 
 ### Task 10: Phase B — replace smoke and test doubles with real framework contracts
 
-- [ ] **Step 1: Auth token and HTTP allow/deny**
-- [ ] **Step 2: MyBatis ddd4j Repository contract on MySQL**
-- [ ] **Step 3: JPA transaction commit/rollback on PostgreSQL**
-- [ ] **Step 4: DataScope, External and Data Logs consumer behavior**
-- [ ] **Step 5: PostgreSQL Outbox as a three-line gate**
+- [ ] **Step 1: Add shared OIDC module contracts and reactor wiring**
+
+  Add `ddd4j-javalin-auth-oidc` to auth aggregation and BOM on all three lines. Start with compile-failing tests for
+  `OidcProperties`, `OidcTokenVerifier`, `OidcSubjectProvider` and `Ddd4jOidcJavalinModule`; add Nimbus only after the
+  public API and security invariants are fixed by tests.
+
+- [ ] **Step 2: Verify JWT security and claim mapping**
+
+  Use locally generated RSA/JWKS fixtures to prove signature, issuer, audience, exp, nbf, algorithm allowlist,
+  bounded clock skew, roles/permissions mapping, invalid-token 401 and JWKS-unavailable 503. Do not use mocks for JWT verification.
+
+- [ ] **Step 3: Keycloak token and HTTP allow/deny on all lines**
+
+  Obtain a real RS256 access token from the Testcontainers realm public client, call a protected Javalin route and
+  assert Principal visibility plus 200. Missing/tampered token must return 401 and ThreadContext must be empty afterward.
+
+- [ ] **Step 4: Preserve native auth-provider boundaries**
+
+  Keep Sa-Token/Security/Shiro native token tests separate. Rename their current Keycloak container-start tests to smoke
+  semantics unless they actually install an OIDC bridge; do not claim the native providers directly validate Keycloak JWT.
+
+- [ ] **Step 5: MyBatis ddd4j Repository contract on MySQL**
+- [ ] **Step 6: JPA transaction commit/rollback on PostgreSQL**
+- [ ] **Step 7: DataScope, External and Data Logs consumer behavior**
+- [ ] **Step 8: PostgreSQL Outbox as a three-line gate**
 
 ### Task 11: Phase C — durability and extension governance
 

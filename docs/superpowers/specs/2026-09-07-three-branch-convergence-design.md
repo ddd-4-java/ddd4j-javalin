@@ -234,6 +234,59 @@ Phase A 必须先完成，之后才能继续声明框架能力对齐：
   DataScope、External、Data Logs 以消费者行为为验收边界。
 - PostgreSQL Outbox 测试升级为三条分支共同门禁，验证业务写、事件、读模型与 Outbox 状态。
 
+#### 11.3.1 三线共享 `ddd4j-javalin-auth-oidc`
+
+新增独立模块 `ddd4j-javalin-auth/ddd4j-javalin-auth-oidc`，由三条 Javalin 分支共享源码，
+但分别消费对应 ddd4j/Javalin/Maven/JDK 基线。它是外部 OIDC Resource Server 适配层，
+不修改 Sa-Token、Spring Security 或 Shiro 的原生 token/session 语义。
+
+组件边界：
+
+| 组件 | 职责 |
+|---|---|
+| `OidcProperties` | issuer、JWKS URI、audience、允许算法、时钟偏差、网络超时和 claim 映射；构造期 fail-fast 校验。 |
+| `OidcTokenVerifier` | 将 Bearer JWT 验证为 `AuthPrincipal`；非法 token 返回空，基础设施故障抛稳定的不可用异常。 |
+| `NimbusOidcTokenVerifier` | 使用 Nimbus JOSE JWT 完成签名、issuer、audience、exp、nbf 校验和 JWKS key rotation/cache。 |
+| `OidcSubject` | 只读外部身份 Subject；当前 Principal 仅保存在 ddd4j 请求 `ThreadContext`，请求关闭即清理。 |
+| `OidcSubjectProvider` | 向 ddd4j `SubjectProvider` 暴露同一个线程安全、无会话状态的 OIDC Subject。 |
+| `Ddd4jOidcJavalinModule` | Guice 装配并通过既有 Auth/Core override 机制注册 OIDC SubjectProvider。 |
+
+安全约束：
+
+1. v1 不实现 Authorization Code 页面、callback、refresh token、password grant 或本地 session 存储。
+2. 生产 JWKS URI 必须为 HTTPS；仅 Testcontainers 所在 loopback 地址允许 HTTP。URI 不从请求参数生成，避免 SSRF。
+3. 默认只允许 RS256；允许算法必须显式配置，拒绝 `none` 以及 token 自选未授权算法。
+4. issuer 必须精确匹配；audience 非空且必须命中；必须校验 exp，存在 nbf 时必须校验，并支持有上限的 clock skew。
+5. JWT/claim/签名错误映射为未认证（401），不得把 token 或底层解析异常写入响应；JWKS 网络或服务故障映射为 503。
+6. `OidcSubject` 的 login/logout/refresh/kickout/disable 等本地会话写操作显式拒绝，不能静默成功。
+7. roles/permissions 只从配置允许的 claim 读取，映射到新的 `AuthPrincipal`，不得信任客户端自定义 header。
+
+真实验收链：
+
+```mermaid
+sequenceDiagram
+    participant Test as Keycloak IT
+    participant KC as Keycloak 26.2
+    participant App as Javalin + OIDC Module
+    participant JWKS as Keycloak JWKS
+    Test->>KC: password grant（仅测试 client/user）
+    KC-->>Test: RS256 access_token
+    Test->>App: GET /protected + Bearer token
+    App->>JWKS: 获取/缓存签名公钥
+    App->>App: signature + issuer + audience + exp/nbf
+    App->>App: claims → AuthPrincipal → ThreadContext
+    App-->>Test: 200 + 当前 subject
+    Test->>App: 篡改或缺失 token
+    App-->>Test: 401
+```
+
+测试分层：
+
+- 单元测试使用本地生成 RSA key/JWKS，覆盖有效签名、篡改、错误 issuer/audience、过期、nbf、算法拒绝和 claim 映射。
+- HTTP 契约测试使用真实 Javalin/Guice，验证 Principal 在线程内可见且请求后清理。
+- Keycloak IT 使用现有 `KeycloakTestContainerFixture` 和 realm public client 获取真实 token，验证 200/401；测试代码不得把用户名密码带入生产配置。
+- 三分支均执行同一行为矩阵；只有 Javalin 路由 API 与 Maven/JDK 结构允许分支差异。
+
 ### 11.4 Phase C：可靠性与扩展治理（P2）
 
 - MQ 增加 `persist=true`，验证 ACK 后状态推进、重试、死信、重复投递幂等和进程恢复。

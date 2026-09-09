@@ -311,7 +311,7 @@
 
   Run MySQL CRUD and PostgreSQL outbox modules with `-Pjavalin-integration-tests -am`. Expected: actual SQL write/read/transaction assertions, not only container startup.
 
-- [ ] **Step 2: Run auth IT**
+- [x] **Step 2: Run auth IT**
 
   Run the OIDC Keycloak IT for real token acquisition and HTTP allow/deny. Run Sa-Token, Security, and Shiro
   Keycloak smoke tests separately to preserve their native-provider boundary; those smoke tests do not claim an OIDC bridge.

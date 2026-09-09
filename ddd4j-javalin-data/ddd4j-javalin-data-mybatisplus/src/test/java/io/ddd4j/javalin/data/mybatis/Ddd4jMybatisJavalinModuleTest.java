@@ -47,8 +47,9 @@ class Ddd4jMybatisJavalinModuleTest {
         }
 
         Ddd4jMybatisJavalinModule module = new Ddd4jMybatisJavalinModule(dataSource)
-                .addMapper(TestUserMapper.class);
+                .bindRepository(TestUserRepository.class, TestUserMapper.class);
         injector = Guice.createInjector(module);
+        module.initRepositories(injector);
     }
 
     @AfterAll
@@ -65,12 +66,8 @@ class Ddd4jMybatisJavalinModuleTest {
 
     @Test
     void shouldWireTestUserRepository() {
-        // Bind a TestUserRepository manually because Ddd4jMybatisJavalinModule
-        // is adapter-only; full BaseRepositoryImpl wiring lives in the core
-        // ddd4j-data-mybatisplus module (already covered by core tests).
-        SqlSession sqlSession = injector.getInstance(SqlSession.class);
-        TestUserRepository repo = new TestUserRepository(sqlSession, TestUserMapper.class);
+        TestUserRepository repo = injector.getInstance(TestUserRepository.class);
         assertNotNull(repo);
-        assertNotNull(repo.getMapper());
+        assertNotNull(repo.getBaseMapper());
     }
 }

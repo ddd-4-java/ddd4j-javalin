@@ -21,9 +21,9 @@
 
 | 分支 | 总测试 | failure | error | skip |
 |---|---:|---:|---:|---:|
-| `feature/6.7.x` | 158 | 0 | 0 | 4 |
-| `feature/7.1.x` | 136 | 0 | 0 | 4 |
-| `feature/7.2.x` | 131 | 0 | 0 | 4 |
+| `feature/6.7.x` | 159 | 0 | 0 | 4 |
+| `feature/7.1.x` | 137 | 0 | 0 | 4 |
+| `feature/7.2.x` | 137 | 0 | 0 | 4 |
 
 覆盖 MySQL `BaseRepositoryImpl`、PostgreSQL JPA、PostgreSQL Outbox、OIDC Keycloak、九个本地 Broker，
 以及 RabbitMQ 的 persistent delivery、publisher confirm、mandatory return、持久化失败 NACK/requeue
@@ -40,9 +40,11 @@
 
 ## MQ 可靠性审计边界
 
-RabbitMQ 已达到协议级持久化与恢复证据。其他 Broker 的正常 publish/consume 与 ACK 映射已有测试；
-NATS 和 Kafka 另有真实上游集成测试。ActiveMQ、Pulsar、SQS、RocketMQ 等仍以各自协议的确认映射和
-Javalin 真实往返为主，不能表述为已经完成与 RabbitMQ 相同的故障注入、宕机恢复和 DLQ 验收。
+RabbitMQ 保持 persistent delivery、publisher confirm、mandatory return、NACK/requeue 与恢复后 ACK
+的参考证据。Kafka、NATS、Pulsar、Redis Stream、RocketMQ、SQS、MQTT 和 ActiveMQ 已分别采用协议原生
+确认与失败恢复语义：broker Future/同步 send、JetStream、negative ACK、PEL、broker retry、
+visibility reset、manual ACK 或 session recover。协议不提供统一 DLQ 的适配器不会伪造 RabbitMQ
+语义，而是明确交由 broker policy、业务主题或 ddd4j 核心 DEAD 状态机处理。
 
 ## 未关闭门禁
 
@@ -50,9 +52,9 @@ GitHub Actions 最新任务仍在执行任何 step 前失败。Check Run annotat
 或 Actions spending limit 需要提高。所有失败 Job 都是 `steps=0`，因此 `MAVEN_SETTINGS_XML` 校验、
 Maven 构建和 Testcontainers 均未获得远端执行机会。
 
-Maven 4 仍会报告 ddd4j 3.0.x 聚合平台中的 BOM import 冲突。ddd4j 已使用精确 allowlist 和最终版本
-权威校验约其结果，但“警告为零”尚未实现，需要拆分当前一次导入 64 个生态 BOM 的
-`ddd4j-dependencies`，不能在 Javalin 层通过隐藏日志解决。
+ddd4j 3.0.x 已移除 64 个生态 BOM import，改为显式受管坐标，并将 Model 4.1 内部 parent 统一为固定
+GAV。Maven 4 debug validation 中 `io.ddd4j` effective-model 汇总为零；残余告警仅来自第三方
+SmallRye、Narayana 与 Pulsar POM。Quarkus test/package/augmentation 和 121 模块 clean test 均已验证。
 
 ## 当前结论
 

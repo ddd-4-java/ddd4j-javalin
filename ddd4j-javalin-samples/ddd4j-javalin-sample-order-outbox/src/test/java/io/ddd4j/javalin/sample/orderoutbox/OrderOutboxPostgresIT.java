@@ -104,13 +104,14 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
     @Test
     void shouldRoundTripOrderThroughPostgresAndPublishOutbox() throws Exception {
         String runId = java.util.UUID.randomUUID().toString();
+        String orderNo = "ORDER-PG-" + runId;
         // 1. HTTP 创建订单（订单 + Outbox + 读模型在同一 JDBC 事务内落库）
         HttpResponse<String> create = http(HttpRequest.newBuilder(url("/api/orders"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", OrderOutboxTestSupport.AUTHORIZATION)
                 .header("Idempotency-Key", "create-order-" + runId)
                 .POST(HttpRequest.BodyPublishers.ofString(
-                        "{\"orderNo\":\"ORDER-PG-001\",\"buyerId\":\"buyer-1\",\"buyerName\":\"Alice\"}"))
+                        "{\"orderNo\":\"" + orderNo + "\",\"buyerId\":\"buyer-1\",\"buyerName\":\"Alice\"}"))
                 .build());
         assertThat(create.statusCode()).withFailMessage(create.body()).isEqualTo(200);
         JsonNode created = JSON.readTree(create.body());
@@ -136,7 +137,7 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
                 .GET().build());
         assertThat(find.statusCode()).isEqualTo(200);
         JsonNode found = JSON.readTree(find.body());
-        assertThat(found.path("data").path("orderNo").asText()).isEqualTo("ORDER-PG-001");
+        assertThat(found.path("data").path("orderNo").asText()).isEqualTo(orderNo);
 
         // 4. 事务 Outbox 发布：领取 + 发送 + 确认在单个 PostgreSQL 事务内完成
         OutboxDispatchResult result = injector.getInstance(TransactionalOutboxPublisher.class).publishPending(100);

@@ -74,8 +74,21 @@ sequenceDiagram
 ```
 
 RabbitMQ 已具备 persistent delivery、publisher confirm、`mandatory=true`、不可路由 return 失败、
-持久化失败 NACK/requeue 与恢复后 ACK 的真实容器契约。其他 Broker 共享 ddd4j MQ 核心的 Inbox、
-Outbox、重试与 DEAD 策略，但其协议级失败恢复证据必须按 Broker 独立核验，不能由普通 round-trip 代替。
+持久化失败 NACK/requeue 与恢复后 ACK 的真实容器契约。其余适配器按协议保留不同但明确的失败语义：
+
+| 适配器 | 发布确认 | 消费失败与恢复 | Dead-letter 边界 |
+|---|---|---|---|
+| ActiveMQ | persistent synchronous send | 处理失败触发 `session.recover()` 重投 | 由 broker redelivery/DLQ policy 管理 |
+| Kafka | 等待 broker Future；失败抛出 | 失败不提交 offset，并 seek 当前记录 | 由业务 retry/DLT topic 策略管理 |
+| NATS | 默认强制 JetStream publish ACK | JetStream durable consumer；不可用时 fail closed | 由 stream/consumer policy 管理 |
+| Pulsar | 等待 `sendAsync().get()` | 成功 ACK，失败 negative ACK | 由 subscription dead-letter policy 管理 |
+| Redis Stream | 同步 XADD | 成功后 XACK；失败保留 PEL，并优先恢复 pending | 无原生 DLQ，使用核心 DEAD/业务 stream |
+| RocketMQ | synchronous send；失败抛出 | listener 失败返回 broker retry 结果 | 由 broker retry/DLQ 管理 |
+| SQS | synchronous `sendMessage` | 失败重置 visibility 以便重投 | 由 queue redrive policy 管理 |
+| MQTT | QoS publish | manual ACK；处理失败不确认 | 协议无统一 DLQ，交由业务主题/核心 DEAD |
+
+这些适配器继续共享 ddd4j MQ 核心的 Inbox、Outbox、重试与 DEAD 状态机；ONS/TDMQ 为托管服务排除项，
+Mica MQTT 为明确的上游限制，均不由普通 round-trip 推断生产能力。
 
 ## 测试基础设施边界
 

@@ -25,22 +25,30 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
 
     private final ExternalProperties externalProperties;
     private final SequenceProperties sequenceProperties;
+    private final IpRegionTemplate ipRegionTemplate;
 
     public Ddd4jExternalJavalinModule() {
-        this(new ExternalProperties(), new SequenceProperties());
+        this(new ExternalProperties(), new SequenceProperties(), IpRegionTemplate.none());
     }
 
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
                                      SequenceProperties sequenceProperties) {
+        this(externalProperties, sequenceProperties, IpRegionTemplate.none());
+    }
+
+    public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
+                                     SequenceProperties sequenceProperties,
+                                     IpRegionTemplate ipRegionTemplate) {
         this.externalProperties = Objects.requireNonNull(
                 externalProperties, "externalProperties must not be null");
         this.sequenceProperties = Objects.requireNonNull(
                 sequenceProperties, "sequenceProperties must not be null");
+        this.ipRegionTemplate = Objects.requireNonNull(ipRegionTemplate, "ipRegionTemplate must not be null");
     }
 
     @Override
     protected void configure() {
-        bind(IpRegionTemplate.class).toInstance(IpRegionTemplate.none());
+        bind(IpRegionTemplate.class).toInstance(ipRegionTemplate);
     }
 
     @Provides
@@ -58,8 +66,10 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
     @Provides
     @Singleton
     GlobalSequence globalSequence(SequenceProperties properties) {
-        return new GlobalSequence(longValue(properties.getWorkerId()),
-                longValue(properties.getDataCenterId()), properties.isUseSystemClock(),
+        if (Objects.isNull(properties.getWorkerId()) || Objects.isNull(properties.getDataCenterId())) {
+            throw new IllegalStateException("workerId and dataCenterId are required for GlobalSequence");
+        }
+        return new GlobalSequence(properties.getWorkerId(), properties.getDataCenterId(), properties.isUseSystemClock(),
                 longValue(properties.getTimeOffset()), longValue(properties.getRandomSequenceLimit()));
     }
 

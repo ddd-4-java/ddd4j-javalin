@@ -9,6 +9,9 @@ import io.ddd4j.javalin.testcontainers.database.PostgresTestContainerFixture;
 import io.ddd4j.javalin.testcontainers.web.JavalinTestFixture;
 import io.ddd4j.sample.order.application.OutboxDispatchResult;
 import io.ddd4j.sample.order.application.OutboxMessage;
+import io.ddd4j.sample.order.application.OutboxPublisher;
+import io.ddd4j.sample.order.jdbc.JdbcOrderTransactionPort;
+import io.ddd4j.sample.order.jdbc.JdbcOutboxPort;
 import io.ddd4j.sample.order.jdbc.TransactionalOutboxPublisher;
 import io.javalin.Javalin;
 import org.junit.jupiter.api.AfterAll;
@@ -27,6 +30,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -135,6 +141,33 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
         assertThat(countRows(dataSource, "SELECT COUNT(*) FROM sample_order_read_models")).isEqualTo(1);
     }
 
+    @Test
+    void shouldKeepFailedMessagePendingAndPublishItOnRetry() {
+        DataSource dataSource = injector.getInstance(DataSource.class);
+        JdbcOrderTransactionPort transaction = new JdbcOrderTransactionPort(dataSource);
+        JdbcOutboxPort outbox = new JdbcOutboxPort(transaction, JSON);
+        OutboxMessage message = new OutboxMessage("retry-message", "retry-order", "RetryEvent",
+                java.util.Map.of("value", "retry"), Instant.now());
+        transaction.execute(() -> outbox.append(List.of(message)));
+        AtomicInteger attempts = new AtomicInteger();
+        OutboxPublisher publisher = new OutboxPublisher(outbox, ignored -> {
+            if (attempts.getAndIncrement() == 0) {
+                throw new IllegalStateException("broker unavailable");
+            }
+        });
+        TransactionalOutboxPublisher transactional = new TransactionalOutboxPublisher(transaction, publisher);
+
+        OutboxDispatchResult failed = transactional.publishPending(1);
+        assertThat(failed.failed()).isEqualTo(1);
+        assertThat(countOutboxStatus(dataSource, "PENDING")).isGreaterThanOrEqualTo(1);
+        assertThat(outboxError(dataSource, "retry-message")).isEqualTo("broker unavailable");
+
+        OutboxDispatchResult retried = transactional.publishPending(1);
+        assertThat(retried.published()).isEqualTo(1);
+        assertThat(outboxStatus(dataSource, "retry-message")).isEqualTo("PUBLISHED");
+        assertThat(outboxAttempts(dataSource, "retry-message")).isEqualTo(2);
+    }
+
     private static void ensureSchema() {
         if (!SCHEMA_READY.compareAndSet(false, true)) {
             return;
@@ -176,6 +209,32 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
             return rows.getInt(1);
         } catch (Exception exception) {
             throw new IllegalStateException("Failed to query sample schema", exception);
+        }
+    }
+
+    private static String outboxStatus(DataSource dataSource, String id) {
+        return outboxValue(dataSource, id, "status");
+    }
+
+    private static String outboxError(DataSource dataSource, String id) {
+        return outboxValue(dataSource, id, "last_error");
+    }
+
+    private static int outboxAttempts(DataSource dataSource, String id) {
+        return Integer.parseInt(outboxValue(dataSource, id, "attempts"));
+    }
+
+    private static String outboxValue(DataSource dataSource, String id, String column) {
+        String sql = "SELECT " + column + " FROM sample_order_outbox WHERE id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                resultSet.next();
+                return resultSet.getString(1);
+            }
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to query outbox message", exception);
         }
     }
 }

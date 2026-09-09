@@ -14,6 +14,7 @@ import io.ddd4j.kit.lang.StrKit;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -88,7 +89,8 @@ public final class NimbusOidcTokenVerifier implements OidcTokenVerifier {
                 .setLoginId(subject)
                 .setUserId(subject)
                 .setOrgId(claims.getClaim("tenant_id"))
-                .setPerms(stringSet(claims.getClaim("permissions")));
+                .setPerms(stringSet(claims.getClaim("permissions")))
+                .setRoles(rolePairs(claims.getClaim("roles")));
         principal.setProfile(Map.of("issuer", claims.getIssuer(), "subject", subject));
         return principal;
     }
@@ -103,5 +105,13 @@ public final class NimbusOidcTokenVerifier implements OidcTokenVerifier {
             }
         }
         return result;
+    }
+
+    private List<AuthPrincipal.RolePair> rolePairs(Object value) {
+        List<AuthPrincipal.RolePair> roles = new ArrayList<>();
+        for (String role : stringSet(value)) {
+            roles.add(new AuthPrincipal.RolePair().setRoleId(role).setRoleCode(role).setRoleName(role));
+        }
+        return roles;
     }
 }

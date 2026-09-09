@@ -1,9 +1,13 @@
 package io.ddd4j.javalin.data.jpa;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Guice Module for JPA wiring in Javalin applications.
@@ -21,9 +25,17 @@ import jakarta.persistence.Persistence;
 public class Ddd4jJpaJavalinModule extends AbstractModule {
 
     private final String persistenceUnitName;
+    private final Map<String, Object> properties;
 
     public Ddd4jJpaJavalinModule(String persistenceUnitName) {
-        this.persistenceUnitName = persistenceUnitName;
+        this(persistenceUnitName, Collections.emptyMap());
+    }
+
+    public Ddd4jJpaJavalinModule(String persistenceUnitName, Map<String, ?> properties) {
+        this.persistenceUnitName = Objects.requireNonNull(
+                persistenceUnitName, "persistenceUnitName must not be null");
+        this.properties = Collections.unmodifiableMap(new LinkedHashMap<>(
+                Objects.requireNonNull(properties, "properties must not be null")));
     }
 
     public Ddd4jJpaJavalinModule() {
@@ -32,11 +44,12 @@ public class Ddd4jJpaJavalinModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(EntityManagerFactory.class).toInstance(buildEntityManagerFactory());
-        bind(EntityManagerFactory.class).in(Singleton.class);
+        EntityManagerFactory factory = buildEntityManagerFactory();
+        bind(EntityManagerFactory.class).toInstance(factory);
+        bind(JpaTransactionTemplate.class).toInstance(new JpaTransactionTemplate(factory));
     }
 
     private EntityManagerFactory buildEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(persistenceUnitName);
+        return Persistence.createEntityManagerFactory(persistenceUnitName, properties);
     }
 }

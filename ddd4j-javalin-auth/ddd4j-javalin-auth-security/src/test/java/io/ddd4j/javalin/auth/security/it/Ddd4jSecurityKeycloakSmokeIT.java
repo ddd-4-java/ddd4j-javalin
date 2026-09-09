@@ -1,4 +1,4 @@
-package io.ddd4j.javalin.auth.shiro.it;
+package io.ddd4j.javalin.auth.security.it;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
@@ -9,17 +9,14 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Skeleton integration test for Apache Shiro ↔ Keycloak integration via the
- * {@code ddd4j-javalin-auth-shiro} module.
+ * Keycloak 容器夹具冒烟测试，不代表 Spring Security 已安装 OIDC/JWT bridge。
  *
- * <p>Shiro does not have first-class OIDC support, so the full login round-trip uses an
- * OIDC <em>subject</em> bridge (a custom Shiro {@code Realm} that resolves identities from
- * the Keycloak JWKS endpoint). That wiring lives in
- * {@code ddd4j-javalin-sample-keycloak}.
+ * <p>本测试只验证 testcontainers-keycloak 夹具可启动；真实 token/JWKS/HTTP allow-deny
+ * 由 {@code ddd4j-javalin-auth-oidc} 的 Keycloak IT 独立证明。
  */
 @Tag("integration")
 @JunitJupiterTestContainers
-class Ddd4jShiroKeycloakIT {
+class Ddd4jSecurityKeycloakSmokeIT {
 
     @SuppressWarnings("resource")
     private static final KeycloakContainer KEYCLOAK = new KeycloakTestContainerFixture().newContainer();

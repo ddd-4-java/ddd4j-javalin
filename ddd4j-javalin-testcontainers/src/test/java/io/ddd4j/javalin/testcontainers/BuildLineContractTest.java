@@ -160,12 +160,15 @@ class BuildLineContractTest {
                 "6.7.x 测试运行时必须提供一个 SLF4J binding");
     }
 
-    /** 公共 BOM 必须导出运行时依赖管理，消费者不能回退到 ddd4j 自带的其他 Javalin 版本。 */
+    /** 公共 BOM 必须直接继承运行时依赖管理，父级版本不能抢占本发布线的 Javalin 版本。 */
     @Test
-    void shouldImportRuntimeDependenciesFromPublicBom() throws Exception {
+    void shouldInheritRuntimeDependenciesInPublicBom() throws Exception {
         Document bom = parse(repositoryRoot().resolve("ddd4j-javalin-bom/pom.xml"));
-        assertEquals(1, managedImportCount(bom, "io.ddd4j.javalin", "ddd4j-javalin-dependencies"),
-                "ddd4j-javalin-bom 必须 import ddd4j-javalin-dependencies");
+        Element parent = (Element) bom.getElementsByTagName("parent").item(0);
+        assertEquals("../ddd4j-javalin-dependencies/pom.xml", text(parent, "relativePath"),
+                "ddd4j-javalin-bom 必须直接继承 ddd4j-javalin-dependencies");
+        assertEquals(0, managedImportCount(bom, "io.ddd4j.javalin", "ddd4j-javalin-dependencies"),
+                "直接父级不可再作为 BOM 重复 import");
     }
 
     @Test

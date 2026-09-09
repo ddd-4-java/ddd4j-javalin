@@ -5,6 +5,10 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import io.ddd4j.data.external.ExternalProperties;
 import io.ddd4j.data.external.SequenceProperties;
+import io.ddd4j.data.external.region.IpRegionTemplate;
+import io.ddd4j.data.external.sequence.GlobalSequence;
+
+import java.util.Objects;
 
 /**
  * Guice Module for ddd4j-data-external wiring in Javalin applications.
@@ -19,20 +23,47 @@ import io.ddd4j.data.external.SequenceProperties;
  */
 public class Ddd4jExternalJavalinModule extends AbstractModule {
 
+    private final ExternalProperties externalProperties;
+    private final SequenceProperties sequenceProperties;
+
+    public Ddd4jExternalJavalinModule() {
+        this(new ExternalProperties(), new SequenceProperties());
+    }
+
+    public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
+                                     SequenceProperties sequenceProperties) {
+        this.externalProperties = Objects.requireNonNull(
+                externalProperties, "externalProperties must not be null");
+        this.sequenceProperties = Objects.requireNonNull(
+                sequenceProperties, "sequenceProperties must not be null");
+    }
+
     @Override
     protected void configure() {
-        // Bindings provided by @Provides methods below
+        bind(IpRegionTemplate.class).toInstance(IpRegionTemplate.none());
     }
 
     @Provides
     @Singleton
     ExternalProperties externalProperties() {
-        return new ExternalProperties();
+        return externalProperties;
     }
 
     @Provides
     @Singleton
     SequenceProperties sequenceProperties() {
-        return new SequenceProperties();
+        return sequenceProperties;
+    }
+
+    @Provides
+    @Singleton
+    GlobalSequence globalSequence(SequenceProperties properties) {
+        return new GlobalSequence(longValue(properties.getWorkerId()),
+                longValue(properties.getDataCenterId()), properties.isUseSystemClock(),
+                longValue(properties.getTimeOffset()), longValue(properties.getRandomSequenceLimit()));
+    }
+
+    private long longValue(Long value) {
+        return Objects.isNull(value) ? 0L : value;
     }
 }

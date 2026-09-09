@@ -102,6 +102,10 @@ class BuildLineContractTest {
             return;
         }
 
+        Element rootParent = (Element) rootPom.getElementsByTagName("parent").item(0);
+        assertEquals(0, rootParent.getElementsByTagName("relativePath").getLength(),
+                "Maven 4 外部 root parent 只应声明 GAV，不应同时声明 relativePath");
+
         try (var paths = Files.walk(root)) {
             List<Path> childPoms = paths
                     .filter(path -> path.getFileName().toString().equals("pom.xml"))

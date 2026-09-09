@@ -103,10 +103,12 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
 
     @Test
     void shouldRoundTripOrderThroughPostgresAndPublishOutbox() throws Exception {
+        String runId = java.util.UUID.randomUUID().toString();
         // 1. HTTP 创建订单（订单 + Outbox + 读模型在同一 JDBC 事务内落库）
         HttpResponse<String> create = http(HttpRequest.newBuilder(url("/api/orders"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", OrderOutboxTestSupport.AUTHORIZATION)
+                .header("Idempotency-Key", "create-order-" + runId)
                 .POST(HttpRequest.BodyPublishers.ofString(
                         "{\"orderNo\":\"ORDER-PG-001\",\"buyerId\":\"buyer-1\",\"buyerName\":\"Alice\"}"))
                 .build());
@@ -119,6 +121,7 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
         HttpResponse<String> line = http(HttpRequest.newBuilder(url("/api/orders/" + orderId + "/lines"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", OrderOutboxTestSupport.AUTHORIZATION)
+                .header("Idempotency-Key", "add-order-line-" + runId)
                 .POST(HttpRequest.BodyPublishers.ofString(
                         "{\"goodsId\":\"goods-1\",\"goodsName\":\"DDD Book\",\"quantity\":2,\"unitPrice\":59.90}"))
                 .build());

@@ -3,6 +3,7 @@ package io.ddd4j.javalin.auth.oidc;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
@@ -75,6 +76,20 @@ class NimbusOidcTokenVerifierTest {
                 () -> verifier.verify(token(issuer, "another-api", Instant.now().plusSeconds(60))));
         assertThrows(OidcAuthenticationException.class,
                 () -> verifier.verify(token(issuer, "ddd4j-api", Instant.now().minusSeconds(120))));
+    }
+
+    @Test
+    void shouldRejectAlgorithmOutsideAllowlist() throws Exception {
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                .issuer(issuer)
+                .subject("user-42")
+                .audience("ddd4j-api")
+                .expirationTime(Date.from(Instant.now().plusSeconds(60)))
+                .build();
+        SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
+        jwt.sign(new MACSigner(new byte[32]));
+
+        assertThrows(OidcAuthenticationException.class, () -> verifier.verify(jwt.serialize()));
     }
 
     private String token(String tokenIssuer, String audience, Instant expiresAt) throws Exception {

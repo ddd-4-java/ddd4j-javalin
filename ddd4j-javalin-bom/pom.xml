@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
     <modelVersion>4.1.0</modelVersion>
     <parent>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../ddd4j-javalin-dependencies/pom.xml</relativePath>
     </parent>
 
     <artifactId>ddd4j-javalin-bom</artifactId>
@@ -13,14 +13,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- 导出本发布线的 Javalin/Testcontainers 等运行时版本，防止消费者回退到上游默认值。 -->
-            <dependency>
-                <groupId>io.ddd4j.javalin</groupId>
-                <artifactId>ddd4j-javalin-dependencies</artifactId>
-                <version>${revision}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- Javalin 聚合与基础入口 -->
             <dependency>
                 <groupId>io.ddd4j.javalin</groupId>

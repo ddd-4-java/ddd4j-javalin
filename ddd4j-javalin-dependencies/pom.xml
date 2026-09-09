@@ -55,10 +55,16 @@
         <commons-lang3-testcontainers.version>3.18.0</commons-lang3-testcontainers.version>
         <!-- ddd4j 1.0.x consumer BOM only manages the JDK 8 -4.9 parser variant. -->
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
+        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${jaxb-runtime.version}</version>
+            </dependency>
             <!-- 与 ddd4j-dependencies import 对齐：第三方库 + Spring Framework 6.x -->
             <dependency>
                 <groupId>io.ddd4j</groupId>

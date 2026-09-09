@@ -490,6 +490,18 @@
 - [x] **Step 2: Decide every POM-only module: implement, direct-reuse proof, or removal**
 - [x] **Step 3: Re-run Testcontainers matrix and document explicit managed-service exclusions**
 - [ ] **Step 4: Final local, private-repository and GitHub Actions evidence convergence**
+- [ ] **Step 5: Close protocol-specific durability evidence for every remaining MQ adapter**
+
+  RabbitMQ is the reference but not a forced semantic template. For ActiveMQ, Kafka, NATS, Pulsar, Redis Stream,
+  RocketMQ, SQS and MQTT, document each protocol's publish durability, success confirmation, ACK/NACK or equivalent,
+  retry/requeue, dead-letter and restart recovery semantics. Add real fault-injection tests where the protocol supports
+  them; explicitly fail closed or document unsupported operations instead of inferring parity from a happy-path round-trip.
+
+- [ ] **Step 6: Eliminate the ddd4j 3.0.x Maven 4 effective-model warning debt**
+
+  Keep the existing exact conflict allowlist as a migration guard, but do not treat it as zero-warning completion.
+  Split or layer the current 64 imported ecosystem BOMs so consumers do not receive thousands of ignored-import
+  diagnostics. Do not hide Maven warnings in Javalin or replace dependency authority with accidental first-import wins.
 
 #### Phase A Validation Record
 

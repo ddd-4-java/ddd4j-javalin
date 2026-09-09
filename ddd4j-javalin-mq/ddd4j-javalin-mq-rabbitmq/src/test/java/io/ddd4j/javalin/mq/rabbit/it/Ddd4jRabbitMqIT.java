@@ -21,6 +21,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -110,6 +111,53 @@ class Ddd4jRabbitMqIT {
         }
     }
 
+    @Test
+    void shouldNackAndRedeliverWhenPersistenceFailsBeforeAcknowledgment() throws Exception {
+        RABBIT.start();
+        try {
+            RabbitMQProperties brokerProps = new RabbitMQProperties();
+            brokerProps.setHost(RABBIT.getHost());
+            brokerProps.setPort(RABBIT.getAmqpPort());
+            brokerProps.setUsername(RABBIT.getAdminUsername());
+            brokerProps.setPassword(RABBIT.getAdminPassword());
+            MQProperties mqProps = new MQProperties();
+            mqProps.setEnabled(true);
+            mqProps.setBroker("rabbit");
+            mqProps.setExchange("amq.topic");
+            mqProps.setPersist(true);
+
+            RabbitMQClient client = new RabbitMQClient(brokerProps);
+            MQClient mqClient = Guice.createInjector(new Ddd4jRabbitMqGuiceModule(client, brokerProps))
+                    .getInstance(MQClient.class);
+            RedeliveryListener bean = new RedeliveryListener();
+            Method onMessage = RedeliveryListener.class.getMethod("onMessage", MQEvent.class);
+            MQListener listener = MQListener.of(bean, onMessage, onMessage.getAnnotation(MQEventListener.class));
+            AtomicInteger storeAttempts = new AtomicInteger();
+            AtomicReference<String> storedMessageId = new AtomicReference<>();
+            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), event -> {
+                if (storeAttempts.incrementAndGet() == 1) {
+                    throw new IllegalStateException("simulated persistence outage");
+                }
+                storedMessageId.set(event.getMsgId());
+            });
+
+            Thread.sleep(3000);
+            MQEvent event = new MQEvent();
+            event.setMsgId("rabbit-redelivery-it-" + System.nanoTime());
+            event.setTopic(TOPIC);
+            event.setTag(TAG);
+            event.publish();
+
+            await().atMost(Duration.ofSeconds(20)).until(() -> bean.received.get() != null);
+            assertThat(storeAttempts.get()).isGreaterThanOrEqualTo(2);
+            assertThat(storedMessageId.get()).isEqualTo(event.getMsgId());
+            assertThat(bean.received.get().getMsgId()).isEqualTo(event.getMsgId());
+            assertThat(bean.invocations.get()).isEqualTo(1);
+        } finally {
+            RABBIT.stop();
+        }
+    }
+
     /** Listener bean invoked by the ddd4j consume pipeline; records the delivered event. */
     public static class SmokeListener {
 
@@ -117,6 +165,19 @@ class Ddd4jRabbitMqIT {
 
         @MQEventListener(topic = TOPIC, tags = TAG, group = "it-rabbit-consumer")
         public void onSmoke(MQEvent event) {
+            received.set(event);
+        }
+    }
+
+    /** Listener used to prove that storage failure is nacked and redelivered before business handling. */
+    public static class RedeliveryListener {
+
+        final AtomicReference<MQEvent> received = new AtomicReference<>();
+        final AtomicInteger invocations = new AtomicInteger();
+
+        @MQEventListener(topic = TOPIC, tags = TAG, group = "it-rabbit-redelivery-consumer")
+        public void onMessage(MQEvent event) {
+            invocations.incrementAndGet();
             received.set(event);
         }
     }

@@ -1,9 +1,10 @@
 package io.ddd4j.javalin.data.datascope;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import io.ddd4j.data.datascope.DataScopeProvider;
 import io.ddd4j.data.datascope.RequiresDataPermissionsValidator;
+
+import java.util.Objects;
 
 /**
  * Guice Module wiring the ddd4j-data-datascope SPI for Javalin applications.
@@ -18,8 +19,20 @@ import io.ddd4j.data.datascope.RequiresDataPermissionsValidator;
  */
 public class Ddd4jDataScopeJavalinModule extends AbstractModule {
 
+    private final DataScopeProvider provider;
+
+    public Ddd4jDataScopeJavalinModule() {
+        this(DataScopeProvider.nonNullAllowed());
+    }
+
+    public Ddd4jDataScopeJavalinModule(DataScopeProvider provider) {
+        this.provider = Objects.requireNonNull(provider, "provider must not be null");
+    }
+
     @Override
     protected void configure() {
-        bind(RequiresDataPermissionsValidator.class).in(Singleton.class);
+        bind(DataScopeProvider.class).toInstance(provider);
+        bind(RequiresDataPermissionsValidator.class)
+                .toInstance(new RequiresDataPermissionsValidator(provider));
     }
 }

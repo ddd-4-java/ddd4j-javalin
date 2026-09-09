@@ -15,7 +15,7 @@ import java.util.Objects;
  * {@link DataScopeProvider}.
  *
  * <p>Users should bind their own {@link DataScopeProvider} implementation (typically
- * tenant-aware); if no binding is provided the ddd4j-data-datascope default is used.
+ * tenant-aware). The no-argument module is fail-closed and denies every value.
  */
 public class Ddd4jDataScopeJavalinModule extends AbstractModule {
 

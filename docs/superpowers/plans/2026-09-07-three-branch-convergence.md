@@ -485,9 +485,9 @@
 
 ### Task 11: Phase C — durability and extension governance
 
-- [ ] **Step 1: MQ persistence, ACK, retry, dead-letter and recovery tests**
-- [ ] **Step 2: Decide every POM-only module: implement, direct-reuse proof, or removal**
-- [ ] **Step 3: Re-run Testcontainers matrix and document explicit managed-service exclusions**
+- [x] **Step 1: MQ persistence, ACK, retry, dead-letter and recovery tests**
+- [x] **Step 2: Decide every POM-only module: implement, direct-reuse proof, or removal**
+- [x] **Step 3: Re-run Testcontainers matrix and document explicit managed-service exclusions**
 - [ ] **Step 4: Final local, private-repository and GitHub Actions evidence convergence**
 
 #### Phase A Validation Record
@@ -506,6 +506,7 @@
 - 2026-09-09 Phase B JPA RED/GREEN: added `JpaTransactionTemplate` and a real PostgreSQL RESOURCE_LOCAL contract. Successful callbacks commit, failing callbacks roll back, and every invocation closes its EntityManager. The JPA module accepts explicit provider properties and centrally pins Jakarta-compatible JAXB runtime 4.0.6 for Hibernate bootstrap.
 - 2026-09-09 Phase B Step 7 RED/GREEN: DataScope now injects the consumer policy, defaults fail-closed, and proves allow/deny decisions. External binds caller properties, requires explicit Snowflake node IDs when consumed, and supports an injectable offline/real `IpRegionTemplate`. Data Logs proves mutually exclusive success/failure callbacks with a consumer provider; the upstream aspect no longer double-records failures. The invalid empty `Ddd4jLogsJavalinModule` source was removed.
 - 2026-09-09 Phase B Step 8: the PostgreSQL Outbox gate now proves both the successful HTTP order/write-model/read-model/outbox round trip and broker-failure recovery. Failed messages remain PENDING with `last_error`, retry succeeds, status becomes PUBLISHED, and attempts advances to two.
+- 2026-09-09 Phase C Steps 1-3: `persist=true` now fails closed before business handling when `MQEventStorer` is missing or fails. MQ core tests cover ACK-facing persistence order, retry, exponential delivery policy, DEAD transition, lease-loss and Inbox idempotency. All three Javalin lines completed the full Testcontainers matrix; ONS and TDMQ remain explicit managed-service exclusions, and Mica MQTT retains its documented upstream limitation. POM-only governance removed the nonexistent Akka/Jackson wrappers, retained valid aggregators/BOMs and the Excel/Monitor/PF4J upstream-reuse coordinates, and added an exact inventory regression gate.
 - 2026-09-09 6.7.x regression: the 52-module clean unit reactor passed with 91 tests, zero failures/errors/skips. Custom idempotency cache/TTL and unused server-property decisions remain open in Task 9 Step 5.
 - 2026-09-09 7.1.x compatibility: retained Maven 3/JDK 17 and the upstream Javalin 7 adapter; the full clean reactor passed 77 tests with zero failures/errors/skips (`3a0ea69`).
 - 2026-09-09 7.2.x compatibility: retained Maven 4/POM 4.1.0/JDK 21 and the upstream Javalin 7 adapter; the full clean reactor passed 71 tests with zero failures/errors/skips (`ffecb3e`).

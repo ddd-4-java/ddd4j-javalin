@@ -161,6 +161,14 @@ class BuildLineContractTest {
                 "测试运行时必须提供一个 SLF4J binding/provider");
     }
 
+    /** 公共 BOM 必须导出运行时依赖管理，消费者不能回退到 ddd4j 自带的其他 Javalin 版本。 */
+    @Test
+    void shouldImportRuntimeDependenciesFromPublicBom() throws Exception {
+        Document bom = parse(repositoryRoot().resolve("ddd4j-javalin-bom/pom.xml"));
+        assertEquals(1, managedImportCount(bom, "io.ddd4j.javalin", "ddd4j-javalin-dependencies"),
+                "ddd4j-javalin-bom 必须 import ddd4j-javalin-dependencies");
+    }
+
     @Test
     void shouldGovernEveryPomOnlyModuleExplicitly() throws Exception {
         Path root = repositoryRoot();
@@ -249,6 +257,21 @@ class BuildLineContractTest {
             if (groupId.equals(text(dependency, "groupId"))
                     && artifactId.equals(text(dependency, "artifactId"))
                     && scope.equals(text(dependency, "scope"))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static int managedImportCount(Document document, String groupId, String artifactId) {
+        int count = 0;
+        NodeList dependencies = document.getElementsByTagName("dependency");
+        for (int index = 0; index < dependencies.getLength(); index++) {
+            Element dependency = (Element) dependencies.item(index);
+            if (groupId.equals(text(dependency, "groupId"))
+                    && artifactId.equals(text(dependency, "artifactId"))
+                    && "pom".equals(text(dependency, "type"))
+                    && "import".equals(text(dependency, "scope"))) {
                 count++;
             }
         }

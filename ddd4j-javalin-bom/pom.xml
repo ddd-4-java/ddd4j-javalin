@@ -217,17 +217,7 @@
             <!-- Javalin extensions -->
             <dependency>
                 <groupId>io.ddd4j.javalin</groupId>
-                <artifactId>ddd4j-javalin-extension-akka</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.ddd4j.javalin</groupId>
                 <artifactId>ddd4j-javalin-extension-excel</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.ddd4j.javalin</groupId>
-                <artifactId>ddd4j-javalin-extension-jackson</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

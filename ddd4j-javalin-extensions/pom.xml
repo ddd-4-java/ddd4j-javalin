@@ -14,6 +14,7 @@
     <subprojects>
         <subproject>ddd4j-javalin-extension-excel</subproject>
         <subproject>ddd4j-javalin-extension-monitor</subproject>
+        <subproject>ddd4j-javalin-extension-pf4j</subproject>
         <subproject>ddd4j-javalin-extension-qlexpress</subproject>
         <subproject>ddd4j-javalin-extension-qrcode</subproject>
         <subproject>ddd4j-javalin-extension-validation</subproject>

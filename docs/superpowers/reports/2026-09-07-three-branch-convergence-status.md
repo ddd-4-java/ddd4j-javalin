@@ -73,10 +73,11 @@ SmallRye、Narayana 与 Pulsar POM。Quarkus test/package/augmentation 和 121 �
 failure/error/skip；完整 `javalin-integration-tests` 执行 188 项，零 failure/error，并保留且仅保留
 ONS、TDMQ、Mica MQTT 共 4 个治理 skip。九类本地 MQ IT 已全部改为从 Javalin 生产生命周期启动。
 
-这些 Phase D 结果仍是未提交工作树证据，尚未同步到 `feature/7.1.x`、`feature/7.2.x`，也未执行新的
-GitHub Actions 或阿里云 Maven 发布。因此上文旧版本的三线发布证据不能作为 Phase D 发布完成证明；
-必须在三线同步、分支正确工具链验证、最终 SHA Actions 和三个独立空缓存消费全部通过后才能关闭计划。
+Phase D 已同步到 `feature/7.1.x` 与 `feature/7.2.x`，三线均完成分支正确工具链验证。新增的生产组合
+门禁在 Javalin 6.7.0、7.1.0、7.2.3 上分别通过：真实 Keycloak、PostgreSQL、RabbitMQ 同时运行，
+readiness 返回 200，真实 token 通过，重复共享幂等键返回 409，MQ 往返成功，停止后资源关闭。
+当前增量仍未执行新的阿里云 Maven 发布；旧发布证据不能作为 Phase D 发布完成证明。
 
 预推送只读审计确认 `origin` 与 `github` 的三个旧分支头一致；所有 Workflow 均引用
 `MAVEN_SETTINGS_XML`、使用对应 JDK，且没有 job-level `continue-on-error`。当前唯一仓库内 Workflow
-差异是 `feature/7.1.x` 的 `ci.yml` 缺少 `workflow_dispatch`，须在该分支同步 Phase D 时一并修复。
+差异是 `feature/7.1.x` 的 `ci.yml` 曾缺少 `workflow_dispatch`，已在 Phase D 同步时修复。

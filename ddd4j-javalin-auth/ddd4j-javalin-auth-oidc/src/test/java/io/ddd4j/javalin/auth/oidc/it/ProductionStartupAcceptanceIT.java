@@ -98,7 +98,7 @@ class ProductionStartupAcceptanceIT {
                     participantModule(database));
             OidcHttpAuthentication.register(app, provider,
                     Set.of("/health", "/health/readiness", "/health/liveness"));
-            app.unsafe.routes.post("/production", context -> context.result("accepted"));
+            app.post("/production", context -> context.result("accepted"));
 
             assertThat(get(app, "/health/readiness", null, null).statusCode()).isEqualTo(200);
             assertThat(post(app, token, "same-key").statusCode()).isEqualTo(200);

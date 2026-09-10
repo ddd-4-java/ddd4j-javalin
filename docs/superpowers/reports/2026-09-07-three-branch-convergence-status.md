@@ -37,6 +37,7 @@
 - Phase B 后 Javalin Outbox 已成为三线正式门禁，因此旧的 sample-order 不发布策略已失效。五个共享 sample-order JAR及 `ddd4j-samples` 父 POM已在三线发布，并通过空缓存闭包解析。
 - 7.2.x 使用新的 Maven 本地仓库完成 dependency tree 和 52 模块完整单元 Reactor，最终 `BUILD SUCCESS`。
 - 公共 `ddd4j-javalin-bom` 现直接继承 `ddd4j-javalin-dependencies`；单纯嵌套 import 会被父级依赖管理抢占，直接继承可确保 6.7.x 消费者解析 Javalin 6.7.0，而不再回退到 4.6.8。
+- 最终六线均重新执行 clean deploy：ddd4j 1.0/2.0/3.0 与 Javalin 6.7/7.1/7.2 全部 `BUILD SUCCESS`。三个独立空缓存随后消费最终 Javalin BOM/Web，编译并启动随机端口健康测试，三线均返回 HTTP 200；ddd4j-core 与 ddd4j-javalin-web 的 sources/javadoc 也均从私仓取得并通过 ZIP 完整性检查。
 
 ## MQ 可靠性审计边界
 
@@ -58,5 +59,5 @@ SmallRye、Narayana 与 Pulsar POM。Quarkus test/package/augmentation 和 121 �
 
 ## 当前结论
 
-本地代码、版本矩阵、真实容器行为、空缓存依赖闭包和上游私仓构件已经形成证据。最终规格保持未关闭，
-直到最新提交完成私仓发布，并且 GitHub Actions 在解除账户门禁后真正执行且全部通过。
+本地代码、版本矩阵、真实容器行为、空缓存依赖闭包和六线私仓发布已经形成证据。最终规格保持未关闭，
+仅等待 GitHub Actions 在解除组织账户门禁后真正执行且全部通过。

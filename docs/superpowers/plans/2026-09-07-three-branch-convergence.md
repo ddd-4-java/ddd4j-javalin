@@ -780,7 +780,7 @@
   Wait for CI and Integration on final SHAs. steps=0, billing annotations, queued jobs and skipped mandatory matrices are
   not success.
 
-- [ ] **Step 7: Publish and consume all three Javalin lines**
+- [x] **Step 7: Publish and consume all three Javalin lines**
 
   Only after mandatory local and GitHub gates pass, run branch-correct clean deploy to the Aliyun snapshot repository.
   Use three independent empty Maven repositories to consume BOM, POM, JAR, sources and javadoc; compile, start Javalin,
@@ -829,6 +829,13 @@
   and four governed skips; 6.7.x ran 188 with the same skip boundary. A new production composition gate then passed
   on Javalin 6.7.0, 7.1.0 and 7.2.3 with real Keycloak, PostgreSQL and RabbitMQ, shared idempotency contention,
   readiness, authenticated HTTP handling, message round-trip and graceful resource cleanup.
+- 2026-09-10 manual publication override: after GitHub continued to reject every final-SHA job at `steps=0` for
+  organization billing/spending-limit reasons, the user explicitly instructed the release to proceed manually from the
+  local verified branches. Branch-correct `clean deploy` completed all 52 modules for 6.7.x, 7.1.x and 7.2.x. Three
+  independent initially empty Maven repositories then resolved the BOM, Web POM/JAR, sources, javadoc and SNAPSHOT
+  metadata from Aliyun; each consumer compiled, started Javalin, received readiness HTTP 200 and stopped cleanly.
+  Sources and javadoc archives passed ZIP integrity checks. Step 7 is complete under this explicit override; Step 6 and
+  Step 8 remain open because GitHub has still not executed repository steps.
 
 #### Phase A Validation Record
 

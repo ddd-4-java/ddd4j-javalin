@@ -76,7 +76,14 @@ ONS、TDMQ、Mica MQTT 共 4 个治理 skip。九类本地 MQ IT 已全部改为
 Phase D 已同步到 `feature/7.1.x` 与 `feature/7.2.x`，三线均完成分支正确工具链验证。新增的生产组合
 门禁在 Javalin 6.7.0、7.1.0、7.2.3 上分别通过：真实 Keycloak、PostgreSQL、RabbitMQ 同时运行，
 readiness 返回 200，真实 token 通过，重复共享幂等键返回 409，MQ 往返成功，停止后资源关闭。
-当前增量仍未执行新的阿里云 Maven 发布；旧发布证据不能作为 Phase D 发布完成证明。
+用户明确将发布方式改为手动本地发布后，三线均以各自规定工具链完成新的 52 模块 `clean deploy`：
+6.7.x、7.1.x、7.2.x 全部 `BUILD SUCCESS`。三个独立初始空 Maven 缓存随后分别解析 BOM、Web
+POM/JAR、sources、javadoc 与 SNAPSHOT metadata；消费者均编译成功、启动 Javalin、取得 readiness
+HTTP 200 并正常停止，sources/javadoc ZIP 完整性检查通过。
+
+GitHub Actions 门禁没有被伪装成成功：最终 SHA 的 CI/Integration 仍因组织 Billing/Actions spending
+limit 在 `steps=0` 失败。因此私仓发布已按用户手动例外完成，但 Task 8 Step 6、Task 11 Step 4 与
+Task 17 Steps 6/8 继续保持未关闭。
 
 预推送只读审计确认 `origin` 与 `github` 的三个旧分支头一致；所有 Workflow 均引用
 `MAVEN_SETTINGS_XML`、使用对应 JDK，且没有 job-level `continue-on-error`。当前唯一仓库内 Workflow

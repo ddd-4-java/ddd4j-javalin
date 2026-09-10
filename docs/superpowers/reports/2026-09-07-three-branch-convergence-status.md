@@ -80,3 +80,8 @@ GitHub Actions 或阿里云 Maven 发布。因此上文旧版本的三线发布�
 预推送只读审计确认 `origin` 与 `github` 的三个旧分支头一致；所有 Workflow 均引用
 `MAVEN_SETTINGS_XML`、使用对应 JDK，且没有 job-level `continue-on-error`。当前唯一仓库内 Workflow
 差异是 `feature/7.1.x` 的 `ci.yml` 缺少 `workflow_dispatch`，须在该分支同步 Phase D 时一并修复。
+
+`feature/7.1.x` 已完成本地 Phase D 兼容同步，保留 Maven 3.9.16、POM 4.0.0、JDK 17 与 Javalin 7
+`app.unsafe.routes` API，并补齐 `ci.yml` 的 `workflow_dispatch`。九类支持的 broker 均通过独立生产生命
+周期门禁；最终完整集成 Reactor 执行 166 项，零 failure/error，且仅有 4 个治理 skip。该增量尚待提交、
+双远端推送与 Actions 验证。

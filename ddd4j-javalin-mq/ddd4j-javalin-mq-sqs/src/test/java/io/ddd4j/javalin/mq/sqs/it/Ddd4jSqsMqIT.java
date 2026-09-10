@@ -93,7 +93,8 @@ class Ddd4jSqsMqIT {
             MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
             // SQS has no topic: the MQListener topic must be the queue URL.
             listener.setTopic(queueUrl);
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.start(
+                    mqClient, List.of(listener), mqProps, new JsonMQEventSerialization(), null);
 
             MQEvent event = new MQEvent();
             event.setMsgId("sqs-it-" + System.nanoTime());
@@ -107,6 +108,7 @@ class Ddd4jSqsMqIT {
             assertThat(received.getTopic()).isEqualTo(queueUrl);
             assertThat(received.getTag()).isEqualTo(TAG);
         } finally {
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.close();
             LOCALSTACK.stop();
         }
     }

@@ -96,7 +96,8 @@ class Ddd4jPulsarMqIT {
             SmokeListener bean = new SmokeListener();
             Method onSmoke = SmokeListener.class.getMethod("onSmoke", MQEvent.class);
             MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.start(
+                    mqClient, List.of(listener), mqProps, new JsonMQEventSerialization(), null);
 
             // No tag: the consumer subscribes to the bare physical topic
             // (tenant/namespace/topic), the producer appends ":tag" on publish.
@@ -110,6 +111,7 @@ class Ddd4jPulsarMqIT {
             assertThat(received.getMsgId()).isEqualTo(event.getMsgId());
             assertThat(received.getTopic()).isEqualTo(TOPIC);
         } finally {
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.close();
             PULSAR.stop();
         }
     }

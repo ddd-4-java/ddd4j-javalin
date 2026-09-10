@@ -114,7 +114,8 @@ class Ddd4jRocketMqIT {
             SmokeListener bean = new SmokeListener();
             Method onSmoke = SmokeListener.class.getMethod("onSmoke", MQEvent.class);
             MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.start(
+                    mqClient, List.of(listener), mqProps, new JsonMQEventSerialization(), null);
 
             // Give the consumer a moment to finish the initial rebalance / pull setup.
             Thread.sleep(3000);
@@ -132,6 +133,7 @@ class Ddd4jRocketMqIT {
             assertThat(received.getTopic()).isEqualTo(TOPIC);
             assertThat(received.getTag()).isEqualTo(TAG);
         } finally {
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.close();
             ROCKETMQ.stop();
         }
     }

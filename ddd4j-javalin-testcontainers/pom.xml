@@ -79,6 +79,16 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.ddd4j</groupId>
+            <artifactId>ddd4j-mq-core</artifactId>
+            <version>${ddd4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-mq-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
 </dependencies>
 
     <build>

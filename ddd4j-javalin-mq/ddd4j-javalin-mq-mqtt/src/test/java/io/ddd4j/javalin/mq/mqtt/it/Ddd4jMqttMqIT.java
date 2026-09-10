@@ -90,7 +90,8 @@ class Ddd4jMqttMqIT {
             SmokeListener bean = new SmokeListener();
             Method onSmoke = SmokeListener.class.getMethod("onSmoke", MQEvent.class);
             MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.start(
+                    mqClient, List.of(listener), mqProps, new JsonMQEventSerialization(), null);
 
             MQEvent event = new MQEvent();
             event.setMsgId("mqtt-it-" + System.nanoTime());
@@ -104,6 +105,7 @@ class Ddd4jMqttMqIT {
             assertThat(received.getTopic()).isEqualTo(TOPIC);
             assertThat(received.getTag()).isEqualTo(TAG);
         } finally {
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.close();
             MOSQUITTO.stop();
         }
     }

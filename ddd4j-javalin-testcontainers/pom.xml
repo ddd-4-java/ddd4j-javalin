@@ -90,6 +90,11 @@
             <version>${ddd4j.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-mq-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>

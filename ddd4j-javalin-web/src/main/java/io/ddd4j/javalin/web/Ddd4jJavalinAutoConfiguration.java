@@ -16,6 +16,7 @@ import io.ddd4j.web.core.context.WebRequestLifecycle;
 import io.ddd4j.web.core.error.DefaultWebExceptionTranslator;
 import io.ddd4j.web.core.error.WebExceptionTranslator;
 import io.ddd4j.web.core.idempotency.CacheIdempotencyGuard;
+import io.ddd4j.web.core.idempotency.IdempotencyGuard;
 import io.ddd4j.web.core.idempotency.WebIdempotencyLifecycle;
 import io.ddd4j.javalin.web.Ddd4jJavalinWeb;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +39,21 @@ import java.util.Objects;
 public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
 
     private final Ddd4jJavalinProperties properties;
+    private final IdempotencyGuard sharedIdempotencyGuard;
 
     public Ddd4jJavalinAutoConfiguration() {
         this(new Ddd4jJavalinProperties());
     }
 
     public Ddd4jJavalinAutoConfiguration(Ddd4jJavalinProperties properties) {
-        this.properties = properties;
+        this(properties, null);
+    }
+
+    /** 使用显式共享 Guard 创建生产级 Web 装配。 */
+    public Ddd4jJavalinAutoConfiguration(Ddd4jJavalinProperties properties,
+                                          IdempotencyGuard sharedIdempotencyGuard) {
+        this.properties = Objects.requireNonNull(properties, "properties must not be null");
+        this.sharedIdempotencyGuard = sharedIdempotencyGuard;
     }
 
     @Override
@@ -107,12 +116,16 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
         if (!properties.isIdempotencyEnabled()) {
             return null;
         }
-        String cacheName = properties.getIdempotencyCacheName();
         long ttlSeconds = Objects.requireNonNull(
                 properties.getIdempotencyTtl(), "idempotencyTtl must not be null").getSeconds();
         if (ttlSeconds <= 0) {
             throw new IllegalArgumentException("idempotencyTtl must be at least one second");
         }
+        if (properties.getIdempotencyDeploymentMode() == IdempotencyDeploymentMode.SHARED) {
+            return new WebIdempotencyLifecycle(Objects.requireNonNull(sharedIdempotencyGuard,
+                    "sharedIdempotencyGuard is required for SHARED mode"), properties.getIdempotencyTtl());
+        }
+        String cacheName = properties.getIdempotencyCacheName();
         if (Objects.isNull(CacheKit.getCache(cacheName))) {
             CacheKit.register(cacheName, CaffeineCache.create(CacheConfig.builder(cacheName)
                     .expireAfterWriteSeconds(ttlSeconds)

@@ -3,6 +3,8 @@ package io.ddd4j.javalin.testcontainers.messaging;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import io.ddd4j.javalin.mq.core.Ddd4jJavalinMqProperties;
+import io.ddd4j.javalin.mq.core.JavalinMqLifecycleParticipant;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.MQProperties;
 import io.ddd4j.mq.annotation.MQEventListener;
@@ -123,9 +125,6 @@ public abstract class AbstractMqIntegrationTest<P extends MQProperties, C extend
             C client = newClient(brokerProps);
             preInit(client, brokerProps, mqProps);
 
-            Injector injector = Guice.createInjector(guiceModule(client, brokerProps));
-            MQClient mqClient = injector.getInstance(MQClient.class);
-
             SmokeListener bean = new SmokeListener();
             Method onSmoke = SmokeListener.class.getMethod("onSmoke", MQEvent.class);
             MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
@@ -133,25 +132,32 @@ public abstract class AbstractMqIntegrationTest<P extends MQProperties, C extend
             listener.setGroup(consumerGroup());
             listener.setTags(listenerTags());
             adaptListenerTopic(listener, brokerProps);
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
+            Ddd4jJavalinMqProperties integrationProperties = new Ddd4jJavalinMqProperties();
+            JavalinMqLifecycleParticipant lifecycle = new JavalinMqLifecycleParticipant(
+                    client, mqProps, integrationProperties, () -> List.of(listener),
+                    new JsonMQEventSerialization(), null);
+            lifecycle.start();
+            try {
+                // Give the consumer a moment to finish connect / subscribe / rebalance.
+                Thread.sleep(consumerSettleDelay().toMillis());
 
-            // Give the consumer a moment to finish connect / subscribe / rebalance.
-            Thread.sleep(consumerSettleDelay().toMillis());
+                MQEvent event = new MQEvent();
+                event.setMsgId(brokerName() + "-it-" + System.nanoTime());
+                event.setTopic(listener.getTopic());
+                if (tagName() != null) {
+                    event.setTag(tagName());
+                }
+                event.publish();
 
-            MQEvent event = new MQEvent();
-            event.setMsgId(brokerName() + "-it-" + System.nanoTime());
-            event.setTopic(listener.getTopic());
-            if (tagName() != null) {
-                event.setTag(tagName());
-            }
-            event.publish();
-
-            await().atMost(awaitTimeout()).until(() -> bean.received.get() != null);
-            MQEvent received = bean.received.get();
-            assertThat(received.getMsgId()).isEqualTo(event.getMsgId());
-            assertThat(received.getTopic()).isEqualTo(listener.getTopic());
-            if (tagName() != null) {
-                assertThat(received.getTag()).isEqualTo(tagName());
+                await().atMost(awaitTimeout()).until(() -> bean.received.get() != null);
+                MQEvent received = bean.received.get();
+                assertThat(received.getMsgId()).isEqualTo(event.getMsgId());
+                assertThat(received.getTopic()).isEqualTo(listener.getTopic());
+                if (tagName() != null) {
+                    assertThat(received.getTag()).isEqualTo(tagName());
+                }
+            } finally {
+                lifecycle.close();
             }
         } finally {
             container().stop();

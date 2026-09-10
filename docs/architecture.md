@@ -104,6 +104,8 @@ sequenceDiagram
     participant Main as main()
     participant App as Ddd4jJavalinApplication
     participant Guice as Guice Injector
+    participant Runtime as Ddd4jJavalinRuntime
+    participant Parts as Lifecycle Participants
     participant Web as Ddd4jJavalinWeb
     participant Javalin as Javalin 6/7
 
@@ -112,10 +114,24 @@ sequenceDiagram
     App->>Guice: createInjector(Ddd4jCoreGuiceModule + DddAnnotationModule + WebModule + extraModules)
     Note right of Guice: extraModules 通过 Modules.override 覆盖默认绑定
     Guice-->>App: Injector 就绪
-    App->>Web: getInstance(Ddd4jJavalinWeb)
+    App->>Web: 解析 Web 与共享幂等依赖
+    App->>Runtime: start()
+    Runtime->>Parts: validate()（升序）
+    Runtime->>Parts: start()（升序）
+    Note right of Parts: MyBatis/JPA/MQ 在监听端口前完成初始化
     App->>Javalin: Javalin.create(config -> web.configure(config))
     Note right of Javalin: web.configure 注册 before/after/exception 钩子
     Javalin->>Javalin: app.start(host, port)
     App-->>Main: 返回 Javalin 实例
-    Javalin-->>Guice: STOPPING 时关闭 Ddd4jGuiceRuntime
+    Javalin-->>Runtime: STOPPED 时 close()
+    Runtime->>Parts: close()（逆序、最多一次）
+    Runtime->>Guice: 关闭 Ddd4jGuiceRuntime
 ```
+
+任一属性校验、Web Provision 或参与者启动失败都会在绑定端口前失败并回滚。MQ 参与者不调用会吞掉
+消费者异常的便利初始化入口，而是严格执行 producer/consumer 初始化；MyBatis Repository mapper 由
+生命周期自动注入；JPA 仅关闭模块内部创建的 `EntityManagerFactory`，调用方传入的工厂仍由调用方管理。
+
+生产模式的 `/health/readiness` 汇总所有参与者，仅在 Runtime 为 `RUNNING` 且全部就绪时返回 200；
+失败响应不包含原始异常、凭证或连接串。生产 CORS 必须配置明确 origin，生产幂等必须注入多实例共享、
+具备原子 CAS 语义的 `IdempotencyGuard`；默认 Caffeine 仅用于开发或单实例。

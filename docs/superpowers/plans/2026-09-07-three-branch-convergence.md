@@ -22,6 +22,7 @@
 - Do not push without explicit authorization. Local commits are required before switching official branches and therefore have a separate authorization gate.
 - Use a fresh temporary Maven local repository for publication-consumption proof; a developer's populated `~/.m2` is not release evidence.
 - Treat source/POM checks, dependency resolution, unit tests, container IT, GitHub Actions, and remote SHA equality as separate evidence levels.
+- Phase D changes only ddd4j-javalin; matching published ddd4j artifacts are read-only compatibility inputs, not implementation targets.
 
 ---
 
@@ -502,6 +503,327 @@
   Keep the existing exact conflict allowlist as a migration guard, but do not treat it as zero-warning completion.
   Split or layer the current 64 imported ecosystem BOMs so consumers do not receive thousands of ignored-import
   diagnostics. Do not hide Maven warnings in Javalin or replace dependency authority with accidental first-import wins.
+
+### Task 12: Phase D — production configuration contract
+
+**Files:**
+- Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinRuntimeMode.java
+- Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesLoader.java
+- Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesValidator.java
+- Modify: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinProperties.java
+- Modify: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinApplication.java
+- Test: ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesLoaderTest.java
+- Test: ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesValidatorTest.java
+
+**Interfaces:**
+- Produce enum Ddd4jJavalinRuntimeMode with DEVELOPMENT and PRODUCTION.
+- All three lines default to DEVELOPMENT for source and behavior compatibility; production deployments and Task 17
+  acceptance must set PRODUCTION explicitly.
+- Produce Ddd4jJavalinPropertiesLoader.load(String[] args).
+- Produce Ddd4jJavalinPropertiesValidator.validate(Ddd4jJavalinProperties properties).
+- Precedence is CLI, system property, environment variable, application.properties, Java default.
+- Environment names use uppercase snake case, for example DDD4J_WEB_JAVALIN_CONTEXT_PATH.
+- YAML is not silently claimed: correct the existing Javadoc to the formats actually implemented.
+
+- [x] **Step 1: RED — prove the convenience bootstrap ignores external configuration**
+
+  Add table-driven tests for host, port, context-path, cors, max-upload-size-bytes, request-timeout-ms,
+  request-lifecycle, runtime-mode, public-paths and allowed-origins. Assert exact precedence and strict parsing.
+
+- [x] **Step 2: Run the loader contract and verify RED**
+
+  Run the web module with only Ddd4jJavalinPropertiesLoaderTest selected. Expected: compilation failure because the
+  loader and runtime-mode types do not exist.
+
+- [x] **Step 3: GREEN — implement deterministic property loading**
+
+  Parse only documented keys, trim text, split lists on commas, accept booleans only as true or false, and reject
+  malformed numbers. Keep the explicit-properties run overload unchanged; route only the convenience overload through
+  the loader.
+
+- [x] **Step 4: RED — define production validation failures**
+
+  Test blank host, port outside 0..65535, malformed context path, non-positive upload/timeout/TTL values, null public
+  paths, and PRODUCTION plus cors=true plus empty allowed origins.
+
+- [x] **Step 5: GREEN — validate before creating Injector or server**
+
+  Validate after configuration precedence is resolved and before Guice.createInjector. A validation failure must leave
+  no Guice runtime, shutdown hook or listening socket.
+
+- [x] **Step 6: Verify Task 12**
+
+  Run both focused tests and the complete web reactor on the branch-correct JDK/Maven line. Do not commit or synchronize
+  branches until the batch review gate.
+
+### Task 13: Phase D — one owned Javalin runtime lifecycle
+
+**Files:**
+- Create: ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/JavalinLifecycleParticipant.java
+- Create: ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/Ddd4jJavalinRuntime.java
+- Create: ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/JavalinRuntimeState.java
+- Modify: ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/Ddd4jCoreGuiceModule.java
+- Modify: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinApplication.java
+- Test: ddd4j-javalin-core/src/test/java/io/ddd4j/javalin/core/lifecycle/Ddd4jJavalinRuntimeTest.java
+- Test: ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/Ddd4jJavalinApplicationLifecycleTest.java
+
+**Interfaces:**
+- JavalinLifecycleParticipant exposes order, validate, start, readiness and close.
+- Ddd4jJavalinRuntime exposes start, state, readiness and idempotent close.
+- States are NEW, STARTING, RUNNING, DRAINING and STOPPED.
+- Validate/start run in ascending order; rollback/close run in descending order.
+
+- [x] **Step 1: RED — specify ordering, rollback and idempotent close**
+
+  Use recording participants to prove start order, reverse close order, rollback after a middle participant fails,
+  no later start after failure, and exactly-once close.
+
+- [x] **Step 2: Run the lifecycle contract and verify RED**
+
+  Expected: compilation failure because the lifecycle API does not exist.
+
+- [x] **Step 3: GREEN — implement the lifecycle coordinator**
+
+  Bind a Guice Multibinder of JavalinLifecycleParticipant, inject the ordered set, accumulate cleanup failures without
+  skipping later cleanup, and make the coordinator own the upstream Ddd4jGuiceRuntime close boundary.
+
+- [x] **Step 4: RED/GREEN — rollback before socket publication**
+
+  Start with a failing participant through Ddd4jJavalinApplication. Require an exception, reverse cleanup and no returned
+  server. Then integrate runtime start before Javalin socket start.
+
+- [x] **Step 5: GREEN — govern the shutdown hook**
+
+  Register one hook only after successful startup. Normal server stop closes the runtime once and removes the hook when
+  the JVM is not already shutting down.
+
+- [x] **Step 6: Verify Task 13**
+
+  Run lifecycle, core and web tests, including repeated stop and startup-failure paths.
+
+### Task 14: Phase D — MQ automatic initialization and production fail-closed behavior
+
+**Files:**
+- Create: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/JavalinMqListenerScanner.java
+- Create: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/JavalinMqLifecycleParticipant.java
+- Create: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/Ddd4jJavalinMqProperties.java
+- Modify: ddd4j-javalin-mq/ddd4j-javalin-mq-core/pom.xml
+- Modify: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/AbstractDdd4jMqGuiceModule.java
+- Modify: every broker-specific Ddd4j*MqGuiceModule.java
+- Test: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/test/java/io/ddd4j/javalin/mq/core/JavalinMqListenerScannerTest.java
+- Test: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/test/java/io/ddd4j/javalin/mq/core/JavalinMqLifecycleParticipantTest.java
+- Test: affected broker integration tests
+
+**Interfaces:**
+- JavalinMqListenerScanner.scan(Injector, Collection<String>) returns deterministic MQListener entries.
+- The mq-core POM declares ClassGraph directly; listener discovery must not rely on a transitive dependency.
+- Ddd4jJavalinMqProperties declares role PRODUCER_ONLY, CONSUMER_ONLY or BOTH and requireListeners.
+- The participant consumes MQClient, MQProperties, MQEventSerialization, optional MQEventStorer and base packages.
+- Javalin owns invoking init, start and close; it does not reimplement broker protocol behavior.
+
+- [x] **Step 1: RED — production bootstrap currently never initializes MQ**
+
+  Start with a recording MQ client and annotated listener through Ddd4jJavalinApplication. Assert init and start are
+  currently never called.
+
+- [x] **Step 2: RED — define startup rejection contracts**
+
+  Cover enabled broker mismatch, consumer role with zero listeners, persist=true without MQEventStorer, duplicate route
+  expressions and initConsumer failure. Prove PRODUCER_ONLY can legitimately have zero listeners.
+
+- [x] **Step 3: GREEN — discover application listeners and initialize once**
+
+  Scan configured base packages, obtain listener objects from Guice, reject duplicate routes, call client.init once and
+  then client.start. Any production validation or initialization error aborts application startup.
+
+- [x] **Step 4: GREEN — close through Javalin lifecycle**
+
+  Invoke MQClient.close exactly once on normal stop and rollback. Report upstream clients whose close implementation is
+  a no-op as an upstream boundary; do not modify ddd4j in this phase.
+
+- [x] **Step 5: Real broker verification**
+
+  Convert Kafka, RabbitMQ, NATS, Pulsar, ActiveMQ, RocketMQ, Redis Stream, MQTT and SQS ITs to start through the
+  production lifecycle instead of calling MQClient.init directly. Preserve ONS/TDMQ and Mica governed exclusions.
+
+- [x] **Step 6: Verify Task 14**
+
+  Run MQ core plus every supported broker in isolated Testcontainers invocations. No new ungoverned skip is allowed.
+
+### Task 15: Phase D — data component lifecycle ownership
+
+**Files:**
+- Modify: ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/main/java/io/ddd4j/javalin/data/mybatis/Ddd4jMybatisJavalinModule.java
+- Create: ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/main/java/io/ddd4j/javalin/data/mybatis/MybatisRepositoryLifecycleParticipant.java
+- Modify: ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/main/java/io/ddd4j/javalin/data/jpa/Ddd4jJpaJavalinModule.java
+- Create: ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/main/java/io/ddd4j/javalin/data/jpa/JpaLifecycleParticipant.java
+- Test: ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/test/java/io/ddd4j/javalin/data/mybatis/Ddd4jMybatisProductionLifecycleIT.java
+- Test: ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/test/java/io/ddd4j/javalin/data/jpa/Ddd4jJpaProductionLifecycleIT.java
+
+**Interfaces:**
+- MyBatis participant calls existing initRepositories(Injector) exactly once after Injector creation.
+- Ddd4jJpaJavalinModule(String, Map) owns and closes the EMF it creates.
+- Ddd4jJpaJavalinModule(EntityManagerFactory) treats the supplied EMF as caller-owned and never closes it.
+- Both participants expose safe readiness checks without leaking connections or EntityManagers.
+
+- [x] **Step 1: RED/GREEN — initialize MyBatis through production bootstrap**
+
+  Remove direct test calls to initRepositories, prove the mapper is currently absent, then register a lifecycle
+  participant that initializes repositories once.
+
+- [x] **Step 2: RED — distinguish owned and external EMF shutdown**
+
+  Assert internally created EMF closes once, external EMF remains open, and startup rollback follows the same ownership
+  rule.
+
+- [x] **Step 3: GREEN — implement explicit JPA ownership**
+
+  Register JpaTransactionTemplate and JpaLifecycleParticipant from the same EMF; do not change existing transaction
+  commit/rollback semantics.
+
+- [x] **Step 4: Real database verification**
+
+  Run MySQL BaseRepositoryImpl CRUD/pagination/delete and PostgreSQL JPA commit/rollback through the production
+  application entry, then assert application-owned resources are closed.
+
+- [x] **Step 5: Verify Task 15**
+
+  Run both database modules with the integration profile and their complete unit reactors.
+
+### Task 16: Phase D — truthful readiness, cluster idempotency and production CORS
+
+**Files:**
+- Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinReadinessRoutes.java
+- Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/IdempotencyDeploymentMode.java
+- Modify: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinProperties.java
+- Modify: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinAutoConfiguration.java
+- Modify: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinApplication.java
+- Test: ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/Ddd4jJavalinProductionReadinessTest.java
+- Test: ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/Ddd4jJavalinCorsContractTest.java
+
+**Interfaces:**
+- /health/liveness reports process liveness.
+- /health/readiness returns 200 only when runtime state is RUNNING and every required participant is ready; otherwise 503.
+- /health returns a safe aggregate without credentials or raw exceptions.
+- LOCAL idempotency uses Caffeine. SHARED requires an injected shared IdempotencyGuard. Production rejects LOCAL.
+- Ddd4jJavalinAutoConfiguration(Ddd4jJavalinProperties, IdempotencyGuard) is the explicit SHARED injection path;
+  the existing constructor remains the DEVELOPMENT/LOCAL path.
+- Production CORS accepts only explicit origins; development may opt into any-host behavior.
+
+- [x] **Step 1: RED/GREEN — replace fixed READY**
+
+  Start with an unavailable recording participant, observe the current 200, then route readiness through
+  Ddd4jJavalinRuntime and require 503 with a safe response.
+
+- [x] **Step 2: RED/GREEN — require shared idempotency in production**
+
+  Prove PRODUCTION plus LOCAL fails before startup. Inject one shared recording guard into two application instances and
+  prove they contend on the same idempotency key.
+
+- [x] **Step 3: RED/GREEN — replace production anyHost CORS**
+
+  Assert configured origins receive CORS headers, unknown origins do not, and production without origins fails.
+  Credentials must never be combined with wildcard origin.
+
+- [x] **Step 4: Verify Task 16**
+
+  Run real HTTP contracts for 2xx, 4xx, 5xx and timeout paths. Assert ThreadContext, idempotency lease and OTel scope
+  cleanup for every path.
+
+### Task 17: Phase D — three-line production convergence and publication
+
+**Files:**
+- Modify: pom.xml
+- Modify: ddd4j-javalin-testcontainers/src/test/java/io/ddd4j/javalin/testcontainers/BuildLineContractTest.java
+- Modify: .github/workflows/ci.yml
+- Modify: .github/workflows/integration-it.yml
+- Modify: docs/architecture.md
+- Modify: docs/testcontainers-guide.md
+- Modify: docs/superpowers/reports/2026-09-07-three-branch-convergence-status.md
+- Modify: this plan only after evidence exists.
+
+**Interfaces:**
+- 6.7.x and 7.1.x retain Maven 3, POM 4.0 and JDK 17.
+- 7.2.x retains Maven 4, POM 4.1 and JDK 21.
+- All lines expose the same production lifecycle API; differences are limited to Javalin 6 versus 7 APIs.
+- Published ddd4j artifacts are consumed without source modification.
+
+- [ ] **Step 1: Synchronize compatible Phase D changes across official branches**
+
+  Apply source-compatible changes individually. Resolve Javalin 6/7 differences without wholesale file replacement.
+  Run xmllint and BuildLineContractTest before each branch checkpoint.
+
+- [ ] **Step 2: Run complete local gates**
+
+  On each prescribed JDK/Maven line, run clean unit tests and the full javalin-integration-tests profile. Record executed
+  test, failure, error and skip counts. The existing four ONS/TDMQ/Mica exclusions are the only accepted skips.
+  Remove the root POM's unconditional Surefire skip so an ordinary `test` invocation executes child-module tests;
+  retain explicit profile control for Testcontainers ITs and add a BuildLineContract assertion against regressions.
+
+- [ ] **Step 3: Run production-startup acceptance**
+
+  Start through Ddd4jJavalinApplication in PRODUCTION mode with PostgreSQL/MySQL, one supported broker, OIDC and a shared
+  idempotency guard. Assert startup validation, readiness transition, request handling, graceful drain and cleanup.
+
+- [ ] **Step 4: Verify workflows before push**
+
+  Require exact branch JDK/Maven, MAVEN_SETTINGS_XML, lifecycle contracts, no job-level continue-on-error, and consistent
+  workflow_dispatch support on all three branches.
+
+- [ ] **Step 5: Obtain separate commit and push authorization**
+
+  Present exact files, local SHAs, test evidence and upstream boundaries. Do not commit, switch official branches or
+  push until the corresponding authorization is explicit.
+
+- [ ] **Step 6: Require real GitHub execution**
+
+  Wait for CI and Integration on final SHAs. steps=0, billing annotations, queued jobs and skipped mandatory matrices are
+  not success.
+
+- [ ] **Step 7: Publish and consume all three Javalin lines**
+
+  Only after mandatory local and GitHub gates pass, run branch-correct clean deploy to the Aliyun snapshot repository.
+  Use three independent empty Maven repositories to consume BOM, POM, JAR, sources and javadoc; compile, start Javalin,
+  call readiness, then stop cleanly.
+
+- [ ] **Step 8: Close the specification**
+
+  Mark Task 8 Step 6, Task 11 Step 4 and Task 17 complete only when SHA equality, Actions, private publication,
+  clean-cache startup and production lifecycle evidence all pass.
+
+#### Phase D Planning Record
+
+- 2026-09-10: Javalin-only production-hardening design approved. Phase D Tasks 12-17 were appended to this existing
+  plan as the sole execution source. No production source, test, POM, workflow, branch, commit, remote or published
+  artifact was changed during planning.
+- 2026-09-10 Phase D Task 14: Javalin now discovers listeners deterministically, rejects duplicate routes and invalid
+  production MQ configuration, performs strict producer/consumer initialization, and closes clients through the shared
+  lifecycle. The MQ core gate ran 7 tests. Kafka, RabbitMQ, NATS, Pulsar, ActiveMQ, RocketMQ, Redis Stream, MQTT and
+  SQS were each run in an isolated Testcontainers invocation through `JavalinMqLifecycleParticipant`; their broker ITs
+  ran 2/3/2/2/2/2/3/2/2 tests respectively, with zero failures, errors or skips. A standalone broker Guice regression
+  also proved modules remain resolvable without requiring the core bootstrap module.
+- 2026-09-10 Phase D Task 15: MyBatis repository injection moved from manual test/bootstrap calls into a lifecycle
+  participant with exactly-once initialization and SqlSession cleanup. JPA now distinguishes application-owned and
+  caller-owned EntityManagerFactory instances, reports safe readiness and applies the ownership rule during normal
+  shutdown and startup rollback. The combined data reactor ran 4 MyBatis unit contracts plus 2 MySQL CRUD/pagination
+  ITs, and 4 JPA unit/rollback contracts plus 1 PostgreSQL commit/rollback IT, with zero failures, errors or skips.
+- 2026-09-10 Phase D Task 16: health/readiness now reflects the unified runtime and returns 503 when a required
+  participant is unavailable without exposing its diagnostic details. Production rejects LOCAL idempotency and accepts
+  an explicitly injected shared IdempotencyGuard; two live application instances were proven to contend on the same
+  key. Production CORS now uses an explicit origin allowlist while development retains the compatible any-host option.
+  The complete core/web reactor ran 42 web tests plus 8 core tests with zero failures, errors or skips, including the
+  existing success, authentication/error, timeout, ThreadContext, idempotency lease and OTel cleanup contracts.
+- 2026-09-10 Phase D 6.7.x checkpoint: the root POM no longer disables Surefire globally; a new build-line contract
+  prevents `skip=true` and `skipTests=true` regressions. Corretto 17 with Maven Wrapper 3.9.16 completed the 52-module
+  ordinary `clean test` with 152 tests and zero failures/errors/skips. The complete integration profile then completed
+  188 tests with zero failures/errors and exactly the four governed ONS/TDMQ/Mica skips. Completion review additionally
+  proved and fixed core-runtime cleanup when SHARED idempotency provisioning fails before socket startup. Task 17 remains open because
+  compatible synchronization, validation and publication on 7.1.x and 7.2.x require the separate branch/commit/push
+  authorization defined in Step 5.
+- 2026-09-10 pre-push workflow audit: origin and github match at `9e4e18e` (6.7.x), `0c64209` (7.1.x) and
+  `9d5571b` (7.2.x). Both workflows on all lines reference `MAVEN_SETTINGS_XML`, use the branch-correct JDK and contain
+  no job-level `continue-on-error`. The 7.1.x `ci.yml` alone lacks `workflow_dispatch`; fix it during compatible branch
+  synchronization before Task 17 Step 4 can be checked.
 
 #### Phase A Validation Record
 

@@ -5,8 +5,8 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import io.ddd4j.guice.DddAnnotationModule;
-import io.ddd4j.guice.Ddd4jGuiceRuntime;
 import io.ddd4j.javalin.core.Ddd4jCoreGuiceModule;
+import io.ddd4j.javalin.core.lifecycle.Ddd4jJavalinRuntime;
 import io.ddd4j.javalin.web.Ddd4jJavalinWeb;
 import io.ddd4j.kit.lang.StrKit;
 import io.javalin.Javalin;
@@ -14,6 +14,7 @@ import io.javalin.config.JavalinConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Static one-shot bootstrap entry for ddd4j-javalin applications.
@@ -57,8 +58,8 @@ public final class Ddd4jJavalinApplication {
      */
     @SafeVarargs
     public static Javalin run(String[] args, String basePackages, Module... extraModules) {
-        Ddd4jJavalinProperties properties = new Ddd4jJavalinProperties();
-        return run(properties, args, basePackages, extraModules);
+        Ddd4jJavalinProperties properties = Ddd4jJavalinPropertiesLoader.load(args);
+        return run(properties, new String[0], basePackages, extraModules);
     }
 
     /**
@@ -76,14 +77,23 @@ public final class Ddd4jJavalinApplication {
         Objects.requireNonNull(properties, "properties must not be null");
         Objects.requireNonNull(basePackages, "basePackages must not be null");
         applyCliOverrides(properties, args);
+        Ddd4jJavalinPropertiesValidator.validate(properties);
 
         Module[] modules = buildModules(basePackages, properties, extraModules);
         Injector injector = Guice.createInjector(modules);
 
-        Ddd4jJavalinWeb web = properties.isRequestLifecycle()
-                ? injector.getInstance(Ddd4jJavalinWeb.class)
-                : null;
-        Ddd4jGuiceRuntime runtime = injector.getInstance(Ddd4jGuiceRuntime.class);
+        Ddd4jJavalinRuntime runtime = injector.getInstance(Ddd4jJavalinRuntime.class);
+        Ddd4jJavalinWeb web;
+        try {
+            web = properties.isRequestLifecycle()
+                    ? injector.getInstance(Ddd4jJavalinWeb.class)
+                    : null;
+            runtime.start();
+        } catch (RuntimeException | Error exception) {
+            runtime.close();
+            throw exception;
+        }
+        AtomicReference<Thread> shutdownHook = new AtomicReference<>();
         // ddd4j-web-javalin：统一请求生命周期等全部经 configure(config) 装配，
         // 无独立的 applyTo 步骤（与 ddd4j-sample-javalin 的标准用法一致）。
         Javalin app = Javalin.create((JavalinConfig config) -> {
@@ -91,20 +101,42 @@ public final class Ddd4jJavalinApplication {
             config.http.maxRequestSize = properties.getMaxUploadSizeBytes();
             config.http.asyncTimeout = properties.getRequestTimeoutMs();
             if (properties.isCors()) {
-                config.bundledPlugins.enableCors(cors -> cors.addRule(rule -> rule.anyHost()));
+                config.bundledPlugins.enableCors(cors -> cors.addRule(rule -> {
+                    if (properties.getAllowedOrigins().length == 0) {
+                        rule.anyHost();
+                    } else {
+                        for (String origin : properties.getAllowedOrigins()) {
+                            rule.allowHost(origin);
+                        }
+                    }
+                }));
             }
             if (Objects.nonNull(web)) {
                 web.configure(config);
             }
-            config.events.serverStopped(runtime::close);
+            config.events.serverStopped(() -> {
+                runtime.close();
+                removeShutdownHook(shutdownHook.get());
+            });
         });
-        applyHealthEndpoint(app, properties);
-        app.start(properties.getHost(), properties.getPort());
+        applyHealthEndpoint(app, properties, runtime);
+        try {
+            app.start(properties.getHost(), properties.getPort());
+        } catch (RuntimeException | Error exception) {
+            try {
+                app.stop();
+            } finally {
+                runtime.close();
+            }
+            throw exception;
+        }
 
         log.info("ddd4j-javalin started on http://{}:{} (context={})",
                 properties.getHost(), app.port(), properties.getContextPath());
 
-        Runtime.getRuntime().addShutdownHook(new Thread(app::stop, "ddd4j-javalin-shutdown"));
+        Thread hook = new Thread(app::stop, "ddd4j-javalin-shutdown");
+        shutdownHook.set(hook);
+        Runtime.getRuntime().addShutdownHook(hook);
         return app;
     }
 
@@ -113,7 +145,7 @@ public final class Ddd4jJavalinApplication {
                                         Module[] extraModules) {
         Module web = new Ddd4jJavalinAutoConfiguration(properties);
         java.util.List<Module> head = new java.util.ArrayList<>();
-        head.add(Ddd4jCoreGuiceModule.defaults());
+        head.add(Ddd4jCoreGuiceModule.defaults(basePackages));
         if (StrKit.isNotBlank(basePackages)) {
             head.add(new DddAnnotationModule(basePackages));
         }
@@ -140,12 +172,21 @@ public final class Ddd4jJavalinApplication {
         }
     }
 
-    private static void applyHealthEndpoint(Javalin app, Ddd4jJavalinProperties properties) {
+    private static void applyHealthEndpoint(Javalin app, Ddd4jJavalinProperties properties,
+                                            Ddd4jJavalinRuntime runtime) {
         if (properties.isHealthEndpoint()) {
-            // Javalin 6 API：start() 前直接注册路由（7.x 的 app.unsafe.routes 在 6.7.0 不存在）
-            app.get("/health", ctx -> ctx.json("{\"status\":\"UP\"}"));
-            app.get("/health/readiness", ctx -> ctx.json("{\"status\":\"READY\"}"));
-            app.get("/health/liveness", ctx -> ctx.json("{\"status\":\"LIVE\"}"));
+            Ddd4jJavalinReadinessRoutes.register(app, runtime);
+        }
+    }
+
+    private static void removeShutdownHook(Thread hook) {
+        if (Objects.isNull(hook) || Thread.currentThread() == hook) {
+            return;
+        }
+        try {
+            Runtime.getRuntime().removeShutdownHook(hook);
+        } catch (IllegalStateException ignored) {
+            // JVM shutdown already started; the active hook is responsible for stopping Javalin.
         }
     }
 }

@@ -206,6 +206,27 @@ class BuildLineContractTest {
         }
     }
 
+    /** 根 POM 不得硬编码跳过 Surefire，否则新增模块的测试会被静默遗漏。 */
+    @Test
+    void shouldNotDisableUnitTestsInRootPluginManagement() throws Exception {
+        Document rootPom = parse(repositoryRoot().resolve("pom.xml"));
+        NodeList plugins = rootPom.getElementsByTagName("plugin");
+        for (int index = 0; index < plugins.getLength(); index++) {
+            Element plugin = (Element) plugins.item(index);
+            if (!"maven-surefire-plugin".equals(text(plugin, "artifactId"))) {
+                continue;
+            }
+            NodeList configurations = plugin.getElementsByTagName("configuration");
+            for (int configIndex = 0; configIndex < configurations.getLength(); configIndex++) {
+                Element configuration = (Element) configurations.item(configIndex);
+                assertFalse("true".equals(optionalText(configuration, "skip")),
+                        "根 POM 不得配置 surefire skip=true");
+                assertFalse("true".equals(optionalText(configuration, "skipTests")),
+                        "根 POM 不得配置 surefire skipTests=true");
+            }
+        }
+    }
+
     private static Path repositoryRoot() {
         String configuredRoot = System.getProperty("ddd4j.repo.root");
         Path start = Path.of(Objects.isNull(configuredRoot) ? "" : configuredRoot).toAbsolutePath().normalize();
@@ -249,6 +270,11 @@ class BuildLineContractTest {
     private static String text(Element element, String name) {
         NodeList values = element.getElementsByTagName(name);
         return values.item(0).getTextContent().trim();
+    }
+
+    private static String optionalText(Element element, String name) {
+        NodeList values = element.getElementsByTagName(name);
+        return values.getLength() == 0 ? "" : values.item(0).getTextContent().trim();
     }
 
     private static int dependencyCount(Document document, String groupId, String artifactId, String scope) {

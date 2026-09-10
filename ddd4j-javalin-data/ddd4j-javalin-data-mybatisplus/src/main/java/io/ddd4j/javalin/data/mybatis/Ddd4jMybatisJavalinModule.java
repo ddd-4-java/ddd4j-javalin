@@ -1,6 +1,8 @@
 package io.ddd4j.javalin.data.mybatis;
 
 import io.ddd4j.guice.Ddd4jMybatisGuiceModule;
+import com.google.inject.multibindings.Multibinder;
+import io.ddd4j.javalin.core.lifecycle.JavalinLifecycleParticipant;
 
 import javax.sql.DataSource;
 
@@ -66,5 +68,14 @@ public class Ddd4jMybatisJavalinModule extends Ddd4jMybatisGuiceModule {
     public Ddd4jMybatisJavalinModule bindRepository(Class<?> repositoryImpl, Class<?> mapperInterface) {
         super.bindRepository(repositoryImpl, mapperInterface);
         return this;
+    }
+
+    @Override
+    protected void configure() {
+        super.configure();
+        bind(Ddd4jMybatisJavalinModule.class).toInstance(this);
+        bind(MybatisRepositoryLifecycleParticipant.class);
+        Multibinder.newSetBinder(binder(), JavalinLifecycleParticipant.class)
+                .addBinding().to(MybatisRepositoryLifecycleParticipant.class);
     }
 }

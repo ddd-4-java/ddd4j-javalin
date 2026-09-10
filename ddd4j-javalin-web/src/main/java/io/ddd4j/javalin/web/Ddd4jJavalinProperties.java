@@ -8,8 +8,7 @@ import java.time.Duration;
 
 /**
  * Configuration properties for ddd4j-javalin-web, bound from {@code ddd4j.web.javalin.*}
- * keys in {@code application.yml} / {@code application.properties} / System properties /
- * environment variables (loaded by the consumer's bootstrap mechanism).
+ * keys in {@code application.properties}, System properties or environment variables.
  *
  * <p>Aligned with {@code ddd4j-boot-web-webmvc}'s {@code Ddd4jWebMvcProperties} and
  * {@code ddd4j-boot-web-webflux}'s {@code Ddd4jWebFluxProperties}.
@@ -34,6 +33,9 @@ public class Ddd4jJavalinProperties {
 
     /** Whether to enable CORS for all origins (dev convenience). Default {@code false}. */
     private boolean cors = false;
+
+    /** Explicit origins used by production CORS configuration. */
+    private String[] allowedOrigins = {};
 
     /** Maximum upload size in bytes. Default 10 MB. */
     private long maxUploadSizeBytes = 10L * 1024L * 1024L;
@@ -62,6 +64,12 @@ public class Ddd4jJavalinProperties {
     /** Lease duration for an idempotency key. */
     private Duration idempotencyTtl = Duration.ofMinutes(5);
 
+    /** 幂等 Guard 的部署范围；LOCAL 仅用于开发或单实例。 */
+    private IdempotencyDeploymentMode idempotencyDeploymentMode = IdempotencyDeploymentMode.LOCAL;
+
     /** Whether to expose a default {@code /health} endpoint. */
     private boolean healthEndpoint = true;
+
+    /** Runtime validation mode. Defaults to development for compatibility. */
+    private Ddd4jJavalinRuntimeMode runtimeMode = Ddd4jJavalinRuntimeMode.DEVELOPMENT;
 }

@@ -2,8 +2,16 @@ package io.ddd4j.javalin.data.jpa;
 
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
+import io.ddd4j.javalin.core.Ddd4jCoreGuiceModule;
+import io.ddd4j.javalin.core.lifecycle.Ddd4jJavalinRuntime;
+import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Proxy;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -13,6 +21,30 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * absent the error is surfaced cleanly.
  */
 class Ddd4jJpaJavalinModuleTest {
+
+    @Test
+    void shouldNotCloseCallerOwnedEntityManagerFactory() {
+        AtomicBoolean open = new AtomicBoolean(true);
+        EntityManagerFactory factory = (EntityManagerFactory) Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class<?>[]{EntityManagerFactory.class},
+                (proxy, method, arguments) -> switch (method.getName()) {
+                    case "isOpen" -> open.get();
+                    case "close" -> {
+                        open.set(false);
+                        yield null;
+                    }
+                    case "toString" -> "recording-emf";
+                    default -> null;
+                });
+
+        Injector injector = Guice.createInjector(
+                Ddd4jCoreGuiceModule.defaults(), new Ddd4jJpaJavalinModule(factory));
+        Ddd4jJavalinRuntime runtime = injector.getInstance(Ddd4jJavalinRuntime.class);
+        runtime.start();
+        runtime.close();
+
+        assertThat(open).isTrue();
+    }
 
     @Test
     void shouldFailCleanlyWhenNoJpaProviderOnClasspath() {

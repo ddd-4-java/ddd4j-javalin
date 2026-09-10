@@ -2,6 +2,7 @@ package io.ddd4j.javalin.core;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import io.ddd4j.core.ddd.event.DomainEventPublisher;
 import io.ddd4j.core.i18n.I18nProvider;
 import io.ddd4j.core.subject.SubjectProvider;
@@ -9,7 +10,12 @@ import io.ddd4j.guice.Ddd4jGuiceModule;
 import io.ddd4j.guice.event.GuiceDomainEventPublisher;
 import io.ddd4j.guice.i18n.GuiceI18nProvider;
 import io.ddd4j.guice.subject.GuiceSubjectProvider;
+import io.ddd4j.javalin.core.lifecycle.Ddd4jJavalinRuntime;
+import io.ddd4j.javalin.core.lifecycle.Ddd4jJavalinBootstrapContext;
+import io.ddd4j.javalin.core.lifecycle.JavalinLifecycleParticipant;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Objects;
 
 /**
  * ddd4j-javalin 核心层聚合装配 Guice Module（对标 ddd4j-boot-core 的 {@code Ddd4jCoreAutoConfiguration}）。
@@ -47,13 +53,21 @@ import lombok.extern.slf4j.Slf4j;
 public class Ddd4jCoreGuiceModule extends AbstractModule {
 
     private final Ddd4jCoreProperties properties;
+    private final Ddd4jJavalinBootstrapContext bootstrapContext;
 
     public Ddd4jCoreGuiceModule() {
-        this(new Ddd4jCoreProperties());
+        this(new Ddd4jCoreProperties(), new Ddd4jJavalinBootstrapContext(""));
     }
 
     public Ddd4jCoreGuiceModule(Ddd4jCoreProperties properties) {
-        this.properties = properties;
+        this(properties, new Ddd4jJavalinBootstrapContext(""));
+    }
+
+    public Ddd4jCoreGuiceModule(Ddd4jCoreProperties properties,
+                                Ddd4jJavalinBootstrapContext bootstrapContext) {
+        this.properties = Objects.requireNonNull(properties, "properties must not be null");
+        this.bootstrapContext = Objects.requireNonNull(
+                bootstrapContext, "bootstrapContext must not be null");
     }
 
     /**
@@ -65,6 +79,12 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
         return new Ddd4jCoreGuiceModule();
     }
 
+    /** 使用应用扫描包创建默认核心模块。 */
+    public static Ddd4jCoreGuiceModule defaults(String basePackages) {
+        return new Ddd4jCoreGuiceModule(
+                new Ddd4jCoreProperties(), new Ddd4jJavalinBootstrapContext(basePackages));
+    }
+
     @Override
     protected void configure() {
         if (!properties.isEnabled()) {
@@ -72,6 +92,9 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
             return;
         }
         bind(Ddd4jCoreProperties.class).toInstance(properties);
+        bind(Ddd4jJavalinBootstrapContext.class).toInstance(bootstrapContext);
+        Multibinder.newSetBinder(binder(), JavalinLifecycleParticipant.class);
+        bind(Ddd4jJavalinRuntime.class).in(Singleton.class);
         // 核心 Module 组合（1）：ddd4j-runtime-guice 完整核心模块
         install(new Ddd4jGuiceModule());
         // 核心 Module 组合（2）：显式声明核心 SPI 绑定

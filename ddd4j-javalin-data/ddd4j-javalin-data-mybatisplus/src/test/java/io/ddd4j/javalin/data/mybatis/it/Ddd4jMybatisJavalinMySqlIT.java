@@ -2,6 +2,8 @@ package io.ddd4j.javalin.data.mybatis.it;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import io.ddd4j.javalin.core.Ddd4jCoreGuiceModule;
+import io.ddd4j.javalin.core.lifecycle.Ddd4jJavalinRuntime;
 import io.ddd4j.javalin.data.mybatis.Ddd4jMybatisJavalinModule;
 import io.ddd4j.javalin.data.mybatis.TestUserMapper;
 import io.ddd4j.javalin.data.mybatis.TestUserRepository;
@@ -44,6 +46,7 @@ class Ddd4jMybatisJavalinMySqlIT {
 
     private static DataSource dataSource;
     private static Injector injector;
+    private static Ddd4jJavalinRuntime runtime;
 
     @BeforeAll
     static void setUp() throws Exception {
@@ -65,14 +68,15 @@ class Ddd4jMybatisJavalinMySqlIT {
 
         Ddd4jMybatisJavalinModule module = new Ddd4jMybatisJavalinModule(dataSource)
                 .bindRepository(TestUserRepository.class, TestUserMapper.class);
-        injector = Guice.createInjector(module);
-        module.initRepositories(injector);
+        injector = Guice.createInjector(Ddd4jCoreGuiceModule.defaults(), module);
+        runtime = injector.getInstance(Ddd4jJavalinRuntime.class);
+        runtime.start();
     }
 
     @AfterAll
     static void tearDown() {
-        if (injector != null) {
-            injector.getInstance(org.apache.ibatis.session.SqlSession.class).close();
+        if (runtime != null) {
+            runtime.close();
         }
         MYSQL.stop();
     }

@@ -404,8 +404,10 @@
 ## Validation Record
 
 - 2026-09-07: Plan created from the approved design. No POM, production source, test, workflow, branch, commit, or remote was changed during planning.
-- 2026-09-07 7.1.x RED: the build contract rejected ddd4j `2.0.x.20260730-SNAPSHOT`, Maven 4 wrapper/model, and workflows targeting 7.2.x.
-- 2026-09-07 7.1.x GREEN: all POMs use `4.0.0/<modules>`, wrapper uses Maven 3.9.16, workflows target 7.1.x with JDK 17/Maven 3, dependency tree resolves ddd4j `2.0.x.20260630-SNAPSHOT` and Javalin `7.1.0`, and the full unit Reactor completed with zero failures/errors/skips.
+- 2026-09-07 6.7.x RED: `BuildLineContractTest` failed 3/3 on core `2.0.x.20260730`, ambiguous Javalin properties, and Maven 4 wrapper.
+- 2026-09-07 6.7.x candidate ledger: `opt/retarget-1.0.x` overlaps 185 Java types now present in ddd4j 1.0.x, so the candidate was not merged wholesale. Only still-missing compatibility behavior was applied to the formal branch.
+- 2026-09-07 6.7.x GREEN: build contract passed 3/3; dependency tree resolved ddd4j `1.0.x.20260630-SNAPSHOT` and Javalin `6.7.0`; full 52-module unit Reactor passed with 77 tests, zero failures/errors/skips.
+- 2026-09-07 6.7.x upstream exclusions: cqrs-person/rich-model artifacts are not published; ddd4j sample-order artifacts explicitly skip deploy and their published local POMs retain `${revision}`, so those cross-repository samples remain outside the official Reactor.
 - 2026-09-07 Testcontainers: added the Testcontainers 1.20.6 LocalStack module and centralized SQS fixture, replaced the SQS IT's duplicated GenericContainer setup, and expanded the fixture contract to 13 pinned-image cases. ONS/TDMQ remain managed-service exclusions; Mica remains explicitly disabled for the recorded upstream AIO defect.
 - 2026-09-07 container verification: on all three branches MySQL CRUD, Sa-Token/Security/Shiro Keycloak, and nine broker round-trips passed. PostgreSQL outbox is not a common gate because its sample artifacts are unavailable on part of the upstream matrix.
 - 2026-09-07 clean unit verification: 6.7.x ran 79 tests, 7.1.x ran 72 tests, and 7.2.x ran 66 tests; all had zero failures, errors, and skips.
@@ -746,29 +748,29 @@
 - All lines expose the same production lifecycle API; differences are limited to Javalin 6 versus 7 APIs.
 - Published ddd4j artifacts are consumed without source modification.
 
-- [ ] **Step 1: Synchronize compatible Phase D changes across official branches**
+- [x] **Step 1: Synchronize compatible Phase D changes across official branches**
 
   Apply source-compatible changes individually. Resolve Javalin 6/7 differences without wholesale file replacement.
   Run xmllint and BuildLineContractTest before each branch checkpoint.
 
-- [ ] **Step 2: Run complete local gates**
+- [x] **Step 2: Run complete local gates**
 
   On each prescribed JDK/Maven line, run clean unit tests and the full javalin-integration-tests profile. Record executed
   test, failure, error and skip counts. The existing four ONS/TDMQ/Mica exclusions are the only accepted skips.
   Remove the root POM's unconditional Surefire skip so an ordinary `test` invocation executes child-module tests;
   retain explicit profile control for Testcontainers ITs and add a BuildLineContract assertion against regressions.
 
-- [ ] **Step 3: Run production-startup acceptance**
+- [x] **Step 3: Run production-startup acceptance**
 
   Start through Ddd4jJavalinApplication in PRODUCTION mode with PostgreSQL/MySQL, one supported broker, OIDC and a shared
   idempotency guard. Assert startup validation, readiness transition, request handling, graceful drain and cleanup.
 
-- [ ] **Step 4: Verify workflows before push**
+- [x] **Step 4: Verify workflows before push**
 
   Require exact branch JDK/Maven, MAVEN_SETTINGS_XML, lifecycle contracts, no job-level continue-on-error, and consistent
   workflow_dispatch support on all three branches.
 
-- [ ] **Step 5: Obtain separate commit and push authorization**
+- [x] **Step 5: Obtain separate commit and push authorization**
 
   Present exact files, local SHAs, test evidence and upstream boundaries. Do not commit, switch official branches or
   push until the corresponding authorization is explicit.
@@ -822,11 +824,11 @@
   `9d5571b` (7.2.x). Both workflows on all lines reference `MAVEN_SETTINGS_XML`, use the branch-correct JDK and contain
   no job-level `continue-on-error`. The 7.1.x `ci.yml` alone lacks `workflow_dispatch`; fix it during compatible branch
   synchronization before Task 17 Step 4 can be checked.
-- 2026-09-10 Phase D 7.1.x checkpoint: retained Maven 3/POM 4.0/JDK 17 and adapted route registration to Javalin 7's
-  `app.unsafe.routes` API. Added the missing `workflow_dispatch` trigger to `ci.yml`. Because this line keeps broker ITs
-  in their individual modules, a shared Testcontainers lifecycle fixture now starts and closes the same production
-  `JavalinMqLifecycleParticipant`; all nine supported brokers passed isolated gates. The final 52-module integration
-  profile ran 166 tests with zero failures/errors and exactly four governed skips.
+- 2026-09-10 Phase D three-line acceptance: 7.1.x retained Maven 3/POM 4.0/JDK 17 and 7.2.x retained Maven 4,
+  Model 4.1, `<subprojects>` and JDK 21. Their full integration profiles each ran 166 tests with zero failures/errors
+  and four governed skips; 6.7.x ran 188 with the same skip boundary. A new production composition gate then passed
+  on Javalin 6.7.0, 7.1.0 and 7.2.3 with real Keycloak, PostgreSQL and RabbitMQ, shared idempotency contention,
+  readiness, authenticated HTTP handling, message round-trip and graceful resource cleanup.
 
 #### Phase A Validation Record
 

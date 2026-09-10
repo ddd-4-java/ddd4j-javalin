@@ -85,3 +85,7 @@ GitHub Actions 或阿里云 Maven 发布。因此上文旧版本的三线发布�
 `app.unsafe.routes` API，并补齐 `ci.yml` 的 `workflow_dispatch`。九类支持的 broker 均通过独立生产生命
 周期门禁；最终完整集成 Reactor 执行 166 项，零 failure/error，且仅有 4 个治理 skip。该增量尚待提交、
 双远端推送与 Actions 验证。
+
+`feature/7.2.x` 已完成本地 Phase D 兼容同步，保留 Maven 4.0.0-rc-6、POM 4.1.0、`<subprojects>`、
+JDK 21 与 Javalin 7.2.3。九类 broker 独立生命周期门禁全部通过；显式启用单元与 IT 的最终完整
+Reactor 执行 166 项，零 failure/error，4 个治理 skip，PostgreSQL Outbox 3 项均实际执行。

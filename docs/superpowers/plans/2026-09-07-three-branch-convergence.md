@@ -748,12 +748,12 @@
 - All lines expose the same production lifecycle API; differences are limited to Javalin 6 versus 7 APIs.
 - Published ddd4j artifacts are consumed without source modification.
 
-- [ ] **Step 1: Synchronize compatible Phase D changes across official branches**
+- [x] **Step 1: Synchronize compatible Phase D changes across official branches**
 
   Apply source-compatible changes individually. Resolve Javalin 6/7 differences without wholesale file replacement.
   Run xmllint and BuildLineContractTest before each branch checkpoint.
 
-- [ ] **Step 2: Run complete local gates**
+- [x] **Step 2: Run complete local gates**
 
   On each prescribed JDK/Maven line, run clean unit tests and the full javalin-integration-tests profile. Record executed
   test, failure, error and skip counts. The existing four ONS/TDMQ/Mica exclusions are the only accepted skips.
@@ -765,12 +765,12 @@
   Start through Ddd4jJavalinApplication in PRODUCTION mode with PostgreSQL/MySQL, one supported broker, OIDC and a shared
   idempotency guard. Assert startup validation, readiness transition, request handling, graceful drain and cleanup.
 
-- [ ] **Step 4: Verify workflows before push**
+- [x] **Step 4: Verify workflows before push**
 
   Require exact branch JDK/Maven, MAVEN_SETTINGS_XML, lifecycle contracts, no job-level continue-on-error, and consistent
   workflow_dispatch support on all three branches.
 
-- [ ] **Step 5: Obtain separate commit and push authorization**
+- [x] **Step 5: Obtain separate commit and push authorization**
 
   Present exact files, local SHAs, test evidence and upstream boundaries. Do not commit, switch official branches or
   push until the corresponding authorization is explicit.
@@ -829,6 +829,12 @@
   in their individual modules, a shared Testcontainers lifecycle fixture now starts and closes the same production
   `JavalinMqLifecycleParticipant`; all nine supported brokers passed isolated gates. The final 52-module integration
   profile ran 166 tests with zero failures/errors and exactly four governed skips.
+- 2026-09-10 Phase D 7.2.x checkpoint: retained Maven 4.0.0-rc-6, Model 4.1.0, `<subprojects>`, JDK 21 and
+  Javalin 7.2.3. All nine supported brokers passed isolated lifecycle gates. A first full profile revealed Maven 4 still
+  honoring inherited IT skip defaults, so it was not accepted as completion evidence; the final command explicitly set
+  `-DskipTests=false -DskipITs=false` and ran 166 tests with zero failures/errors and exactly four governed skips,
+  including all three PostgreSQL Outbox tests. Tasks 17 Steps 1, 2, 4 and 5 are now complete; production-startup
+  acceptance, real Duo GitHub execution and private publication remain open.
 
 #### Phase A Validation Record
 

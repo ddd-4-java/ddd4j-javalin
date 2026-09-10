@@ -824,6 +824,11 @@
   `9d5571b` (7.2.x). Both workflows on all lines reference `MAVEN_SETTINGS_XML`, use the branch-correct JDK and contain
   no job-level `continue-on-error`. The 7.1.x `ci.yml` alone lacks `workflow_dispatch`; fix it during compatible branch
   synchronization before Task 17 Step 4 can be checked.
+- 2026-09-10 Phase D 7.1.x checkpoint: retained Maven 3/POM 4.0/JDK 17 and adapted route registration to Javalin 7's
+  `app.unsafe.routes` API. Added the missing `workflow_dispatch` trigger to `ci.yml`. Because this line keeps broker ITs
+  in their individual modules, a shared Testcontainers lifecycle fixture now starts and closes the same production
+  `JavalinMqLifecycleParticipant`; all nine supported brokers passed isolated gates. The final 52-module integration
+  profile ran 166 tests with zero failures/errors and exactly four governed skips.
 
 #### Phase A Validation Record
 

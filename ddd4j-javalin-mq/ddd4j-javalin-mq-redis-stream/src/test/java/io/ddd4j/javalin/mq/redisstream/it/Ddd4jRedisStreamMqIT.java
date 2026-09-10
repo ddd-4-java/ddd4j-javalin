@@ -88,7 +88,8 @@ class Ddd4jRedisStreamMqIT {
             SmokeListener bean = new SmokeListener();
             Method onSmoke = SmokeListener.class.getMethod("onSmoke", MQEvent.class);
             MQListener listener = MQListener.of(bean, onSmoke, onSmoke.getAnnotation(MQEventListener.class));
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), null);
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.start(
+                    mqClient, List.of(listener), mqProps, new JsonMQEventSerialization(), null);
 
             MQEvent event = new MQEvent();
             event.setMsgId("redis-it-" + System.nanoTime());
@@ -102,6 +103,7 @@ class Ddd4jRedisStreamMqIT {
             assertThat(received.getTopic()).isEqualTo(TOPIC);
             assertThat(received.getTag()).isEqualTo(TAG);
         } finally {
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.close();
             if (Objects.nonNull(client)) {
                 client.close();
             }
@@ -128,7 +130,8 @@ class Ddd4jRedisStreamMqIT {
             Method method = RecoveryListener.class.getMethod("onMessage", MQEvent.class);
             MQListener listener = MQListener.of(bean, method, method.getAnnotation(MQEventListener.class));
             AtomicInteger storeAttempts = new AtomicInteger();
-            mqClient.init(List.of(listener), mqProps, new JsonMQEventSerialization(), event -> {
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.start(
+                    mqClient, List.of(listener), mqProps, new JsonMQEventSerialization(), event -> {
                 if (storeAttempts.incrementAndGet() == 1) {
                     throw new IllegalStateException("simulated persistence outage");
                 }
@@ -145,6 +148,7 @@ class Ddd4jRedisStreamMqIT {
             assertThat(bean.invocations.get()).isEqualTo(1);
             assertThat(bean.received.get().getMsgId()).isEqualTo(event.getMsgId());
         } finally {
+            io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.close();
             if (Objects.nonNull(client)) {
                 client.close();
             }

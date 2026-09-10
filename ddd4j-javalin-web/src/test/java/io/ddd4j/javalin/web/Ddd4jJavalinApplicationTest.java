@@ -19,12 +19,27 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Round-trip test for {@link Ddd4jJavalinApplication}: starts Javalin on a random port,
  * verifies health endpoint and shutdown.
  */
 class Ddd4jJavalinApplicationTest {
+
+    @Test
+    void shouldRejectInvalidPropertiesBeforeRegisteringRuntime() {
+        BaseContext.remove(SpiKeys.COMMAND_BUS);
+        Ddd4jJavalinProperties properties = new Ddd4jJavalinProperties();
+        properties.setHost("127.0.0.1");
+        properties.setPort(65536);
+        properties.setRequestLifecycle(false);
+
+        assertThatThrownBy(() -> Ddd4jJavalinApplication.run(properties, new String[0], ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("port");
+        assertThat(Contexts.get(SpiKeys.COMMAND_BUS, CommandBus.class)).isEmpty();
+    }
 
     @Test
     void shouldStartJavalinAndExposeHealthEndpoint() throws Exception {

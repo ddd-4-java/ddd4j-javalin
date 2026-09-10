@@ -61,3 +61,22 @@ SmallRye、Narayana 与 Pulsar POM。Quarkus test/package/augmentation 和 121 �
 
 本地代码、版本矩阵、真实容器行为、空缓存依赖闭包和六线私仓发布已经形成证据。最终规格保持未关闭，
 仅等待 GitHub Actions 在解除组织账户门禁后真正执行且全部通过。
+
+## Phase D 当前增量（尚未发布）
+
+`feature/6.7.x` 工作树已经完成 Phase D Tasks 12–16：真实配置加载与启动前校验、统一
+`Ddd4jJavalinRuntime`、严格 MQ 初始化与逆序关闭、MyBatis Repository 自动初始化、JPA 工厂所有权、
+真实 readiness、生产 CORS allowlist，以及多实例共享 `IdempotencyGuard` 门禁。共享 Guard Provision
+失败时也会回滚已创建的核心 Runtime，不遗留全局 SPI。
+
+当前增量在 Corretto 17 / Maven 3.9.16 下完成 52 模块验证：普通 `clean test` 执行 152 项，零
+failure/error/skip；完整 `javalin-integration-tests` 执行 188 项，零 failure/error，并保留且仅保留
+ONS、TDMQ、Mica MQTT 共 4 个治理 skip。九类本地 MQ IT 已全部改为从 Javalin 生产生命周期启动。
+
+这些 Phase D 结果仍是未提交工作树证据，尚未同步到 `feature/7.1.x`、`feature/7.2.x`，也未执行新的
+GitHub Actions 或阿里云 Maven 发布。因此上文旧版本的三线发布证据不能作为 Phase D 发布完成证明；
+必须在三线同步、分支正确工具链验证、最终 SHA Actions 和三个独立空缓存消费全部通过后才能关闭计划。
+
+预推送只读审计确认 `origin` 与 `github` 的三个旧分支头一致；所有 Workflow 均引用
+`MAVEN_SETTINGS_XML`、使用对应 JDK，且没有 job-level `continue-on-error`。当前唯一仓库内 Workflow
+差异是 `feature/7.1.x` 的 `ci.yml` 缺少 `workflow_dispatch`，须在该分支同步 Phase D 时一并修复。

@@ -28,6 +28,11 @@
             <artifactId>ddd4j-runtime-guice</artifactId>
             <version>${ddd4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.ddd4j.javalin</groupId>
+            <artifactId>ddd4j-javalin-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <!-- Guice（Javalin DI 容器） -->
         <dependency>
             <groupId>com.google.inject</groupId>

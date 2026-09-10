@@ -4,6 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.ddd4j.javalin.data.jpa.Ddd4jJpaJavalinModule;
 import io.ddd4j.javalin.data.jpa.JpaTransactionTemplate;
+import io.ddd4j.javalin.core.Ddd4jCoreGuiceModule;
+import io.ddd4j.javalin.core.lifecycle.Ddd4jJavalinRuntime;
 import io.ddd4j.javalin.testcontainers.JunitJupiterTestContainers;
 import io.ddd4j.javalin.testcontainers.database.PostgresTestContainerFixture;
 import jakarta.persistence.EntityManagerFactory;
@@ -28,14 +30,17 @@ class Ddd4jJpaJavalinPostgresIT {
     void shouldCommitRollbackAndCloseEntityManagers() {
         POSTGRES.start();
         EntityManagerFactory factory = null;
+        Ddd4jJavalinRuntime runtime = null;
         try {
-            Injector injector = Guice.createInjector(new Ddd4jJpaJavalinModule(
+            Injector injector = Guice.createInjector(Ddd4jCoreGuiceModule.defaults(), new Ddd4jJpaJavalinModule(
                     "ddd4j-javalin-postgres",
                     Map.of("jakarta.persistence.jdbc.url", POSTGRES.getJdbcUrl(),
                             "jakarta.persistence.jdbc.user", POSTGRES.getUsername(),
                             "jakarta.persistence.jdbc.password", POSTGRES.getPassword(),
                             "jakarta.persistence.jdbc.driver", "org.postgresql.Driver",
                             "hibernate.hbm2ddl.auto", "create-drop")));
+            runtime = injector.getInstance(Ddd4jJavalinRuntime.class);
+            runtime.start();
             factory = injector.getInstance(EntityManagerFactory.class);
             JpaTransactionTemplate transactions = injector.getInstance(JpaTransactionTemplate.class);
 
@@ -63,8 +68,11 @@ class Ddd4jJpaJavalinPostgresIT {
             assertEquals(1L, count(transactions));
             assertFalse(transactions.hasOpenEntityManager());
         } finally {
+            if (runtime != null) {
+                runtime.close();
+            }
             if (factory != null) {
-                factory.close();
+                assertFalse(factory.isOpen());
             }
             POSTGRES.stop();
         }

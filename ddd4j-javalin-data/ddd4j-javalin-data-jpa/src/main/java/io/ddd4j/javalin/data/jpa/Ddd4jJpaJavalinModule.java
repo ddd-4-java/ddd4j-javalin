@@ -1,6 +1,8 @@
 package io.ddd4j.javalin.data.jpa;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
+import io.ddd4j.javalin.core.lifecycle.JavalinLifecycleParticipant;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
@@ -26,6 +28,7 @@ public class Ddd4jJpaJavalinModule extends AbstractModule {
 
     private final String persistenceUnitName;
     private final Map<String, Object> properties;
+    private final EntityManagerFactory suppliedFactory;
 
     public Ddd4jJpaJavalinModule(String persistenceUnitName) {
         this(persistenceUnitName, Collections.emptyMap());
@@ -36,6 +39,14 @@ public class Ddd4jJpaJavalinModule extends AbstractModule {
                 persistenceUnitName, "persistenceUnitName must not be null");
         this.properties = Collections.unmodifiableMap(new LinkedHashMap<>(
                 Objects.requireNonNull(properties, "properties must not be null")));
+        this.suppliedFactory = null;
+    }
+
+    /** 使用调用方管理的 EntityManagerFactory。该工厂不会被 Javalin 关闭。 */
+    public Ddd4jJpaJavalinModule(EntityManagerFactory factory) {
+        this.persistenceUnitName = null;
+        this.properties = Collections.emptyMap();
+        this.suppliedFactory = Objects.requireNonNull(factory, "factory must not be null");
     }
 
     public Ddd4jJpaJavalinModule() {
@@ -44,9 +55,13 @@ public class Ddd4jJpaJavalinModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        EntityManagerFactory factory = buildEntityManagerFactory();
+        boolean ownsFactory = Objects.isNull(suppliedFactory);
+        EntityManagerFactory factory = ownsFactory ? buildEntityManagerFactory() : suppliedFactory;
         bind(EntityManagerFactory.class).toInstance(factory);
         bind(JpaTransactionTemplate.class).toInstance(new JpaTransactionTemplate(factory));
+        bind(JpaLifecycleParticipant.class).toInstance(new JpaLifecycleParticipant(factory, ownsFactory));
+        Multibinder.newSetBinder(binder(), JavalinLifecycleParticipant.class)
+                .addBinding().to(JpaLifecycleParticipant.class);
     }
 
     private EntityManagerFactory buildEntityManagerFactory() {

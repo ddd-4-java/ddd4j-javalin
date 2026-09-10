@@ -31,7 +31,7 @@
 | MySQL / PostgreSQL / MariaDB | JDBC 可用后执行真实写入、读取或事务断言 |
 | MongoDB | 默认副本集探测后执行读写断言 |
 | Redis | 监听端口就绪后执行 stream round-trip |
-| Kafka / RabbitMQ | 模块默认就绪检查后执行 publish → consume → acknowledgment |
+| Kafka / RabbitMQ | 通过 `JavalinMqLifecycleParticipant` 初始化并执行 publish → consume → acknowledgment |
 | ActiveMQ Artemis | 监听端口就绪后执行 JMS round-trip |
 | RocketMQ | nameserver 9876 就绪；fixture 管理固定 10911 映射，然后执行消息 round-trip |
 | Pulsar | 等待默认 namespace 创建完成，再执行消息 round-trip |
@@ -54,8 +54,16 @@
 排障或避免固定端口服务互相影响时，应按模块串行执行 IT：
 
 ```bash
-./mvnw -pl ddd4j-javalin-mq/ddd4j-javalin-mq-kafka -am \
-  -Dtest=Ddd4jKafkaMqIT -Dsurefire.failIfNoSpecifiedTests=false test
+./mvnw -Pjavalin-integration-tests \
+  -pl ddd4j-javalin-mq/ddd4j-javalin-mq-kafka -am \
+  -Dit.test=Ddd4jKafkaMqIT \
+  -Dsurefire.failIfNoSpecifiedTests=false \
+  -Dfailsafe.failIfNoSpecifiedTests=false verify
 ```
+
+Kafka、RabbitMQ、NATS、Pulsar、ActiveMQ、RocketMQ、Redis Stream、MQTT 与 SQS 的 round-trip
+必须从生产 MQ 生命周期启动，不允许在 IT 中直接调用 `MQClient.init(...)`。MySQL Repository 与
+PostgreSQL JPA IT 同样通过 `Ddd4jJavalinRuntime` 初始化和关闭资源。普通 `./mvnw clean test` 必须执行
+单元测试；根 POM 禁止设置 `maven-surefire-plugin` 的 `skip=true` 或 `skipTests=true`。
 
 本地无法复现的托管服务 ONS、TDMQ 明确禁用；Mica MQTT 因已记录的上游 AIO 缺陷明确禁用。禁用原因必须留在对应测试上，不能用 workflow 级 `continue-on-error` 代替。

@@ -2,6 +2,7 @@ package io.ddd4j.javalin.mq.core;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import io.ddd4j.core.context.BaseContext;
 import io.ddd4j.core.health.ReadinessResult;
 import io.ddd4j.javalin.core.Ddd4jCoreGuiceModule;
 import io.ddd4j.javalin.core.Ddd4jCoreProperties;
@@ -135,6 +136,29 @@ class JavalinMqLifecycleParticipantTest {
         @MQEventListener(topic = "orders", group = "production")
         public void onEvent(MQEvent event) {
         }
+    }
+
+    /**
+     * Fix A：{@link JavalinMqLifecycleParticipant#close()} 应清理
+     * {@link MqContextPropagator#SNAPSHOT_REGISTRY_KEY}，避免长时间运行的
+     * 进程累积快照。
+     */
+    @Test
+    void shouldClearSnapshotRegistryOnClose() {
+        // 直接 seed BaseContext 模拟"在生命周期内累积了快照"
+        java.util.Map<String, Object> registry = new java.util.concurrent.ConcurrentHashMap<>();
+        registry.put("msg-leak", new java.util.HashMap<>());
+        BaseContext.inject(MqContextPropagator.SNAPSHOT_REGISTRY_KEY, registry);
+        assertThat((Object) BaseContext.get(MqContextPropagator.SNAPSHOT_REGISTRY_KEY)).isNotNull();
+
+        JavalinMqLifecycleParticipant participant = participant(
+                new RecordingClient(), brokerProperties(),
+                Ddd4jJavalinMqProperties.Role.PRODUCER_ONLY, List.of(), event -> {
+                });
+        participant.start();
+        participant.close();
+
+        assertThat((Object) BaseContext.get(MqContextPropagator.SNAPSHOT_REGISTRY_KEY)).isNull();
     }
 
     private static final class RecordingClient implements MQClient {

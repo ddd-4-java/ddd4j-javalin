@@ -12,47 +12,38 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * OIDC JWT 的只读 Subject 适配器；会话变更由外部身份提供方负责。
+ * 写入 {@link ThreadContext#SUBJECT_KEY} 的只读 OIDC Subject 持有器。
  *
- * <p>主体身份通过 {@link ThreadContext}（TTL 透传）持有，由
- * {@link OidcSubjectProvider#authenticate(String)} 在请求边界写入
- * {@code ThreadContext.SUBJECT_KEY}，{@link OidcSubjectScope#close()}
- * 时清理。修改前：{@link OidcSubjectProvider} 自有普通 {@code ThreadLocal}，
- * 异步消费时 broker worker 线程拿不到身份。
+ * <p>仅承载已验证的 {@link AuthPrincipal}，所有 mutation 方法（{@code login/logout/...}）
+ * 抛 {@link UnsupportedOperationException}，与外部身份提供方语义一致。</p>
+ *
+ * <p>{@link OidcSubject#currentPrincipal()} 通过 {@code instanceof} 识别本类，
+ * 避免污染其它 {@link Subject} 实现持有的 ThreadContext 槽位。</p>
  */
-final class OidcSubject implements Subject {
+final class OidcSubjectDelegate implements Subject {
 
+    private final AuthPrincipal principal;
     private final OidcTokenVerifier verifier;
 
-    OidcSubject(OidcTokenVerifier verifier) {
-        this.verifier = verifier;
+    OidcSubjectDelegate(AuthPrincipal principal, OidcTokenVerifier verifier) {
+        this.principal = Objects.requireNonNull(principal, "principal must not be null");
+        this.verifier = Objects.requireNonNull(verifier, "verifier must not be null");
     }
 
-    /**
-     * 读取当前线程绑定的 OIDC 主体（经 TTL 透传）。
-     * 若当前线程未通过 {@link OidcSubjectProvider#authenticate(String)} 写入，
-     * 返回 {@code null}（不影响其它 Subject 实现）。
-     */
-    private AuthPrincipal currentPrincipal() {
-        Subject bound = ThreadContext.getSubject();
-        if (bound instanceof OidcSubjectDelegate) {
-            return ((OidcSubjectDelegate) bound).principal();
-        }
-        return null;
+    AuthPrincipal principal() {
+        return principal;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AuthPrincipal> T getPrincipal() {
-        AuthPrincipal principal = currentPrincipal();
-        return Objects.nonNull(principal) ? (T) principal : null;
+        return (T) principal;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AuthPrincipal> T getPrincipalByLoginId(Object loginId) {
-        AuthPrincipal principal = currentPrincipal();
-        return Objects.nonNull(principal) && Objects.equals(loginId, principal.getLoginId()) ? (T) principal : null;
+        return Objects.equals(loginId, principal.getLoginId()) ? (T) principal : null;
     }
 
     @Override
@@ -62,8 +53,8 @@ final class OidcSubject implements Subject {
 
     @Override
     public boolean isPermitted(String permission) {
-        AuthPrincipal principal = currentPrincipal();
-        return Objects.nonNull(principal) && safePermissions(principal).contains(permission);
+        Set<String> perms = Objects.isNull(principal.getPerms()) ? Collections.emptySet() : principal.getPerms();
+        return perms.contains(permission);
     }
 
     @Override
@@ -107,8 +98,8 @@ final class OidcSubject implements Subject {
 
     @Override
     public boolean hasRole(String roleIdentifier) {
-        AuthPrincipal principal = currentPrincipal();
-        return Objects.nonNull(principal) && safeRoles(principal).stream().anyMatch(role -> roleIdentifier.equals(role.getRoleCode()) || roleIdentifier.equals(role.getRoleId()));
+        List<AuthPrincipal.RolePair> roles = Objects.isNull(principal.getRoles()) ? Collections.emptyList() : principal.getRoles();
+        return roles.stream().anyMatch(role -> roleIdentifier.equals(role.getRoleCode()) || roleIdentifier.equals(role.getRoleId()));
     }
 
     @Override
@@ -150,7 +141,7 @@ final class OidcSubject implements Subject {
         return Objects.nonNull(getPrincipalByLoginId(loginId)) && hasAllRole(roleIdentifiers);
     }
 
-    @Override public boolean isAuthenticated() { return Objects.nonNull(currentPrincipal()); }
+    @Override public boolean isAuthenticated() { return true; }
     @Override public boolean isAuthenticated(Object loginId) { return Objects.nonNull(getPrincipalByLoginId(loginId)); }
     @Override public boolean isRemembered() { return false; }
     @Override public boolean isTrustDeviceId(String deviceId) { return false; }
@@ -170,14 +161,6 @@ final class OidcSubject implements Subject {
     @Override public void disable(Object loginId, long timeout) { throw readOnly(); }
     @Override public boolean isDisabled(Object loginId) { return false; }
     @Override public void untieDisable(Object loginId) { throw readOnly(); }
-
-    private Set<String> safePermissions(AuthPrincipal principal) {
-        return Objects.isNull(principal.getPerms()) ? Collections.emptySet() : principal.getPerms();
-    }
-
-    private List<AuthPrincipal.RolePair> safeRoles(AuthPrincipal principal) {
-        return Objects.isNull(principal.getRoles()) ? Collections.emptyList() : principal.getRoles();
-    }
 
     private UnsupportedOperationException readOnly() {
         return new UnsupportedOperationException("OIDC resource-server subject is read-only");

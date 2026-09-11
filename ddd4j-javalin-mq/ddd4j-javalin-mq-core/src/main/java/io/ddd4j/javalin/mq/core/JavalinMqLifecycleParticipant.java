@@ -93,10 +93,11 @@ public final class JavalinMqLifecycleParticipant implements JavalinLifecyclePart
                 if (Objects.isNull(producer)) {
                     throw new IllegalStateException("MQ producer initialization returned null: " + client.impl());
                 }
-                registerProducer(producer);
+                registerProducer(MqContextPropagator.wrap(producer));
             }
             if (role.consumes()) {
-                for (MQListener listener : discoveredListeners()) {
+                for (MQListener original : discoveredListeners()) {
+                    MQListener listener = wrapListener(original);
                     if (!client.initConsumer(listener, brokerProperties)) {
                         throw new IllegalStateException(
                                 "MQ consumer initialization returned false: "
@@ -141,6 +142,31 @@ public final class JavalinMqLifecycleParticipant implements JavalinLifecyclePart
 
     private List<MQListener> discoveredListeners() {
         return List.copyOf(Objects.requireNonNull(listeners.get(), "listeners result must not be null"));
+    }
+
+    /**
+     * 包装 listener bean 以重建消费线程 ThreadContext。
+     *
+     * <p>JDK {@code Proxy} 包裹原 bean 后保持 listener 引用相等性（route 校验仍按
+     * 原 listener），但 invoke 前通过 {@link MqContextPropagator#restore(MQEvent)}
+     * 按 {@code msgId} 恢复 publisher 端 capture 的快照，invoke 后自动关闭。
+     * 失败（snapshot 缺失 / 反序列化异常）降级为无上下文调用，不影响业务。</p>
+     */
+    private MQListener wrapListener(MQListener original) {
+        Object wrappedBean = MqContextPropagator.wrapListenerBean(original.getBean(), original);
+        if (wrappedBean == original.getBean()) {
+            return original;
+        }
+        return MQListener.builder()
+                .bean(wrappedBean)
+                .method(original.getMethod())
+                .group(original.getGroup())
+                .namespace(original.getNamespace())
+                .topic(original.getTopic())
+                .tags(original.getTags())
+                .supports(original.supports())
+                .separator(original.getSeparator())
+                .build();
     }
 
     private void registerContext() {
@@ -189,6 +215,9 @@ public final class JavalinMqLifecycleParticipant implements JavalinLifecyclePart
                 BaseContext.remove(MQEvent.MQ_EVENT_PUBLISHER);
             }
         }
+        // 清空 MQ 跨线程上下文快照表，防止长时间运行的进程累积
+        // （即便 publisher 崩溃、consumer 永远收不到，registry 也会随生命周期回收）。
+        BaseContext.remove(MqContextPropagator.SNAPSHOT_REGISTRY_KEY);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

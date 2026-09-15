@@ -273,34 +273,19 @@ final class MqContextPropagator {
                 new InvocationHandler() {
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        if (args != null && args.length == 1 && args[0] instanceof MQEvent) {
-                            MQEvent event = (MQEvent) args[0];
-                            AutoCloseable scope = restore(event);
-                            try {
-                                if (Objects.nonNull(scope)) {
-                                    try {
-                                        return method.invoke(originalBean, args);
-                                    } catch (java.lang.reflect.InvocationTargetException ite) {
-                                        throw ite.getCause();
-                                    }
-                                }
-                                // 无快照降级
-                                try {
-                                    return method.invoke(originalBean, args);
-                                } catch (java.lang.reflect.InvocationTargetException ite) {
-                                    throw ite.getCause();
-                                }
-                            } finally {
-                                if (Objects.nonNull(scope)) {
-                                    scope.close();
-                                }
-                            }
-                        }
-                        // 非 MQEvent 参数方法（如 hashCode/equals/toString）：透传
+                        // 仅 MQEvent 参数的方法需要 ThreadContext 透传；
+                        // 非 MQEvent 参数方法（如 hashCode/equals/toString）直接透传。
+                        AutoCloseable scope = (args != null && args.length == 1 && args[0] instanceof MQEvent)
+                                ? restore((MQEvent) args[0])
+                                : null;
                         try {
                             return method.invoke(originalBean, args);
                         } catch (java.lang.reflect.InvocationTargetException ite) {
                             throw ite.getCause();
+                        } finally {
+                            if (scope != null) {
+                                scope.close();
+                            }
                         }
                     }
                 });

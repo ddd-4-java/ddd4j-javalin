@@ -131,6 +131,12 @@ final class MqContextPropagator {
         }
     }
 
+    /**
+     * 类级缓存：避免 {@link #registry()} 中 BaseContext.get → inject 的 check-then-act 竞态。
+     * volatile 保证跨线程可见性；首次初始化后所有线程直接读缓存，不再进入竞态分支。
+     */
+    private static volatile Map<String, TimedSnapshot> cachedRegistry;
+
     private MqContextPropagator() {
     }
 
@@ -301,12 +307,25 @@ final class MqContextPropagator {
     }
 
     private static Map<String, TimedSnapshot> registry() {
-        Map<String, TimedSnapshot> registry = BaseContext.get(SNAPSHOT_REGISTRY_KEY);
-        if (Objects.isNull(registry)) {
-            registry = new ConcurrentHashMap<>();
-            BaseContext.inject(SNAPSHOT_REGISTRY_KEY, registry);
+        Map<String, TimedSnapshot> result = cachedRegistry;
+        if (result != null) {
+            return result;
         }
-        return registry;
+        synchronized (MqContextPropagator.class) {
+            result = cachedRegistry;
+            if (result != null) {
+                return result;
+            }
+            Map<String, TimedSnapshot> existing = BaseContext.get(SNAPSHOT_REGISTRY_KEY);
+            if (existing != null) {
+                cachedRegistry = existing;
+                return existing;
+            }
+            Map<String, TimedSnapshot> created = new ConcurrentHashMap<>();
+            BaseContext.inject(SNAPSHOT_REGISTRY_KEY, created);
+            cachedRegistry = created;
+            return created;
+        }
     }
 
     private static long snapshotTtlMillis() {

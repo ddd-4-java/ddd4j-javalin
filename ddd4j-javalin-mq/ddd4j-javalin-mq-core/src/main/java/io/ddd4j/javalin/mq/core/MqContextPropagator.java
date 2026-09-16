@@ -137,6 +137,14 @@ final class MqContextPropagator {
      */
     private static volatile Map<String, TimedSnapshot> cachedRegistry;
 
+    /**
+     * 清除类级缓存。用于测试隔离——当 BaseContext 被重置后调用，避免缓存持有过期引用。
+     * 生产环境无需调用。
+     */
+    static void clearCache() {
+        cachedRegistry = null;
+    }
+
     private MqContextPropagator() {
     }
 

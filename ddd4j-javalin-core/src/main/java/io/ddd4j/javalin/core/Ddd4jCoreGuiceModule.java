@@ -85,7 +85,9 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
         }
     }
 
-    /** 当前装配配置。可见于启动入口与测试。 */
+    /**
+     * 当前装配配置。可见于启动入口与测试。
+     */
     public Ddd4jCoreProperties getProperties() {
         return properties;
     }

@@ -8,7 +8,9 @@ import java.util.function.BooleanSupplier;
  */
 public final class ReadinessEndpoint {
 
-    /** Kubernetes 等上游探针使用的显式就绪路径。 */
+    /**
+     * Kubernetes 等上游探针使用的显式就绪路径。
+     */
     public static final String PATH = "/-/ready";
 
     private final BooleanSupplier readinessSupplier;

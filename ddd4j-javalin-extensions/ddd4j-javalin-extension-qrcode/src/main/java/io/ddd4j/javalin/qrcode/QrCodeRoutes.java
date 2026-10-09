@@ -18,7 +18,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-/** Explicit, opt-in Javalin routes. No remote URL fetch endpoint is provided. */
+/**
+ * Explicit, opt-in Javalin routes. No remote URL fetch endpoint is provided.
+ */
 public class QrCodeRoutes {
 
     private final QrCodeService service;

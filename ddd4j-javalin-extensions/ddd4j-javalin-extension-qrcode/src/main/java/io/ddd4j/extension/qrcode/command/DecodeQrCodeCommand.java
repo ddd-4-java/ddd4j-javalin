@@ -4,7 +4,9 @@ import io.ddd4j.extension.qrcode.model.QrCodeDecodeRequest;
 import lombok.Builder;
 import lombok.Getter;
 
-/** Application command for QR code decoding. */
+/**
+ * Application command for QR code decoding.
+ */
 @Getter
 @Builder
 public final class DecodeQrCodeCommand {

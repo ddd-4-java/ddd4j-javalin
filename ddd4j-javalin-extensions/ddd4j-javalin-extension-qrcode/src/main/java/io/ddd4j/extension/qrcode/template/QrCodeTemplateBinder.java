@@ -11,7 +11,9 @@ import java.util.Objects;
  */
 public class QrCodeTemplateBinder {
 
-    /** Creates a new immutable frame and leaves the registered template unchanged. */
+    /**
+     * Creates a new immutable frame and leaves the registered template unchanged.
+     */
     public QrCodeFrame bind(QrCodeTemplateDefinition definition, Map<String, ?> variables) {
         Objects.requireNonNull(definition, "definition must not be null");
         Objects.requireNonNull(variables, "variables must not be null");

@@ -4,7 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
-/** 二维码生成请求。 */
+/**
+ * 二维码生成请求。
+ */
 @Getter
 @Builder
 public final class QrCodeRequest {

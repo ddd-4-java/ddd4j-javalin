@@ -76,7 +76,7 @@ public final class OfficeFileTypeDetector implements FileTypeDetector {
 
     private Optional<DetectedFileType> detectOle(ValidatableFile file) throws IOException {
         try (InputStream inputStream = new BufferedInputStream(file.openStream());
-                POIFSFileSystem fileSystem = new POIFSFileSystem(inputStream)) {
+             POIFSFileSystem fileSystem = new POIFSFileSystem(inputStream)) {
             DirectoryNode root = fileSystem.getRoot();
             if (root.hasEntry("WordDocument")) {
                 return Optional.of(new DetectedFileType("doc", "application/msword"));

@@ -15,7 +15,7 @@ public final class DefaultValidatableFile implements ValidatableFile {
     private final InputStreamSource inputStreamSource;
 
     public DefaultValidatableFile(String fileName, String contentType, long size,
-            InputStreamSource inputStreamSource) {
+                                  InputStreamSource inputStreamSource) {
         this.fileName = fileName;
         this.contentType = contentType;
         this.size = size;

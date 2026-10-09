@@ -6,7 +6,8 @@
 
 - **企业级消息队列**：基于 AMQP 0-9-1 协议，支持 Exchange/Queue/Binding 路由、消息确认、死信队列
 - **业务零 MQ 耦合**：业务代码只依赖 `MQEventPublisher` 接口，与 Disruptor / Kafka 示例完全一致
-- **完整链路**：`Order.create()` → `OrderCreatedEvent` → `MQEventPublisher.publish()` → RabbitMQ Exchange → Queue → `@MQEventListener`
+- **完整链路**：`Order.create()` → `OrderCreatedEvent` → `MQEventPublisher.publish()` → RabbitMQ Exchange → Queue →
+  `@MQEventListener`
 
 ## 前置条件
 
@@ -42,8 +43,8 @@ curl -X POST http://localhost:8080/orders \
 
 仅需修改 `pom.xml` 中的依赖：
 
-| MQ 类型 | 依赖 artifactId | 外部依赖 |
-|---------|-----------------|---------|
-| Disruptor | `ddd4j-mq-disruptor` | 无 |
-| Kafka | `ddd4j-mq-kafka` | Kafka Broker |
-| RabbitMQ（当前） | `ddd4j-mq-rabbitmq` | RabbitMQ Broker |
+| MQ 类型          | 依赖 artifactId      | 外部依赖        |
+|------------------|----------------------|-----------------|
+| Disruptor        | `ddd4j-mq-disruptor` | 无              |
+| Kafka            | `ddd4j-mq-kafka`     | Kafka Broker    |
+| RabbitMQ（当前） | `ddd4j-mq-rabbitmq`  | RabbitMQ Broker |

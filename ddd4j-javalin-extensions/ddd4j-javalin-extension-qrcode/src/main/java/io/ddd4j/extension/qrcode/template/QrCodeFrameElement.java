@@ -2,7 +2,9 @@ package io.ddd4j.extension.qrcode.template;
 
 import lombok.Getter;
 
-/** 二维码外框元素的公共坐标属性。 */
+/**
+ * 二维码外框元素的公共坐标属性。
+ */
 @Getter
 public abstract class QrCodeFrameElement {
 

@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** 可复用的二维码外框模板。 */
+/**
+ * 可复用的二维码外框模板。
+ */
 @Getter
 public final class QrCodeFrame {
 

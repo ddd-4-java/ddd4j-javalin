@@ -98,7 +98,9 @@ public class TestUserRepository {
     public static class TestUserQuery {
     }
 
-    /** Minimal Page wrapper (mirrors the {@code Page<T>} contract). */
+    /**
+     * Minimal Page wrapper (mirrors the {@code Page<T>} contract).
+     */
     public record Page<T>(List<T> records, long total) {
         public List<T> getRecords() {
             return records;

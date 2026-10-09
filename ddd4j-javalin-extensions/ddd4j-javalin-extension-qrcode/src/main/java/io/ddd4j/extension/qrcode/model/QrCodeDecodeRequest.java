@@ -6,7 +6,9 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.Objects;
 
-/** 二维码解码请求。 */
+/**
+ * 二维码解码请求。
+ */
 @Getter
 public final class QrCodeDecodeRequest {
 

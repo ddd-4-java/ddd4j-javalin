@@ -4,7 +4,9 @@ import io.ddd4j.extension.qrcode.result.QrCodeArtifact;
 import lombok.Builder;
 import lombok.Getter;
 
-/** Success or failure of one QR generation batch item. */
+/**
+ * Success or failure of one QR generation batch item.
+ */
 @Getter
 @Builder
 public final class QrCodeBatchItemResult {

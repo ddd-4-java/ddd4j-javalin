@@ -17,9 +17,9 @@
 
         - Ddd4jCoreProperties：ddd4j.core.* 配置 POJO（enabled / domainEventsEnabled / projectionEnabled）
         - Ddd4jCoreGuiceModule：聚合装配 Guice Module，install ddd4j-runtime-guice 的 Ddd4jGuiceModule，
-          并显式声明核心 SPI 绑定（DomainEventPublisher / SubjectProvider / I18nProvider）
+        并显式声明核心 SPI 绑定（DomainEventPublisher / SubjectProvider / I18nProvider）
         - Ddd4jCoreAutoConfiguration：静态 install(Injector) 入口，"启动即注册 SPI"
-          （GuiceContext.setInjector + 投影位置仓储 SPI 注册）
+        （GuiceContext.setInjector + 投影位置仓储 SPI 注册）
 
         Javalin 应用只需 install 本模块即可获得与 ddd4j-boot 一致的 ddd4j 核心能力。
     </description>
@@ -48,7 +48,7 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-</dependencies>
+    </dependencies>
 
     <build>
         <plugins>

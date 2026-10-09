@@ -51,10 +51,10 @@ public final class Ddd4jJavalinApplication {
      * Build the Guice injector and start Javalin. The base packages are scanned by
      * {@link DddAnnotationModule} for DDD-annotated types.
      *
-     * @param args           standard CLI args (first may be a port override).
-     * @param basePackages   packages to scan for {@code @DomainService}, {@code @DomainRepository},
-     *                       etc.
-     * @param extraModules   any number of extra Guice modules to install (auth, data, mq, …).
+     * @param args         standard CLI args (first may be a port override).
+     * @param basePackages packages to scan for {@code @DomainService}, {@code @DomainRepository},
+     *                     etc.
+     * @param extraModules any number of extra Guice modules to install (auth, data, mq, …).
      * @return the running Javalin instance, ready to be returned to the caller.
      */
     @SafeVarargs
@@ -82,8 +82,8 @@ public final class Ddd4jJavalinApplication {
     }
 
     private static Module[] buildModules(String basePackages,
-                                        Ddd4jJavalinProperties properties,
-                                        Module[] extraModules) {
+                                         Ddd4jJavalinProperties properties,
+                                         Module[] extraModules) {
         Module web = new Ddd4jJavalinAutoConfiguration(properties);
         java.util.List<Module> head = new java.util.ArrayList<>();
         // The full Ddd4jGuiceModule binds DefaultProjectionService which has no

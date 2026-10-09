@@ -44,7 +44,7 @@ import java.util.function.Function;
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  */
 @Deprecated
-public class Ddd4jCacheJavalinModule  {
+public class Ddd4jCacheJavalinModule {
 
     /**
      * 设置默认本地缓存类型（影响后续 {@link #build} 方法）。

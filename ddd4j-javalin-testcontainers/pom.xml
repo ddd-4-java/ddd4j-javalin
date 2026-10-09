@@ -115,7 +115,7 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
         </dependency>
-</dependencies>
+    </dependencies>
 
     <build>
         <plugins>

@@ -13,7 +13,8 @@
 
     <artifactId>ddd4j-javalin-parent</artifactId>
     <packaging>pom</packaging>
-    <description>Javalin Projects Parent: common plugins and dependency versions for ddd4j-javalin modules.</description>
+    <description>Javalin Projects Parent: common plugins and dependency versions for ddd4j-javalin modules.
+    </description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

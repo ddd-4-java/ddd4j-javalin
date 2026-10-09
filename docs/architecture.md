@@ -31,14 +31,14 @@ flowchart TB
 
 ## 模块边界
 
-| 边界 | Javalin 层职责 | ddd4j 权威实现 |
-|---|---|---|
-| Core | 安装完整 `Ddd4jGuiceModule`，管理 Injector 与关闭生命周期 | CommandBus、事件、投影和全局 SPI |
-| Web | 请求上下文、鉴权策略、异常翻译、幂等、CORS、上传限制与超时 | `WebRequestLifecycle`、`Ddd4jJavalinWeb` |
-| Auth | 将 SubjectProvider 装入 Guice；OIDC 提供通用 JWT/JWKS 资源服务器能力 | Sa-Token、Security、Shiro 原生 Provider |
-| Data | Repository 注册、JPA EntityManagerFactory 与事务模板、DataScope/External/Data Logs 消费装配 | MyBatis/JPA/日志与数据端口 |
-| MQ | 每个 Broker 的 Client/Properties 单例绑定 | 发布、消费、ACK/NACK、持久化与投递策略 |
-| Extensions | 对有效上游扩展提供直接复用或轻量装配 | Excel、Monitor、PF4J、QLExpress、QRCode、Validation |
+| 边界       | Javalin 层职责                                                                              | ddd4j 权威实现                                      |
+|------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| Core       | 安装完整 `Ddd4jGuiceModule`，管理 Injector 与关闭生命周期                                   | CommandBus、事件、投影和全局 SPI                    |
+| Web        | 请求上下文、鉴权策略、异常翻译、幂等、CORS、上传限制与超时                                  | `WebRequestLifecycle`、`Ddd4jJavalinWeb`            |
+| Auth       | 将 SubjectProvider 装入 Guice；OIDC 提供通用 JWT/JWKS 资源服务器能力                        | Sa-Token、Security、Shiro 原生 Provider             |
+| Data       | Repository 注册、JPA EntityManagerFactory 与事务模板、DataScope/External/Data Logs 消费装配 | MyBatis/JPA/日志与数据端口                          |
+| MQ         | 每个 Broker 的 Client/Properties 单例绑定                                                   | 发布、消费、ACK/NACK、持久化与投递策略              |
+| Extensions | 对有效上游扩展提供直接复用或轻量装配                                                        | Excel、Monitor、PF4J、QLExpress、QRCode、Validation |
 
 OIDC 与原生认证模块具有不同边界：只有 `ddd4j-javalin-auth-oidc` 负责 Keycloak JWT 验签与 HTTP
 allow/deny；Sa-Token、Spring Security 和 Shiro 的 Keycloak 测试只证明容器兼容性，不宣称原生模块
@@ -76,16 +76,16 @@ sequenceDiagram
 RabbitMQ 已具备 persistent delivery、publisher confirm、`mandatory=true`、不可路由 return 失败、
 持久化失败 NACK/requeue 与恢复后 ACK 的真实容器契约。其余适配器按协议保留不同但明确的失败语义：
 
-| 适配器 | 发布确认 | 消费失败与恢复 | Dead-letter 边界 |
-|---|---|---|---|
-| ActiveMQ | persistent synchronous send | 处理失败触发 `session.recover()` 重投 | 由 broker redelivery/DLQ policy 管理 |
-| Kafka | 等待 broker Future；失败抛出 | 失败不提交 offset，并 seek 当前记录 | 由业务 retry/DLT topic 策略管理 |
-| NATS | 默认强制 JetStream publish ACK | JetStream durable consumer；不可用时 fail closed | 由 stream/consumer policy 管理 |
-| Pulsar | 等待 `sendAsync().get()` | 成功 ACK，失败 negative ACK | 由 subscription dead-letter policy 管理 |
-| Redis Stream | 同步 XADD | 成功后 XACK；失败保留 PEL，并优先恢复 pending | 无原生 DLQ，使用核心 DEAD/业务 stream |
-| RocketMQ | synchronous send；失败抛出 | listener 失败返回 broker retry 结果 | 由 broker retry/DLQ 管理 |
-| SQS | synchronous `sendMessage` | 失败重置 visibility 以便重投 | 由 queue redrive policy 管理 |
-| MQTT | QoS publish | manual ACK；处理失败不确认 | 协议无统一 DLQ，交由业务主题/核心 DEAD |
+| 适配器       | 发布确认                       | 消费失败与恢复                                   | Dead-letter 边界                        |
+|--------------|--------------------------------|--------------------------------------------------|-----------------------------------------|
+| ActiveMQ     | persistent synchronous send    | 处理失败触发 `session.recover()` 重投            | 由 broker redelivery/DLQ policy 管理    |
+| Kafka        | 等待 broker Future；失败抛出   | 失败不提交 offset，并 seek 当前记录              | 由业务 retry/DLT topic 策略管理         |
+| NATS         | 默认强制 JetStream publish ACK | JetStream durable consumer；不可用时 fail closed | 由 stream/consumer policy 管理          |
+| Pulsar       | 等待 `sendAsync().get()`       | 成功 ACK，失败 negative ACK                      | 由 subscription dead-letter policy 管理 |
+| Redis Stream | 同步 XADD                      | 成功后 XACK；失败保留 PEL，并优先恢复 pending    | 无原生 DLQ，使用核心 DEAD/业务 stream   |
+| RocketMQ     | synchronous send；失败抛出     | listener 失败返回 broker retry 结果              | 由 broker retry/DLQ 管理                |
+| SQS          | synchronous `sendMessage`      | 失败重置 visibility 以便重投                     | 由 queue redrive policy 管理            |
+| MQTT         | QoS publish                    | manual ACK；处理失败不确认                       | 协议无统一 DLQ，交由业务主题/核心 DEAD  |
 
 这些适配器继续共享 ddd4j MQ 核心的 Inbox、Outbox、重试与 DEAD 状态机；ONS/TDMQ 为托管服务排除项，
 Mica MQTT 为明确的上游限制，均不由普通 round-trip 推断生产能力。

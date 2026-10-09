@@ -6,13 +6,17 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Objects;
 
-/** 在创建 Guice 和监听端口前校验 Javalin 配置。 */
+/**
+ * 在创建 Guice 和监听端口前校验 Javalin 配置。
+ */
 public final class Ddd4jJavalinPropertiesValidator {
 
     private Ddd4jJavalinPropertiesValidator() {
     }
 
-    /** 校验启动所需的全部基础属性。 */
+    /**
+     * 校验启动所需的全部基础属性。
+     */
     public static void validate(Ddd4jJavalinProperties properties) {
         Ddd4jJavalinProperties value = Objects.requireNonNull(properties, "properties must not be null");
         require(StrKit.isNotBlank(value.getHost()), "host must not be blank");

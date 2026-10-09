@@ -2,7 +2,9 @@ package io.ddd4j.javalin.auth.oidc;
 
 import io.ddd4j.core.auth.AuthPrincipal;
 
-/** 验证 OIDC Bearer Token 并映射为 ddd4j 认证主体。 */
+/**
+ * 验证 OIDC Bearer Token 并映射为 ddd4j 认证主体。
+ */
 @FunctionalInterface
 public interface OidcTokenVerifier {
 

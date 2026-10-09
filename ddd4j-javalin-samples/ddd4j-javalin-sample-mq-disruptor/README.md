@@ -50,10 +50,10 @@ curl -X POST http://localhost:8080/orders \
 
 仅需修改 `pom.xml` 中的依赖：
 
-| MQ 类型 | 依赖 artifactId | 外部依赖 |
-|---------|-----------------|---------|
-| Disruptor（当前） | `ddd4j-mq-disruptor` | 无 |
-| Kafka | `ddd4j-mq-kafka` | Kafka Broker |
-| RabbitMQ | `ddd4j-mq-rabbitmq` | RabbitMQ Broker |
+| MQ 类型           | 依赖 artifactId      | 外部依赖        |
+|-------------------|----------------------|-----------------|
+| Disruptor（当前） | `ddd4j-mq-disruptor` | 无              |
+| Kafka             | `ddd4j-mq-kafka`     | Kafka Broker    |
+| RabbitMQ          | `ddd4j-mq-rabbitmq`  | RabbitMQ Broker |
 
 业务代码、`@MQEventListener` 注解、`MQEventPublisher` 调用方式 **完全无需修改**。

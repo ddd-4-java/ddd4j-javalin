@@ -18,7 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/** 在 Javalin 启动期严格初始化一个 broker client。 */
+/**
+ * 在 Javalin 启动期严格初始化一个 broker client。
+ */
 @Slf4j
 public final class JavalinMqLifecycleParticipant implements JavalinLifecycleParticipant {
 

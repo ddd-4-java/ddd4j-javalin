@@ -79,7 +79,9 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
         return new Ddd4jCoreGuiceModule();
     }
 
-    /** 使用应用扫描包创建默认核心模块。 */
+    /**
+     * 使用应用扫描包创建默认核心模块。
+     */
     public static Ddd4jCoreGuiceModule defaults(String basePackages) {
         return new Ddd4jCoreGuiceModule(
                 new Ddd4jCoreProperties(), new Ddd4jJavalinBootstrapContext(basePackages));
@@ -108,7 +110,9 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
         }
     }
 
-    /** 当前装配配置。可见于启动入口与测试。 */
+    /**
+     * 当前装配配置。可见于启动入口与测试。
+     */
     public Ddd4jCoreProperties getProperties() {
         return properties;
     }

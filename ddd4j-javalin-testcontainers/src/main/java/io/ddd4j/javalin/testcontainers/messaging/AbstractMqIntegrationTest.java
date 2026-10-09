@@ -46,17 +46,23 @@ import static org.awaitility.Awaitility.await;
  */
 public abstract class AbstractMqIntegrationTest<P extends MQProperties, C extends MQClient> {
 
-    /** 统一 smoke tag。 */
+    /**
+     * 统一 smoke tag。
+     */
     protected static final String TAG = "smoke";
 
     protected abstract String brokerName();
 
     protected abstract String topicName();
 
-    /** 子类持有的静态容器（每个测试方法 start/stop）。 */
+    /**
+     * 子类持有的静态容器（每个测试方法 start/stop）。
+     */
     protected abstract GenericContainer<?> container();
 
-    /** 基于已启动容器构造 broker properties（含连接地址与凭证）。 */
+    /**
+     * 基于已启动容器构造 broker properties（含连接地址与凭证）。
+     */
     protected abstract P newProperties();
 
     protected abstract C newClient(P props);
@@ -69,17 +75,23 @@ public abstract class AbstractMqIntegrationTest<P extends MQProperties, C extend
         return "it-" + brokerName() + "-consumer";
     }
 
-    /** 事件 tag；{@code null} 表示发布与断言均不带 tag。 */
+    /**
+     * 事件 tag；{@code null} 表示发布与断言均不带 tag。
+     */
     protected String tagName() {
         return TAG;
     }
 
-    /** listener 订阅 tags，默认跟随 {@link #tagName()}；Pulsar 覆写为 {@code *}。 */
+    /**
+     * listener 订阅 tags，默认跟随 {@link #tagName()}；Pulsar 覆写为 {@code *}。
+     */
     protected String listenerTags() {
         return tagName();
     }
 
-    /** consumer init 完成后、publish 之前的稳定等待。 */
+    /**
+     * consumer init 完成后、publish 之前的稳定等待。
+     */
     protected Duration consumerSettleDelay() {
         return Duration.ofSeconds(3);
     }
@@ -88,11 +100,15 @@ public abstract class AbstractMqIntegrationTest<P extends MQProperties, C extend
         return Duration.ofSeconds(20);
     }
 
-    /** init 之前的 broker 准备钩子（在 client 创建之后、Guice 装配之前调用）。 */
+    /**
+     * init 之前的 broker 准备钩子（在 client 创建之后、Guice 装配之前调用）。
+     */
     protected void preInit(C client, P props, MQProperties mqProps) throws Exception {
     }
 
-    /** init 之前改写 listener topic 的钩子（默认使用 {@link #topicName()}）。 */
+    /**
+     * init 之前改写 listener topic 的钩子（默认使用 {@link #topicName()}）。
+     */
     protected void adaptListenerTopic(MQListener listener, P props) {
     }
 

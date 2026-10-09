@@ -38,9 +38,9 @@ public class Ddd4jJavalinWeb {
     private final Optional<WebIdempotencyLifecycle> idempotencyLifecycle;
 
     public Ddd4jJavalinWeb(WebRequestContextFactory contextFactory,
-                            WebRequestLifecycle lifecycle,
-                            WebExceptionTranslator translator,
-                            WebIdempotencyLifecycle idempotencyLifecycle) {
+                           WebRequestLifecycle lifecycle,
+                           WebExceptionTranslator translator,
+                           WebIdempotencyLifecycle idempotencyLifecycle) {
         this.contextFactory = Objects.requireNonNull(contextFactory);
         this.lifecycle = Objects.requireNonNull(lifecycle);
         this.translator = Objects.requireNonNull(translator);

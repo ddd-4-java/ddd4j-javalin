@@ -16,9 +16,9 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    branches: [feature/6.7.x]
+    branches: [ feature/6.7.x ]
   pull_request:
-    branches: [feature/6.7.x]
+    branches: [ feature/6.7.x ]
 
 permissions:
   contents: read
@@ -107,7 +107,7 @@ jobs:
     name: Testcontainers infrastructure integration
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [unit-tests]
+    needs: [ unit-tests ]
     strategy:
       fail-fast: false
       matrix:

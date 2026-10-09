@@ -31,13 +31,13 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
     }
 
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
-                                     SequenceProperties sequenceProperties) {
+                                      SequenceProperties sequenceProperties) {
         this(externalProperties, sequenceProperties, IpRegionTemplate.none());
     }
 
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
-                                     SequenceProperties sequenceProperties,
-                                     IpRegionTemplate ipRegionTemplate) {
+                                      SequenceProperties sequenceProperties,
+                                      IpRegionTemplate ipRegionTemplate) {
         this.externalProperties = Objects.requireNonNull(
                 externalProperties, "externalProperties must not be null");
         this.sequenceProperties = Objects.requireNonNull(

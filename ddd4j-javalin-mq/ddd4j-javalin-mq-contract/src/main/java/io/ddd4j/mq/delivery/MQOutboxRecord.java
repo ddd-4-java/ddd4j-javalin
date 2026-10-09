@@ -47,10 +47,10 @@ public record MQOutboxRecord(
     /**
      * 创建一条等待发布的消息。
      *
-     * @param messageId 稳定消息标识
+     * @param messageId   稳定消息标识
      * @param destination broker 目的地
-     * @param payload 已序列化事件负载
-     * @param headers 业务消息头
+     * @param payload     已序列化事件负载
+     * @param headers     业务消息头
      * @param availableAt 首次可投递时间
      * @return 待发布记录
      */

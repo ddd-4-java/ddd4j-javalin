@@ -56,8 +56,8 @@ public record MQDeliveryPolicy(
     /**
      * 计算某次失败后的下一次可投递时间。
      *
-     * @param attempts 已完成的发送尝试次数，从 1 开始
-     * @param failedAt 失败发生时间
+     * @param attempts           已完成的发送尝试次数，从 1 开始
+     * @param failedAt           失败发生时间
      * @param randomUnitInterval [0, 1] 的随机值，由调用方提供以保持测试可重复
      * @return 带抖动的下一次可投递时间
      */

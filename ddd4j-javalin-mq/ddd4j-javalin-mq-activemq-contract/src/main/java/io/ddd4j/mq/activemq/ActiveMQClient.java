@@ -187,6 +187,7 @@ public class ActiveMQClient implements MQClient {
         }
         return Objects.nonNull(messageId) ? messageId : ActivemqKit.messageIdOf(message);
     }
+
     /**
      * ddd4j 消息头统一使用 {@code ddd4j.xxx.yyy} 命名，JMS 场景需替换为 '_'。
      */

@@ -44,7 +44,7 @@ public interface MQDeliveryObserver {
      * Inbox 首次成功处理消息。
      *
      * @param consumerId 消费者标识
-     * @param messageId 稳定消息标识
+     * @param messageId  稳定消息标识
      */
     default void onInboxProcessed(String consumerId, String messageId) {
     }
@@ -53,7 +53,7 @@ public interface MQDeliveryObserver {
      * Inbox 识别到已处理的重复消息。
      *
      * @param consumerId 消费者标识
-     * @param messageId 稳定消息标识
+     * @param messageId  稳定消息标识
      */
     default void onInboxDuplicate(String consumerId, String messageId) {
     }
@@ -62,7 +62,7 @@ public interface MQDeliveryObserver {
      * Inbox 记录或业务处理失败，调用方应保持不 ACK 以触发重投。
      *
      * @param consumerId 消费者标识
-     * @param messageId 稳定消息标识
+     * @param messageId  稳定消息标识
      */
     default void onInboxFailed(String consumerId, String messageId) {
     }

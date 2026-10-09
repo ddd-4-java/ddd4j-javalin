@@ -95,7 +95,8 @@ public class JavalinOrderController {
         }
     }
 
-    public record OrderLineResponse(String id, String productId, String productName, int quantity, BigDecimal subtotal) {
+    public record OrderLineResponse(String id, String productId, String productName, int quantity,
+                                    BigDecimal subtotal) {
 
         static OrderLineResponse from(io.ddd4j.sample.richmodel.order.domain.model.OrderLine line) {
             return new OrderLineResponse(

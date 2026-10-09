@@ -13,8 +13,8 @@ public interface MQInboxStore {
     /**
      * 记录一条尚未处理的消息。
      *
-     * @param consumerId 稳定消费者标识
-     * @param messageId 生产端传入的稳定消息标识
+     * @param consumerId  稳定消费者标识
+     * @param messageId   生产端传入的稳定消息标识
      * @param processedAt 处理开始时间
      * @return {@code true} 表示首次处理；{@code false} 表示重复消息，应直接 ACK
      */

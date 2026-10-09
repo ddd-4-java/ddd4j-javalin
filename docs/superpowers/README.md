@@ -1,6 +1,6 @@
 # ddd4j-javalin superpowers 规范
 
-本目录是 ddd4j-javalin 的**规划与历史单一真相源**（对齐 liteflow 的 `docs/superpowers/` 约定）。所有新需求先写设计，再写计划，实施后回填真实状态。
+本目录是 ddd4j-javalin 的 **规划与历史单一真相源**（对齐 liteflow 的 `docs/superpowers/` 约定）。所有新需求先写设计，再写计划，实施后回填真实状态。
 
 ## 目录约定
 
@@ -17,7 +17,7 @@ docs/superpowers/
 
 ## 命名规范
 
-- 日期前缀 `YYYY-MM-DD` 为**设计定稿日**（不是实施日）。
+- 日期前缀 `YYYY-MM-DD` 为 **设计定稿日**（不是实施日）。
 - `<topic>` 用英文小写短横线分隔（如 `javalin-capability-matrix`、`testcontainers-foundation`、`container-it-roundspec`）。
 - spec 文件一律带 `-design` 后缀；plan 与 report 不带。
 - 同一 topic 的 plan 通过 `Related Design Doc` 头部字段链回 spec。
@@ -94,12 +94,12 @@ docs/superpowers/
 
 ## 索引
 
-| 类型 | 文件 | 主题 |
-|---|---|---|
-| spec | [2026-07-29-javalin-capability-matrix-design.md](specs/2026-07-29-javalin-capability-matrix-design.md) | 能力矩阵对齐（4 任务总设计） |
-| spec | [2026-07-30-testcontainers-foundation-design.md](specs/2026-07-30-testcontainers-foundation-design.md) | Testcontainers Fixture 共享层 |
-| spec | [2026-08-04-container-it-roundspec-design.md](specs/2026-08-04-container-it-roundspec-design.md) | 容器级 IT 真实 round-trip 修复 |
-| plan | [2026-07-29-javalin-capability-matrix.md](plans/2026-07-29-javalin-capability-matrix.md) | 10 Task 实施计划 + 验收记录 |
-| report | [2026-08-05-status.md](reports/2026-08-05-status.md) | 当前真实状态 |
-| spec | [2026-08-16-production-readiness-design.md](specs/2026-08-16-production-readiness-design.md) | 生产就绪改进设计 |
-| plan | [2026-08-16-production-readiness.md](plans/2026-08-16-production-readiness.md) | 生产就绪实施计划 |
+| 类型   | 文件                                                                                                   | 主题                           |
+|--------|--------------------------------------------------------------------------------------------------------|--------------------------------|
+| spec   | [2026-07-29-javalin-capability-matrix-design.md](specs/2026-07-29-javalin-capability-matrix-design.md) | 能力矩阵对齐（4 任务总设计）   |
+| spec   | [2026-07-30-testcontainers-foundation-design.md](specs/2026-07-30-testcontainers-foundation-design.md) | Testcontainers Fixture 共享层  |
+| spec   | [2026-08-04-container-it-roundspec-design.md](specs/2026-08-04-container-it-roundspec-design.md)       | 容器级 IT 真实 round-trip 修复 |
+| plan   | [2026-07-29-javalin-capability-matrix.md](plans/2026-07-29-javalin-capability-matrix.md)               | 10 Task 实施计划 + 验收记录    |
+| report | [2026-08-05-status.md](reports/2026-08-05-status.md)                                                   | 当前真实状态                   |
+| spec   | [2026-08-16-production-readiness-design.md](specs/2026-08-16-production-readiness-design.md)           | 生产就绪改进设计               |
+| plan   | [2026-08-16-production-readiness.md](plans/2026-08-16-production-readiness.md)                         | 生产就绪实施计划               |

@@ -6,7 +6,8 @@
 
 ## 1. 动机
 
-ddd4j-javalin 当前（2026-07）IT 数量 22 个，其中 13 个为 mock，9 个虽然用了真实 broker 但只断言「容器启动成功」而非真实 round-trip。**核心痛点**：
+ddd4j-javalin 当前（2026-07）IT 数量 22 个，其中 13 个为 mock，9 个虽然用了真实 broker 但只断言「容器启动成功」而非真实
+round-trip。 **核心痛点**：
 
 1. 每个模块的 IT 都要自己写 `new GenericContainer<>("postgres:16")...` 等样板；
 2. broker 真实消费未覆盖，无法保证对接 SDK 的正确性；
@@ -52,6 +53,7 @@ public abstract class AbstractTestContainerFixture<C extends GenericContainer<?>
 ```
 
 测试典型用法：
+
 ```java
 @Tag("integration")
 @JunitJupiterTestContainers
@@ -66,20 +68,20 @@ class MyFeatureIT {
 
 ### 2.3 镜像版本（与 testcontainers-bom 1.20.6 对齐）
 
-| 镜像 | 初始版本 | 后续修正 |
-|---|---|---|
-| `mysql:8.0` | ✅ | — |
-| `postgres:16-alpine` | ✅ | — |
-| `mariadb:11` | ✅ | — |
-| `mongo:7` | ✅ | — |
-| `redis:7-alpine` | ✅ | — |
-| `confluentinc/cp-kafka:7.5.0` | ✅ | — |
-| `rabbitmq:3-management` | ⚠️ arm64 上 badmap 崩溃 → **`3.13.7-management-alpine`** | `bc47d8d` |
-| `apache/activemq-classic:5.18.3` | ⚠️ 客户端是 Artemis 6.x → **`apache/activemq-artemis:2.39.0`** | `bc47d8d` |
-| `apache/rocketmq:5.1.0` | ⚠️ 无 arm64、QEMU OOMKilled → **`5.3.2`**（arm64 native） + 收紧堆 | `bc47d8d` |
-| `apachepulsar/pulsar:3.2.0` | ⚠️ standalone OOMKilled → **PULSAR_MEM 收紧 + namespace log wait** | `bc47d8d` |
-| `nats:2-alpine` | ✅ | — |
-| `eclipse-mosquitto:2.0` | ✅ | — |
+| 镜像                             | 初始版本                                                           | 后续修正  |
+|----------------------------------|--------------------------------------------------------------------|-----------|
+| `mysql:8.0`                      | ✅                                                                 | —         |
+| `postgres:16-alpine`             | ✅                                                                 | —         |
+| `mariadb:11`                     | ✅                                                                 | —         |
+| `mongo:7`                        | ✅                                                                 | —         |
+| `redis:7-alpine`                 | ✅                                                                 | —         |
+| `confluentinc/cp-kafka:7.5.0`    | ✅                                                                 | —         |
+| `rabbitmq:3-management`          | ⚠️ arm64 上 badmap 崩溃 → **`3.13.7-management-alpine`**           | `bc47d8d` |
+| `apache/activemq-classic:5.18.3` | ⚠️ 客户端是 Artemis 6.x → **`apache/activemq-artemis:2.39.0`**     | `bc47d8d` |
+| `apache/rocketmq:5.1.0`          | ⚠️ 无 arm64、QEMU OOMKilled → **`5.3.2`**（arm64 native） + 收紧堆 | `bc47d8d` |
+| `apachepulsar/pulsar:3.2.0`      | ⚠️ standalone OOMKilled → **PULSAR_MEM 收紧 + namespace log wait** | `bc47d8d` |
+| `nats:2-alpine`                  | ✅                                                                 | —         |
+| `eclipse-mosquitto:2.0`          | ✅                                                                 | —         |
 
 ### 2.4 等待策略
 

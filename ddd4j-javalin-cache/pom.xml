@@ -28,7 +28,7 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
-</dependencies>
+    </dependencies>
 
     <build>
         <plugins>

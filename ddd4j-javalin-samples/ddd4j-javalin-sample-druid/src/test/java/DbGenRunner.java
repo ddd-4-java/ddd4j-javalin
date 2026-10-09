@@ -14,14 +14,14 @@ import java.util.Map;
 public class DbGenRunner {
 
     private static final Map<SQLDialect, Map<String, String>> sqlDialectMap = Map.of(
-        SQLDialect.H2, Map.of(
-            "driver", org.h2.Driver.class.getName(),
-            "name", org.jooq.meta.h2.H2Database.class.getName()
-        ),
-        SQLDialect.MYSQL, Map.of(
-            "driver", com.mysql.cj.jdbc.Driver.class.getName(),
-            "name", org.jooq.meta.mysql.MySQLDatabase.class.getName()
-        )
+            SQLDialect.H2, Map.of(
+                    "driver", org.h2.Driver.class.getName(),
+                    "name", org.jooq.meta.h2.H2Database.class.getName()
+            ),
+            SQLDialect.MYSQL, Map.of(
+                    "driver", com.mysql.cj.jdbc.Driver.class.getName(),
+                    "name", org.jooq.meta.mysql.MySQLDatabase.class.getName()
+            )
     );
 
     public static void main(String[] args) throws Exception {
@@ -29,7 +29,7 @@ public class DbGenRunner {
         var json = JSONUtil.parseObj(config);
         var dbMap = json.getJSONObject("databases");
         var dbsToGen = List.of(
-            "write"
+                "write"
         );
 
         for (var dbAlias : dbsToGen) {
@@ -40,7 +40,7 @@ public class DbGenRunner {
             var schema = c.getStr("schema");
             var dialectName = c.get("dialect", SQLDialect.class);
 
-            if (! sqlDialectMap.containsKey(dialectName)) {
+            if (!sqlDialectMap.containsKey(dialectName)) {
                 throw new RuntimeException("不支持的SQL方言: " + dialectName);
             }
 
@@ -54,30 +54,30 @@ public class DbGenRunner {
     @SneakyThrows
     private static void genrate(String jdbcUrl, String jdbcUser, String jdbcPassword, String schema, String alias, String driver, String dbName) {
         var conf = new Configuration()
-            .withJdbc(new Jdbc()
-                .withDriver(driver)
-                .withUrl(jdbcUrl)
-                .withUser(jdbcUser)
-                .withPassword(jdbcPassword))
-            .withGenerator(new Generator()
-                .withName(org.jooq.codegen.JavaGenerator.class.getName())
-                .withGenerate(new Generate()
-                    .withPojos(true)
-                    .withDaos(false))
-                .withStrategy(new Strategy()
-                    .withName(JooqGenConfig.class.getName()))
-                .withTarget(new Target()
-                    .withDirectory("base/src/main/java")
-                    .withPackageName(DbGenRunner.class.getPackageName()+".db."+alias))
-                .withDatabase(new Database()
-                    .withName(dbName)
-                    .withIncludes(".*")
-                    .withExcludes("")
-                    .withInputSchema(schema)
-                    .withOutputSchemaToDefault(true)
-                    .withForcedTypes(new ForcedType()
-                        .withName("BOOLEAN")
-                        .withIncludeTypes("(?i:TINYINT\\(1\\))"))));
+                .withJdbc(new Jdbc()
+                        .withDriver(driver)
+                        .withUrl(jdbcUrl)
+                        .withUser(jdbcUser)
+                        .withPassword(jdbcPassword))
+                .withGenerator(new Generator()
+                        .withName(org.jooq.codegen.JavaGenerator.class.getName())
+                        .withGenerate(new Generate()
+                                .withPojos(true)
+                                .withDaos(false))
+                        .withStrategy(new Strategy()
+                                .withName(JooqGenConfig.class.getName()))
+                        .withTarget(new Target()
+                                .withDirectory("base/src/main/java")
+                                .withPackageName(DbGenRunner.class.getPackageName() + ".db." + alias))
+                        .withDatabase(new Database()
+                                .withName(dbName)
+                                .withIncludes(".*")
+                                .withExcludes("")
+                                .withInputSchema(schema)
+                                .withOutputSchemaToDefault(true)
+                                .withForcedTypes(new ForcedType()
+                                        .withName("BOOLEAN")
+                                        .withIncludeTypes("(?i:TINYINT\\(1\\))"))));
 
         GenerationTool.generate(conf);
     }
@@ -87,11 +87,11 @@ public class DbGenRunner {
         public String getJavaClassName(Definition definition, Mode mode) {
             var name = super.getJavaClassName(definition, mode);
 
-            if(definition.getName().startsWith("t_")) {
+            if (definition.getName().startsWith("t_")) {
                 name = name.substring(1);
             }
 
-            if(mode.equals(Mode.POJO)) {
+            if (mode.equals(Mode.POJO)) {
                 name += "Po";
             }
 
@@ -103,7 +103,7 @@ public class DbGenRunner {
         public String getJavaIdentifier(Definition definition) {
             var id = super.getJavaIdentifier(definition);
 
-            if(id.startsWith("T_")) {
+            if (id.startsWith("T_")) {
                 id = id.substring(2);
             }
 

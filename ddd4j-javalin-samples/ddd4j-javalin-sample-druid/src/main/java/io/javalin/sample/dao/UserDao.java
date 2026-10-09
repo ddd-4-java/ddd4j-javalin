@@ -34,12 +34,12 @@ public class UserDao {
         var sql = AppUtil.loadSql("firstUserInCountry");
 
         var cond = DSL.condition("1 = 1");
-        if(fromTs != null && fromTs > 0) {
+        if (fromTs != null && fromTs > 0) {
             cond = tUser.ID.in(DSL.select(tUser.ID).from(tUser).where(tUser.CREATED_AT.ge(fromTs)));
         }
 
         return readDb
-            .fetch(sql, tUser, cond)
-            .into(UserPo.class);
+                .fetch(sql, tUser, cond)
+                .into(UserPo.class);
     }
 }

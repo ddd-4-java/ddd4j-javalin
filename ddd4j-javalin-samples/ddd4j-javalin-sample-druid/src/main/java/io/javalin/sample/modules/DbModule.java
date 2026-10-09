@@ -29,7 +29,7 @@ public class DbModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        for(var conf : dbConfMap.entrySet()) {
+        for (var conf : dbConfMap.entrySet()) {
             bind(DSLContext.class)
                     .annotatedWith(Names.named(conf.getKey()))
                     .toInstance(createJooqContext(conf.getValue()));

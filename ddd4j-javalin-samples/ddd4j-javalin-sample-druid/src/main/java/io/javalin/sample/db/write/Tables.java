@@ -11,7 +11,7 @@ import io.javalin.sample.db.write.tables.User;
 /**
  * Convenience access to all tables in the default schema.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class Tables {
 
     /**

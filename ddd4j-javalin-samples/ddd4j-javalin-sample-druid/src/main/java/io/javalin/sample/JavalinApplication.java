@@ -76,9 +76,9 @@ public class JavalinApplication {
 
             ctx.status(HttpStatus.BAD_REQUEST);
             ctx.json(
-                R.error(HttpStatus.BAD_REQUEST.getCode())
-                    .data(errors)
-                    .message("validation error")
+                    R.error(HttpStatus.BAD_REQUEST.getCode())
+                            .data(errors)
+                            .message("validation error")
             );
         });
 
@@ -100,7 +100,7 @@ public class JavalinApplication {
     private void startTasks() {
         var taskClasses = ClassScanner.scanPackageBySuper(this.getClass().getPackageName(), AbstractTask.class);
 
-        for(var it : taskClasses) {
+        for (var it : taskClasses) {
             var taskName = it.getSimpleName();
             if (config.getTasks().containsKey(taskName)) {
                 var cronExpr = config.getTasks().get(taskName);

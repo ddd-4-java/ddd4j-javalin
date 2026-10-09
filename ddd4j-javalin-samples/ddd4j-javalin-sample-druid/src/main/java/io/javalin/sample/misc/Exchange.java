@@ -13,7 +13,7 @@ public class Exchange {
     public Exchange(Context context) {
         this.context = context;
         var lang = context.header("x-lang");
-        if(lang == null) lang = "en";
+        if (lang == null) lang = "en";
         this.lang = lang;
 
         localContext.set(this);
@@ -26,11 +26,11 @@ public class Exchange {
     public static String getLocalLang() {
         var ctx = localContext.get();
         if (ctx == null) {
-           return "en";
+            return "en";
         }
 
         var lang = ctx.lang;
-        if(StrUtil.isBlank(lang)) {
+        if (StrUtil.isBlank(lang)) {
             return "en";
         }
 

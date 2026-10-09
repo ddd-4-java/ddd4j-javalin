@@ -34,12 +34,12 @@ public class Sequence {
      * <p>
      * 参考：http://www.cnblogs.com/relucent/p/4955340.html
      *
-     * @param workerId            工作机器节点id,数据范围为0~31
+     * @param workerId 工作机器节点id,数据范围为0~31
      * @return {@link Sequence}
      * @since 1.0.0
      */
     public Sequence(long workerId) {
-        this.snowflake = new Snowflake( workerId);
+        this.snowflake = new Snowflake(workerId);
     }
 
     /**
@@ -60,13 +60,13 @@ public class Sequence {
      * <p>
      * 参考：http://www.cnblogs.com/relucent/p/4955340.html
      *
-     * @param workerId            工作机器节点id,数据范围为0~31
-     * @param dataCenterId        数据中心id,数据范围为0~31
+     * @param workerId     工作机器节点id,数据范围为0~31
+     * @param dataCenterId 数据中心id,数据范围为0~31
      * @return {@link Sequence}
      * @since 1.0.0
      */
     public Sequence(long workerId, long dataCenterId) {
-        this.snowflake = new Snowflake( workerId, dataCenterId);
+        this.snowflake = new Snowflake(workerId, dataCenterId);
     }
 
     /**
@@ -87,14 +87,14 @@ public class Sequence {
      * <p>
      * 参考：http://www.cnblogs.com/relucent/p/4955340.html
      *
-     * @param workerId            工作机器节点id,数据范围为0~31
-     * @param dataCenterId        数据中心id,数据范围为0~31
-     * @param isUseSystemClock    是否使用{@link cn.hutool.core.date.SystemClock} 获取当前时间戳
+     * @param workerId         工作机器节点id,数据范围为0~31
+     * @param dataCenterId     数据中心id,数据范围为0~31
+     * @param isUseSystemClock 是否使用{@link cn.hutool.core.date.SystemClock} 获取当前时间戳
      * @return {@link Sequence}
      * @since 1.0.0
      */
     public Sequence(long workerId, long dataCenterId, boolean isUseSystemClock) {
-        this.snowflake = new Snowflake( workerId, dataCenterId, isUseSystemClock);
+        this.snowflake = new Snowflake(workerId, dataCenterId, isUseSystemClock);
     }
 
     /**
@@ -115,15 +115,15 @@ public class Sequence {
      * <p>
      * 参考：http://www.cnblogs.com/relucent/p/4955340.html
      *
-     * @param workerId            工作机器节点id,数据范围为0~31
-     * @param dataCenterId        数据中心id,数据范围为0~31
-     * @param isUseSystemClock    是否使用{@link cn.hutool.core.date.SystemClock} 获取当前时间戳
-     * @param timeOffset          允许时间回拨的毫秒数
+     * @param workerId         工作机器节点id,数据范围为0~31
+     * @param dataCenterId     数据中心id,数据范围为0~31
+     * @param isUseSystemClock 是否使用{@link cn.hutool.core.date.SystemClock} 获取当前时间戳
+     * @param timeOffset       允许时间回拨的毫秒数
      * @return {@link Sequence}
      * @since 1.0.0
      */
     public Sequence(long workerId, long dataCenterId, boolean isUseSystemClock, long timeOffset) {
-        this.snowflake = new Snowflake( null, workerId, dataCenterId, isUseSystemClock, timeOffset);
+        this.snowflake = new Snowflake(null, workerId, dataCenterId, isUseSystemClock, timeOffset);
     }
 
     /**
@@ -153,7 +153,7 @@ public class Sequence {
      * @since 1.0.0
      */
     public Sequence(long workerId, long dataCenterId, boolean isUseSystemClock, long timeOffset, long randomSequenceLimit) {
-        this.snowflake = new Snowflake( null, workerId, dataCenterId, isUseSystemClock, timeOffset, randomSequenceLimit);
+        this.snowflake = new Snowflake(null, workerId, dataCenterId, isUseSystemClock, timeOffset, randomSequenceLimit);
     }
 
     /**

@@ -14,7 +14,7 @@ import java.util.List;
 
 @Data
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @SuppressWarnings("serial")
 public class PaginationEntity<T> extends BaseEntity<T> {
 

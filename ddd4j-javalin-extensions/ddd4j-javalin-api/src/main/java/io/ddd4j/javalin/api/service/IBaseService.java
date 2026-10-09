@@ -23,13 +23,14 @@ import java.util.Map;
 /**
  * 通用Service接口
  *
- * @author <a href="https://github.com/wandl">wandl</a>
  * @param <T> 持有的实体对象
+ * @author <a href="https://github.com/wandl">wandl</a>
  */
 public interface IBaseService<T> extends IService<T> {
 
     /**
      * 更新数据状态
+     *
      * @param id
      * @param status
      * @return
@@ -56,6 +57,7 @@ public interface IBaseService<T> extends IService<T> {
 
     /**
      * 统计记录数
+     *
      * @param t
      * @return
      */
@@ -92,6 +94,7 @@ public interface IBaseService<T> extends IService<T> {
     /**
      *
      * 通过指定key查询对应的唯一值
+     *
      * @param key
      * @return
      */

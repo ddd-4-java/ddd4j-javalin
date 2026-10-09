@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * 用户信息
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({"all", "unchecked", "rawtypes"})
 public class User extends TableImpl<UserRecord> {
 
     private static final long serialVersionUID = 1L;

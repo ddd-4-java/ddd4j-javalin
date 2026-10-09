@@ -105,7 +105,9 @@ class Ddd4jKafkaMqIT {
         }
     }
 
-    /** Listener bean invoked by the ddd4j consume pipeline; records the delivered event. */
+    /**
+     * Listener bean invoked by the ddd4j consume pipeline; records the delivered event.
+     */
     public static class SmokeListener {
 
         final AtomicReference<MQEvent> received = new AtomicReference<>();

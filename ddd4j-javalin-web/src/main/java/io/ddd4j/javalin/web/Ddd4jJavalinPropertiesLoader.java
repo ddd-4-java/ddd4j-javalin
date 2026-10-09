@@ -13,7 +13,9 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Function;
 
-/** 按固定优先级加载 ddd4j-javalin Web 配置。 */
+/**
+ * 按固定优先级加载 ddd4j-javalin Web 配置。
+ */
 public final class Ddd4jJavalinPropertiesLoader {
 
     private static final String PREFIX = Ddd4jJavalinProperties.PREFIX + ".";
@@ -29,7 +31,9 @@ public final class Ddd4jJavalinPropertiesLoader {
     private Ddd4jJavalinPropertiesLoader() {
     }
 
-    /** 从 application.properties、环境变量、系统属性和 CLI 加载配置。 */
+    /**
+     * 从 application.properties、环境变量、系统属性和 CLI 加载配置。
+     */
     public static Ddd4jJavalinProperties load(String[] args) {
         Properties fileProperties = loadApplicationProperties();
         return load(args, fileProperties, System.getenv(), System.getProperties());

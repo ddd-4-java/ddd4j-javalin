@@ -8,7 +8,9 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-/** RESOURCE_LOCAL JPA 事务模板，每次调用独占并关闭一个 EntityManager。 */
+/**
+ * RESOURCE_LOCAL JPA 事务模板，每次调用独占并关闭一个 EntityManager。
+ */
 public final class JpaTransactionTemplate {
 
     private final EntityManagerFactory entityManagerFactory;
@@ -19,7 +21,9 @@ public final class JpaTransactionTemplate {
                 entityManagerFactory, "entityManagerFactory must not be null");
     }
 
-    /** 在新事务中执行回调；成功提交，异常回滚并原样抛出。 */
+    /**
+     * 在新事务中执行回调；成功提交，异常回滚并原样抛出。
+     */
     public <T> T execute(Function<EntityManager, T> callback) {
         Objects.requireNonNull(callback, "callback must not be null");
         EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -41,7 +45,9 @@ public final class JpaTransactionTemplate {
         }
     }
 
-    /** 仅供健康检查与测试观察是否存在未关闭的 EntityManager。 */
+    /**
+     * 仅供健康检查与测试观察是否存在未关闭的 EntityManager。
+     */
     public boolean hasOpenEntityManager() {
         return openEntityManagers.get() > 0;
     }

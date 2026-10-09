@@ -17,7 +17,9 @@ import io.ddd4j.core.subject.SubjectProvider;
  */
 final class OrderOutboxTestSupport {
 
-    /** 已登录会话的 Bearer 请求头值。 */
+    /**
+     * 已登录会话的 Bearer 请求头值。
+     */
     static final String AUTHORIZATION;
 
     static {

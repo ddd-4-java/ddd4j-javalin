@@ -7,7 +7,9 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Startup validation contract for production-facing server properties. */
+/**
+ * Startup validation contract for production-facing server properties.
+ */
 class Ddd4jJavalinPropertiesValidatorTest {
 
     @Test

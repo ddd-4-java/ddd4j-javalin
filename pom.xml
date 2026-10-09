@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         
+
          xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
     <!-- POM的模型版本 -->
     <modelVersion>4.1.0</modelVersion>
@@ -17,7 +17,7 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-        <distributionManagement>
+    <distributionManagement>
         <repository>
             <id>2624322-release-6F6h6R</id>
             <url>https://packages.aliyun.com/6927b116e6c3e0425dbdf60d/maven/2624322-release-6f6h6r</url>
@@ -415,8 +415,12 @@
             <!-- 与 -Pquality 组合使用：注入 JaCoCo agent 到 surefire（经 property 拼接）。
                  单独激活无副作用；agent 依赖声明保证 CI 首跑即下载 runtime jar。 -->
             <properties>
-                <argLine>-javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
-                <jacoco.agent.argLine>-javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</jacoco.agent.argLine>
+                <argLine>
+                    -javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec
+                </argLine>
+                <jacoco.agent.argLine>
+                    -javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec
+                </jacoco.agent.argLine>
             </properties>
             <dependencies>
                 <dependency>

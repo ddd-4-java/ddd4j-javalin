@@ -9,7 +9,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/** Javalin 7 的 Bearer Token 请求边界。 */
+/**
+ * Javalin 7 的 Bearer Token 请求边界。
+ */
 public final class OidcHttpAuthentication {
 
     private static final String SCOPE_ATTRIBUTE = OidcHttpAuthentication.class.getName() + ".scope";
@@ -17,7 +19,9 @@ public final class OidcHttpAuthentication {
     private OidcHttpAuthentication() {
     }
 
-    /** 注册默认拒绝、路径白名单放行的请求认证处理器。 */
+    /**
+     * 注册默认拒绝、路径白名单放行的请求认证处理器。
+     */
     public static void register(Javalin app, OidcSubjectProvider provider, Set<String> publicPaths) {
         Objects.requireNonNull(app, "app must not be null");
         Objects.requireNonNull(provider, "provider must not be null");

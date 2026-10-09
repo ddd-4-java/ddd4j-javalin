@@ -153,7 +153,9 @@ class BuildLineContractTest {
         }
     }
 
-    /** 测试运行时必须提供唯一 SLF4J provider，避免静默降级为 NOP 日志。 */
+    /**
+     * 测试运行时必须提供唯一 SLF4J provider，避免静默降级为 NOP 日志。
+     */
     @Test
     void shouldProvideTestLoggingBinding() throws Exception {
         Document rootPom = parse(repositoryRoot().resolve("pom.xml"));
@@ -161,7 +163,9 @@ class BuildLineContractTest {
                 "测试运行时必须提供一个 SLF4J binding/provider");
     }
 
-    /** 公共 BOM 必须直接继承运行时依赖管理，父级版本不能抢占本发布线的 Javalin 版本。 */
+    /**
+     * 公共 BOM 必须直接继承运行时依赖管理，父级版本不能抢占本发布线的 Javalin 版本。
+     */
     @Test
     void shouldInheritRuntimeDependenciesInPublicBom() throws Exception {
         Document bom = parse(repositoryRoot().resolve("ddd4j-javalin-bom/pom.xml"));
@@ -207,7 +211,9 @@ class BuildLineContractTest {
         }
     }
 
-    /** 根 POM 不得硬编码跳过 Surefire，否则新增模块的测试会被静默遗漏。 */
+    /**
+     * 根 POM 不得硬编码跳过 Surefire，否则新增模块的测试会被静默遗漏。
+     */
     @Test
     void shouldNotDisableUnitTestsInRootPluginManagement() throws Exception {
         Document rootPom = parse(repositoryRoot().resolve("pom.xml"));

@@ -1,40 +1,56 @@
 # ddd4j-javalin Three-Branch Convergence Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Subagent execution and Git worktrees are prohibited for this change.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> Steps use checkbox (`- [ ]`) syntax for tracking. Subagent execution and Git worktrees are prohibited for this change.
 
-**Goal:** Converge the three official ddd4j-javalin branches onto their matching ddd4j/Javalin/Maven/JDK lines and prove them with executable build contracts, full unit tests, Testcontainers round-trips, and branch-correct GitHub Actions.
+**Goal:** Converge the three official ddd4j-javalin branches onto their matching ddd4j/Javalin/Maven/JDK lines and prove
+them with executable build contracts, full unit tests, Testcontainers round-trips, and branch-correct GitHub Actions.
 
-**Architecture:** Preserve the existing Guice + Javalin adapter design and converge already implemented candidate work instead of rebuilding it. Each branch has an explicit build contract: 6.7.x and 7.1.x use Maven 3/POM 4.0.0, while 7.2.x uses Maven 4/POM 4.1.0; all functional verification is performed against the matching deployed ddd4j line.
+**Architecture:** Preserve the existing Guice + Javalin adapter design and converge already implemented candidate work
+instead of rebuilding it. Each branch has an explicit build contract: 6.7.x and 7.1.x use Maven 3/POM 4.0.0, while 7.2.x
+uses Maven 4/POM 4.1.0; all functional verification is performed against the matching deployed ddd4j line.
 
-**Tech Stack:** Java 17/21, Maven 3/4, Javalin 6.7.0/7.1.0/7.2.3, Google Guice, JUnit 5, AssertJ, Testcontainers 1.20.6, GitHub Actions.
+**Tech Stack:** Java 17/21, Maven 3/4, Javalin 6.7.0/7.1.0/7.2.3, Google Guice, JUnit 5, AssertJ, Testcontainers 1.20.6,
+GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-09-07-three-branch-convergence-design.md`
 
 ## Global Constraints
 
-- `feature/6.7.x` = `6.7.x.20260630-SNAPSHOT` + ddd4j `1.0.x.20260630-SNAPSHOT` + Javalin `6.7.0` + Maven 3/POM 4.0.0 + JDK 17.
-- `feature/7.1.x` = `7.1.x.20260630-SNAPSHOT` + ddd4j `2.0.x.20260630-SNAPSHOT` + Javalin `7.1.0` + Maven 3/POM 4.0.0 + JDK 17.
-- `feature/7.2.x` = `7.2.x.20260630-SNAPSHOT` + ddd4j `3.0.x.20260630-SNAPSHOT` + Javalin `7.2.3` + Maven 4/POM 4.1.0 + JDK 21.
+- `feature/6.7.x` = `6.7.x.20260630-SNAPSHOT` + ddd4j `1.0.x.20260630-SNAPSHOT` + Javalin `6.7.0` + Maven 3/POM 4.0.0 +
+  JDK 17.
+- `feature/7.1.x` = `7.1.x.20260630-SNAPSHOT` + ddd4j `2.0.x.20260630-SNAPSHOT` + Javalin `7.1.0` + Maven 3/POM 4.0.0 +
+  JDK 17.
+- `feature/7.2.x` = `7.2.x.20260630-SNAPSHOT` + ddd4j `3.0.x.20260630-SNAPSHOT` + Javalin `7.2.3` + Maven 4/POM 4.1.0 +
+  JDK 21.
 - Maven 3 branches use `<modules>/<module>`; only the Maven 4 branch uses `<subprojects>/<subproject>`.
 - Keep Testcontainers at `1.20.6`; do not combine this convergence with a Testcontainers 2.x upgrade.
 - Never use, create, simulate, or depend on a Git worktree.
 - Preserve the dirty `ddd4j-boot` checkout; it is read-only reference material.
-- Do not push without explicit authorization. Local commits are required before switching official branches and therefore have a separate authorization gate.
-- Use a fresh temporary Maven local repository for publication-consumption proof; a developer's populated `~/.m2` is not release evidence.
-- Treat source/POM checks, dependency resolution, unit tests, container IT, GitHub Actions, and remote SHA equality as separate evidence levels.
-- Phase D changes only ddd4j-javalin; matching published ddd4j artifacts are read-only compatibility inputs, not implementation targets.
+- Do not push without explicit authorization. Local commits are required before switching official branches and
+  therefore have a separate authorization gate.
+- Use a fresh temporary Maven local repository for publication-consumption proof; a developer's populated `~/.m2` is not
+  release evidence.
+- Treat source/POM checks, dependency resolution, unit tests, container IT, GitHub Actions, and remote SHA equality as
+  separate evidence levels.
+- Phase D changes only ddd4j-javalin; matching published ddd4j artifacts are read-only compatibility inputs, not
+  implementation targets.
 
 ---
 
 ### Task 1: Add an executable build-line contract
 
 **Files:**
+
 - Create: `ddd4j-javalin-testcontainers/src/test/java/io/ddd4j/javalin/testcontainers/BuildLineContractTest.java`
 - Modify: `ddd4j-javalin-testcontainers/pom.xml`
 
 **Interfaces:**
-- Consumes: root `pom.xml`, `ddd4j-javalin-dependencies/pom.xml`, `.mvn/wrapper/maven-wrapper.properties`, `.github/workflows/ci.yml`, `.github/workflows/integration-it.yml`.
-- Produces: a JUnit 5 contract that derives the line from root `<revision>` and rejects incompatible ddd4j, Javalin, Maven model, aggregate element, wrapper, JDK, or workflow branch combinations.
+
+- Consumes: root `pom.xml`, `ddd4j-javalin-dependencies/pom.xml`, `.mvn/wrapper/maven-wrapper.properties`,
+  `.github/workflows/ci.yml`, `.github/workflows/integration-it.yml`.
+- Produces: a JUnit 5 contract that derives the line from root `<revision>` and rejects incompatible ddd4j, Javalin,
+  Maven model, aggregate element, wrapper, JDK, or workflow branch combinations.
 
 - [x] **Step 1: Write the failing test for the current 6.7.x mismatch**
 
@@ -48,7 +64,9 @@
   );
   ```
 
-  Parse POMs with JDK DOM APIs, not regex. Assert the root parent and `<ddd4j.version>` equal the expected ddd4j version, the dependencies POM exposes one unambiguous runtime Javalin property, and the aggregation/model match the line.
+  Parse POMs with JDK DOM APIs, not regex. Assert the root parent and `<ddd4j.version>` equal the expected ddd4j
+  version, the dependencies POM exposes one unambiguous runtime Javalin property, and the aggregation/model match the
+  line.
 
 - [x] **Step 2: Run the contract and verify RED**
 
@@ -62,25 +80,30 @@
     -Dsurefire.failIfNoSpecifiedTests=false test
   ```
 
-  Expected on the current formal 6.7.x branch: FAIL because the root parent/`ddd4j.version` is `2.0.x.20260730-SNAPSHOT`, not `1.0.x.20260630-SNAPSHOT`. If dependency resolution prevents the test JVM from starting, capture that as the earlier publication/configuration failure and run the test in the 1.0.x candidate after Task 2 establishes its reactor.
+  Expected on the current formal 6.7.x branch: FAIL because the root parent/`ddd4j.version` is
+  `2.0.x.20260730-SNAPSHOT`, not `1.0.x.20260630-SNAPSHOT`. If dependency resolution prevents the test JVM from
+  starting, capture that as the earlier publication/configuration failure and run the test in the 1.0.x candidate after
+  Task 2 establishes its reactor.
 
 - [x] **Step 3: Add wrapper and workflow assertions**
 
   Assert observable configuration contracts:
 
-  - Maven 3 lines' wrapper distribution contains `/apache-maven/3.`.
-  - Maven 4 line's wrapper distribution contains `/apache-maven/4.`.
-  - CI and IT YAML contain the current line's exact official branch and exact JDK.
-  - Both workflows consume `secrets.MAVEN_SETTINGS_XML` through an environment variable.
-  - Neither workflow contains job-level `continue-on-error: true`.
+    - Maven 3 lines' wrapper distribution contains `/apache-maven/3.`.
+    - Maven 4 line's wrapper distribution contains `/apache-maven/4.`.
+    - CI and IT YAML contain the current line's exact official branch and exact JDK.
+    - Both workflows consume `secrets.MAVEN_SETTINGS_XML` through an environment variable.
+    - Neither workflow contains job-level `continue-on-error: true`.
 
 - [x] **Step 4: Re-run to preserve the expected RED state**
 
-  Use the command from Step 2. Record the exact failing assertions; failures caused only by typos or inability to locate the repository root must be fixed before proceeding.
+  Use the command from Step 2. Record the exact failing assertions; failures caused only by typos or inability to locate
+  the repository root must be fixed before proceeding.
 
 ### Task 2: Converge `feature/6.7.x` with the 1.0.x retarget candidate
 
 **Files:**
+
 - Modify: `pom.xml`
 - Modify: `ddd4j-javalin-dependencies/pom.xml`
 - Modify: `ddd4j-javalin-bom/pom.xml`
@@ -88,9 +111,11 @@
 - Modify: `.github/workflows/ci.yml`
 - Modify: `.github/workflows/integration-it.yml`
 - Review/merge: `ddd4j-javalin-guice-bridge/**`
-- Review/merge: candidate changes under `ddd4j-javalin-{auth,cache,core,data,extensions,mq,samples,testcontainers,web}/**`
+- Review/merge: candidate changes under
+  `ddd4j-javalin-{auth,cache,core,data,extensions,mq,samples,testcontainers,web}/**`
 
 **Interfaces:**
+
 - Consumes: `opt/retarget-1.0.x`, formal `feature/6.7.x`, ddd4j `feature/1.0.x` deployed artifacts.
 - Produces: official `feature/6.7.x` with the 1.0.x compatibility bridge and later formal-branch auth/Web/test fixes.
 
@@ -104,21 +129,26 @@
   git merge-tree "$(git merge-base feature/6.7.x opt/retarget-1.0.x)" feature/6.7.x opt/retarget-1.0.x
   ```
 
-  Classify each unique commit/file as candidate-required, formal-required, obsolete because upstream 1.0.x now supplies it, or documentation-only. Save the classification in the plan's validation record; do not create another specification.
+  Classify each unique commit/file as candidate-required, formal-required, obsolete because upstream 1.0.x now supplies
+  it, or documentation-only. Save the classification in the plan's validation record; do not create another
+  specification.
 
 - [x] **Step 2: Stop for local commit authorization**
 
-  The repository currently contains the approved spec and plan as untracked changes. Obtain explicit authorization before making the local documentation checkpoint or any merge/cherry-pick commit. Do not stash, reset, clean, or use a worktree to bypass this gate.
+  The repository currently contains the approved spec and plan as untracked changes. Obtain explicit authorization
+  before making the local documentation checkpoint or any merge/cherry-pick commit. Do not stash, reset, clean, or use a
+  worktree to bypass this gate.
 
 - [x] **Step 3: Establish the integrated 6.7.x branch**
 
-  After authorization, commit the approved spec/plan, integrate the candidate history into `feature/6.7.x`, and resolve conflicts according to the ledger. Preserve:
+  After authorization, commit the approved spec/plan, integrate the candidate history into `feature/6.7.x`, and resolve
+  conflicts according to the ledger. Preserve:
 
-  - root/managed ddd4j version `1.0.x.20260630-SNAPSHOT`;
-  - Javalin runtime `6.7.0` with a single clearly named runtime property;
-  - Maven 3 `4.0.0/<modules>` structure;
-  - JDK 17 build target;
-  - Guice bridge types only when absent from the newly deployed 1.0.x artifacts.
+    - root/managed ddd4j version `1.0.x.20260630-SNAPSHOT`;
+    - Javalin runtime `6.7.0` with a single clearly named runtime property;
+    - Maven 3 `4.0.0/<modules>` structure;
+    - JDK 17 build target;
+    - Guice bridge types only when absent from the newly deployed 1.0.x artifacts.
 
 - [x] **Step 4: Run the build contract and verify GREEN**
 
@@ -144,11 +174,13 @@
     -DskipTests=false -Dsurefire.skip=false
   ```
 
-  Expected: BUILD SUCCESS with actual executed-test counts; zero failures/errors. Do not reuse the historical 142-test result as current evidence.
+  Expected: BUILD SUCCESS with actual executed-test counts; zero failures/errors. Do not reuse the historical 142-test
+  result as current evidence.
 
 ### Task 3: Restore `feature/7.1.x` to Maven 3 and ddd4j 2.0.x
 
 **Files:**
+
 - Modify: every tracked `**/pom.xml` containing Maven model/schema or aggregate elements
 - Modify: `.mvn/wrapper/maven-wrapper.properties`
 - Modify: `.github/workflows/ci.yml`
@@ -157,6 +189,7 @@
 - Modify: `docs/javalin-version-matrix.md`
 
 **Interfaces:**
+
 - Consumes: integrated shared tests/fixes from Task 2 where source-compatible, ddd4j `2.0.x.20260630-SNAPSHOT`.
 - Produces: Javalin 7.1.0 adapter built entirely with Maven 3/POM 4.0.0 semantics.
 
@@ -164,10 +197,10 @@
 
   Expected failures:
 
-  - ddd4j version is `2.0.x.20260730-SNAPSHOT`;
-  - POMs use `modelVersion 4.1.0` and `<subprojects>`;
-  - wrapper points at Maven 4;
-  - workflows listen to `feature/7.2.x` and describe ddd4j 3.0.x.
+    - ddd4j version is `2.0.x.20260730-SNAPSHOT`;
+    - POMs use `modelVersion 4.1.0` and `<subprojects>`;
+    - wrapper points at Maven 4;
+    - workflows listen to `feature/7.2.x` and describe ddd4j 3.0.x.
 
 - [x] **Step 2: Convert all POMs mechanically to Maven 3 model**
 
@@ -181,15 +214,19 @@
   </project>
   ```
 
-  Replace `<subprojects>/<subproject>` with `<modules>/<module>` without changing module order or membership. Validate every POM with `xmllint --noout`.
+  Replace `<subprojects>/<subproject>` with `<modules>/<module>` without changing module order or membership. Validate
+  every POM with `xmllint --noout`.
 
 - [x] **Step 3: Correct versions and Maven wrapper**
 
-  Set root parent and `<ddd4j.version>` to `2.0.x.20260630-SNAPSHOT`, keep project revision `7.1.x.20260630-SNAPSHOT`, keep Javalin `7.1.0`, and select the Maven 3 wrapper version proven by the current ddd4j 2.0.x workflow/wrapper rather than inventing a version.
+  Set root parent and `<ddd4j.version>` to `2.0.x.20260630-SNAPSHOT`, keep project revision `7.1.x.20260630-SNAPSHOT`,
+  keep Javalin `7.1.0`, and select the Maven 3 wrapper version proven by the current ddd4j 2.0.x workflow/wrapper rather
+  than inventing a version.
 
 - [x] **Step 4: Correct both workflows**
 
-  Make both workflows explicitly target `feature/7.1.x`, JDK 17, Maven 3, ddd4j 2.0.x, and raw-XML `MAVEN_SETTINGS_XML`. Remove 7.2.x/3.0.x comments and job-level `continue-on-error`.
+  Make both workflows explicitly target `feature/7.1.x`, JDK 17, Maven 3, ddd4j 2.0.x, and raw-XML `MAVEN_SETTINGS_XML`.
+  Remove 7.2.x/3.0.x comments and job-level `continue-on-error`.
 
 - [x] **Step 5: Run the build contract and verify GREEN**
 
@@ -197,27 +234,32 @@
 
 - [x] **Step 6: Prove dependency resolution and full tests**
 
-  Run the Task 2 dependency-tree and unit-test commands. Expected: only ddd4j `2.0.x.20260630-SNAPSHOT`, Javalin `7.1.0`, and zero test failures/errors.
+  Run the Task 2 dependency-tree and unit-test commands. Expected: only ddd4j `2.0.x.20260630-SNAPSHOT`, Javalin
+  `7.1.0`, and zero test failures/errors.
 
 ### Task 4: Harden the Maven 4 `feature/7.2.x` line
 
 **Files:**
+
 - Modify: `.github/workflows/ci.yml`
 - Modify: `.github/workflows/integration-it.yml`
 - Modify: `.mvn/wrapper/maven-wrapper.properties` only if it does not match the ddd4j 3.0.x wrapper
 - Modify: POMs only when the contract finds a real Maven 3 residue
 
 **Interfaces:**
+
 - Consumes: ddd4j `3.0.x.20260630-SNAPSHOT`, Javalin `7.2.3`, Maven 4 wrapper.
 - Produces: a JDK 21/Maven 4 branch with no production `<modules>` residue and branch-correct CI.
 
 - [x] **Step 1: Apply the build contract and verify RED**
 
-  Expected current failure: `integration-it.yml` configures JDK 17 instead of JDK 21. CI publication resolution may also fail while ddd4j 3.0.x remains unpublished.
+  Expected current failure: `integration-it.yml` configures JDK 17 instead of JDK 21. CI publication resolution may also
+  fail while ddd4j 3.0.x remains unpublished.
 
 - [x] **Step 2: Correct workflows**
 
-  Use JDK 21 and `./mvnw` in both workflows, target only `feature/7.2.x`, consume `MAVEN_SETTINGS_XML`, and remove job-level `continue-on-error`.
+  Use JDK 21 and `./mvnw` in both workflows, target only `feature/7.2.x`, consume `MAVEN_SETTINGS_XML`, and remove
+  job-level `continue-on-error`.
 
 - [x] **Step 3: Validate Maven 4 structure**
 
@@ -227,7 +269,8 @@
   find . -name pom.xml -print0 | xargs -0 -n1 xmllint --noout
   ```
 
-  Expected: no actual Maven 3 aggregate elements; comments containing `<module>` are either clarified or excluded from the structural check. All POMs parse.
+  Expected: no actual Maven 3 aggregate elements; comments containing `<module>` are either clarified or excluded from
+  the structural check. All POMs parse.
 
 - [x] **Step 4: Run the contract and local reactor checks**
 
@@ -253,31 +296,40 @@
     -Dincludes=io.ddd4j:*,io.javalin:javalin
   ```
 
-  Then run the full Maven 4 unit suite with the same `-Dmaven.repo.local` value. Remove only that validated temporary directory after recording results.
+  Then run the full Maven 4 unit suite with the same `-Dmaven.repo.local` value. Remove only that validated temporary
+  directory after recording results.
 
 ### Task 5: Align Testcontainers fixtures with the module catalog
 
 **Files:**
+
 - Modify: `ddd4j-javalin-testcontainers/pom.xml`
 - Modify: `ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/**/*TestContainerFixture.java`
 - Modify: `ddd4j-javalin-testcontainers/src/test/java/io/ddd4j/javalin/testcontainers/FixtureContractTest.java`
 - Modify: affected `**/*IT.java`
 
 **Interfaces:**
-- Consumes: Testcontainers BOM 1.20.6, existing pinned images, official/community module classifications from `https://testcontainers.com/modules/`.
+
+- Consumes: Testcontainers BOM 1.20.6, existing pinned images, official/community module classifications from
+  `https://testcontainers.com/modules/`.
 - Produces: centralized fixtures with pinned image tags and real consumer-facing round-trip assertions.
 
 - [x] **Step 1: Write failing fixture contract cases**
 
-  For each fixture, instantiate the real container type and assert its configured Docker image name literal. Add negative assertions that no fixture uses `latest` or an unqualified major-less tag. The test must fail if a production change selects the wrong image family/tag.
+  For each fixture, instantiate the real container type and assert its configured Docker image name literal. Add
+  negative assertions that no fixture uses `latest` or an unqualified major-less tag. The test must fail if a production
+  change selects the wrong image family/tag.
 
 - [x] **Step 2: Verify RED for current gaps**
 
-  Expected failures should identify any unpinned image, wrong container type, duplicated per-IT container configuration, or the SQS fixture still using a plain `GenericContainer` when `LocalStackContainer` is compatible with 1.20.6.
+  Expected failures should identify any unpinned image, wrong container type, duplicated per-IT container configuration,
+  or the SQS fixture still using a plain `GenericContainer` when `LocalStackContainer` is compatible with 1.20.6.
 
 - [x] **Step 3: Apply minimal fixture corrections**
 
-  Prefer module-specific Java container classes available in 1.20.6 for MySQL, PostgreSQL, MariaDB, MongoDB, Kafka, RabbitMQ, and LocalStack. Retain `GenericContainer` for services without a compatible 1.20.6 module wrapper. Keep the currently proven ARM64-compatible broker tags unless a focused container startup test proves they are invalid.
+  Prefer module-specific Java container classes available in 1.20.6 for MySQL, PostgreSQL, MariaDB, MongoDB, Kafka,
+  RabbitMQ, and LocalStack. Retain `GenericContainer` for services without a compatible 1.20.6 module wrapper. Keep the
+  currently proven ARM64-compatible broker tags unless a focused container startup test proves they are invalid.
 
 - [x] **Step 4: Verify fixture contract GREEN**
 
@@ -294,40 +346,50 @@
 
 - [x] **Step 5: Audit disabled tests**
 
-  Ensure ONS and TDMQ are explicitly disabled with managed-service reasons. Ensure Mica is either actually annotated `@Disabled` with a current issue reason or is executed; a comment saying it is disabled is insufficient.
+  Ensure ONS and TDMQ are explicitly disabled with managed-service reasons. Ensure Mica is either actually annotated
+  `@Disabled` with a current issue reason or is executed; a comment saying it is disabled is insufficient.
 
 ### Task 6: Execute real container round-trips on each branch
 
 **Files:**
+
 - Test: `ddd4j-javalin-data/**/src/test/**/*IT.java`
 - Test: `ddd4j-javalin-auth/**/src/test/**/*IT.java`
 - Test: `ddd4j-javalin-mq/**/src/test/**/*IT.java`
 - Test: `ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/test/**/*IT.java`
 
 **Interfaces:**
+
 - Consumes: centralized fixtures from Task 5 and the matching line's ddd4j clients.
-- Produces: per-service evidence for startup, request/command, persistence/broker side effect, response/consume, and cleanup.
+- Produces: per-service evidence for startup, request/command, persistence/broker side effect, response/consume, and
+  cleanup.
 
 - [x] **Step 1: Run database and outbox IT**
 
-  Run MySQL CRUD and PostgreSQL outbox modules with `-Pjavalin-integration-tests -am`. Expected: actual SQL write/read/transaction assertions, not only container startup.
+  Run MySQL CRUD and PostgreSQL outbox modules with `-Pjavalin-integration-tests -am`. Expected: actual SQL
+  write/read/transaction assertions, not only container startup.
 
 - [x] **Step 2: Run auth IT**
 
   Run the OIDC Keycloak IT for real token acquisition and HTTP allow/deny. Run Sa-Token, Security, and Shiro
-  Keycloak smoke tests separately to preserve their native-provider boundary; those smoke tests do not claim an OIDC bridge.
+  Keycloak smoke tests separately to preserve their native-provider boundary; those smoke tests do not claim an OIDC
+  bridge.
 
 - [x] **Step 3: Run broker IT serially**
 
-  Execute Kafka, RabbitMQ, Artemis, RocketMQ, Pulsar, NATS, SQS, Redis Stream, and MQTT in separate Maven invocations. For each, require publish → broker → consume → acknowledgment assertions.
+  Execute Kafka, RabbitMQ, Artemis, RocketMQ, Pulsar, NATS, SQS, Redis Stream, and MQTT in separate Maven invocations.
+  For each, require publish → broker → consume → acknowledgment assertions.
 
 - [x] **Step 4: Record failures without blanket exemptions**
 
-  Classify failures as code defect, image/platform incompatibility, upstream client defect, private artifact resolution, or transient infrastructure. Only a reproducible upstream defect may justify an individual `@Disabled`; never enable job-level `continue-on-error`.
+  Classify failures as code defect, image/platform incompatibility, upstream client defect, private artifact resolution,
+  or transient infrastructure. Only a reproducible upstream defect may justify an individual `@Disabled`; never enable
+  job-level `continue-on-error`.
 
 ### Task 7: Synchronize documentation and validation records
 
 **Files:**
+
 - Modify: `README.md`
 - Modify: `docs/architecture.md`
 - Modify: `docs/javalin-version-matrix.md`
@@ -336,6 +398,7 @@
 - Modify: this plan's checkbox/status and append a validation record
 
 **Interfaces:**
+
 - Consumes: actual final POMs, dependency trees, test reports, container runs, and CI URLs.
 - Produces: source-backed documentation with no stale 6.3.x/7.2.2/2.0.x.20260730 claims.
 
@@ -345,19 +408,20 @@
 
 - [x] **Step 2: Correct Testcontainers wording**
 
-  Distinguish Testcontainers official modules, community modules, and images used through `GenericContainer`. Do not call every image “officially supported by Testcontainers.”
+  Distinguish Testcontainers official modules, community modules, and images used through `GenericContainer`. Do not
+  call every image “officially supported by Testcontainers.”
 
 - [x] **Step 3: Record evidence by layer**
 
   For each branch record:
 
-  - branch and commit SHA;
-  - POM/model validation;
-  - resolved ddd4j/Javalin versions;
-  - unit test counts/failures/skips;
-  - each container IT result;
-  - GitHub Actions run URL and conclusion;
-  - unresolved publication or platform blockers.
+    - branch and commit SHA;
+    - POM/model validation;
+    - resolved ddd4j/Javalin versions;
+    - unit test counts/failures/skips;
+    - each container IT result;
+    - GitHub Actions run URL and conclusion;
+    - unresolved publication or platform blockers.
 
 - [x] **Step 4: Run documentation consistency scan**
 
@@ -371,52 +435,77 @@
 ### Task 8: Final verification and remote execution gate
 
 **Files:**
+
 - No new production files; verification only.
 
 **Interfaces:**
+
 - Consumes: completed Tasks 1–7.
 - Produces: final completion report or an explicit blocked report.
 
 - [x] **Step 1: Run branch-local static gates**
 
-  On each official branch run `git diff --check`, all-POM XML validation, forbidden Maven model/aggregate residue scan, and the focused build contract.
+  On each official branch run `git diff --check`, all-POM XML validation, forbidden Maven model/aggregate residue scan,
+  and the focused build contract.
 
 - [x] **Step 2: Run fresh full tests**
 
-  Run the complete unit suite and all required Testcontainers IT with the line's prescribed Maven/JDK. Read complete summaries and count failures/errors/skips.
+  Run the complete unit suite and all required Testcontainers IT with the line's prescribed Maven/JDK. Read complete
+  summaries and count failures/errors/skips.
 
 - [x] **Step 3: Obtain push authorization**
 
-  Before pushing, show the exact local commits/files for all three branches and ask for explicit authorization. Do not infer push permission from implementation approval.
+  Before pushing, show the exact local commits/files for all three branches and ask for explicit authorization. Do not
+  infer push permission from implementation approval.
 
 - [x] **Step 4: Trigger and wait for GitHub Actions**
 
-  After authorized push, wait for the final SHA's CI and integration workflows. A workflow file existing locally is not completion evidence.
+  After authorized push, wait for the final SHA's CI and integration workflows. A workflow file existing locally is not
+  completion evidence.
 
 - [x] **Step 5: Compare local and remote SHAs**
 
-  Compare each official branch against both configured remotes with `git ls-remote --heads`. Report any divergence without force-pushing.
+  Compare each official branch against both configured remotes with `git ls-remote --heads`. Report any divergence
+  without force-pushing.
 
 - [ ] **Step 6: Complete the specification status only with evidence**
 
-  Mark the spec implemented only when all mandatory gates pass. If ddd4j 3.0.x remains unpublished or a required CI job is red, leave the spec/plan incomplete and report the exact blocker.
+  Mark the spec implemented only when all mandatory gates pass. If ddd4j 3.0.x remains unpublished or a required CI job
+  is red, leave the spec/plan incomplete and report the exact blocker.
 
 ## Validation Record
 
-- 2026-09-07: Plan created from the approved design. No POM, production source, test, workflow, branch, commit, or remote was changed during planning.
-- 2026-09-07 6.7.x RED: `BuildLineContractTest` failed 3/3 on core `2.0.x.20260730`, ambiguous Javalin properties, and Maven 4 wrapper.
-- 2026-09-07 6.7.x candidate ledger: `opt/retarget-1.0.x` overlaps 185 Java types now present in ddd4j 1.0.x, so the candidate was not merged wholesale. Only still-missing compatibility behavior was applied to the formal branch.
-- 2026-09-07 6.7.x GREEN: build contract passed 3/3; dependency tree resolved ddd4j `1.0.x.20260630-SNAPSHOT` and Javalin `6.7.0`; full 52-module unit Reactor passed with 77 tests, zero failures/errors/skips.
-- 2026-09-07 6.7.x upstream exclusions: cqrs-person/rich-model artifacts are not published; ddd4j sample-order artifacts explicitly skip deploy and their published local POMs retain `${revision}`, so those cross-repository samples remain outside the official Reactor.
-- 2026-09-07 Testcontainers: added the Testcontainers 1.20.6 LocalStack module and centralized SQS fixture, replaced the SQS IT's duplicated GenericContainer setup, and expanded the fixture contract to 13 pinned-image cases. ONS/TDMQ remain managed-service exclusions; Mica remains explicitly disabled for the recorded upstream AIO defect.
-- 2026-09-07 container verification: on all three branches MySQL CRUD, Sa-Token/Security/Shiro Keycloak, and nine broker round-trips passed. PostgreSQL outbox is not a common gate because its sample artifacts are unavailable on part of the upstream matrix.
-- 2026-09-07 clean unit verification: 6.7.x ran 79 tests, 7.1.x ran 72 tests, and 7.2.x ran 66 tests; all had zero failures, errors, and skips.
-- 2026-09-07 remote execution: all three branches were pushed to `origin` and `github`; both remotes matched the local SHA. All six GitHub Actions runs reached failure before starting any step because the account payment failed or the Actions spending limit must be increased. Remote code execution therefore remains blocked by account state rather than a repository test failure.
-- 2026-09-08 CodeGraph correction: the three Keycloak tests are container-start smoke tests, not token/allow/deny IT; Task 6 Step 2 is reopened. The 6.7.x local web adapter does not invoke its injected request lifecycle, while the shared production bootstrap bypasses the complete core Guice module on all lines.
+- 2026-09-07: Plan created from the approved design. No POM, production source, test, workflow, branch, commit, or
+  remote was changed during planning.
+- 2026-09-07 6.7.x RED: `BuildLineContractTest` failed 3/3 on core `2.0.x.20260730`, ambiguous Javalin properties, and
+  Maven 4 wrapper.
+- 2026-09-07 6.7.x candidate ledger: `opt/retarget-1.0.x` overlaps 185 Java types now present in ddd4j 1.0.x, so the
+  candidate was not merged wholesale. Only still-missing compatibility behavior was applied to the formal branch.
+- 2026-09-07 6.7.x GREEN: build contract passed 3/3; dependency tree resolved ddd4j `1.0.x.20260630-SNAPSHOT` and
+  Javalin `6.7.0`; full 52-module unit Reactor passed with 77 tests, zero failures/errors/skips.
+- 2026-09-07 6.7.x upstream exclusions: cqrs-person/rich-model artifacts are not published; ddd4j sample-order artifacts
+  explicitly skip deploy and their published local POMs retain `${revision}`, so those cross-repository samples remain
+  outside the official Reactor.
+- 2026-09-07 Testcontainers: added the Testcontainers 1.20.6 LocalStack module and centralized SQS fixture, replaced the
+  SQS IT's duplicated GenericContainer setup, and expanded the fixture contract to 13 pinned-image cases. ONS/TDMQ
+  remain managed-service exclusions; Mica remains explicitly disabled for the recorded upstream AIO defect.
+- 2026-09-07 container verification: on all three branches MySQL CRUD, Sa-Token/Security/Shiro Keycloak, and nine broker
+  round-trips passed. PostgreSQL outbox is not a common gate because its sample artifacts are unavailable on part of the
+  upstream matrix.
+- 2026-09-07 clean unit verification: 6.7.x ran 79 tests, 7.1.x ran 72 tests, and 7.2.x ran 66 tests; all had zero
+  failures, errors, and skips.
+- 2026-09-07 remote execution: all three branches were pushed to `origin` and `github`; both remotes matched the local
+  SHA. All six GitHub Actions runs reached failure before starting any step because the account payment failed or the
+  Actions spending limit must be increased. Remote code execution therefore remains blocked by account state rather than
+  a repository test failure.
+- 2026-09-08 CodeGraph correction: the three Keycloak tests are container-start smoke tests, not token/allow/deny IT;
+  Task 6 Step 2 is reopened. The 6.7.x local web adapter does not invoke its injected request lifecycle, while the
+  shared production bootstrap bypasses the complete core Guice module on all lines.
 
 ### Task 9: Phase A — close the production runtime and Web lifecycle
 
 **Files:**
+
 - Modify: `ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinApplication.java`
 - Modify: `ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinAutoConfiguration.java`
 - Modify: `ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinProperties.java`
@@ -468,17 +557,20 @@
 - [x] **Step 2: Verify JWT security and claim mapping**
 
   Use locally generated RSA/JWKS fixtures to prove signature, issuer, audience, exp, nbf, algorithm allowlist,
-  bounded clock skew, roles/permissions mapping, invalid-token 401 and JWKS-unavailable 503. Do not use mocks for JWT verification.
+  bounded clock skew, roles/permissions mapping, invalid-token 401 and JWKS-unavailable 503. Do not use mocks for JWT
+  verification.
 
 - [x] **Step 3: Keycloak token and HTTP allow/deny on all lines**
 
   Obtain a real RS256 access token from the Testcontainers realm public client, call a protected Javalin route and
-  assert Principal visibility plus 200. Missing/tampered token must return 401 and ThreadContext must be empty afterward.
+  assert Principal visibility plus 200. Missing/tampered token must return 401 and ThreadContext must be empty
+  afterward.
 
 - [x] **Step 4: Preserve native auth-provider boundaries**
 
   Keep Sa-Token/Security/Shiro native token tests separate. Rename their current Keycloak container-start tests to smoke
-  semantics unless they actually install an OIDC bridge; do not claim the native providers directly validate Keycloak JWT.
+  semantics unless they actually install an OIDC bridge; do not claim the native providers directly validate Keycloak
+  JWT.
 
 - [x] **Step 5: MyBatis ddd4j Repository contract on MySQL**
 - [x] **Step 6: JPA transaction commit/rollback on PostgreSQL**
@@ -496,7 +588,8 @@
   RabbitMQ is the reference but not a forced semantic template. For ActiveMQ, Kafka, NATS, Pulsar, Redis Stream,
   RocketMQ, SQS and MQTT, document each protocol's publish durability, success confirmation, ACK/NACK or equivalent,
   retry/requeue, dead-letter and restart recovery semantics. Add real fault-injection tests where the protocol supports
-  them; explicitly fail closed or document unsupported operations instead of inferring parity from a happy-path round-trip.
+  them; explicitly fail closed or document unsupported operations instead of inferring parity from a happy-path
+  round-trip.
 
 - [x] **Step 6: Eliminate the ddd4j 3.0.x Maven 4 effective-model warning debt**
 
@@ -507,6 +600,7 @@
 ### Task 12: Phase D — production configuration contract
 
 **Files:**
+
 - Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinRuntimeMode.java
 - Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesLoader.java
 - Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesValidator.java
@@ -516,11 +610,12 @@
 - Test: ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesValidatorTest.java
 
 **Interfaces:**
+
 - Produce enum Ddd4jJavalinRuntimeMode with DEVELOPMENT and PRODUCTION.
 - All three lines default to DEVELOPMENT for source and behavior compatibility; production deployments and Task 17
   acceptance must set PRODUCTION explicitly.
-- Produce Ddd4jJavalinPropertiesLoader.load(String[] args).
-- Produce Ddd4jJavalinPropertiesValidator.validate(Ddd4jJavalinProperties properties).
+- Produce Ddd4jJavalinPropertiesLoader.load (String[] args).
+- Produce Ddd4jJavalinPropertiesValidator.validate (Ddd4jJavalinProperties properties).
 - Precedence is CLI, system property, environment variable, application.properties, Java default.
 - Environment names use uppercase snake case, for example DDD4J_WEB_JAVALIN_CONTEXT_PATH.
 - YAML is not silently claimed: correct the existing Javadoc to the formats actually implemented.
@@ -559,6 +654,7 @@
 ### Task 13: Phase D — one owned Javalin runtime lifecycle
 
 **Files:**
+
 - Create: ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/JavalinLifecycleParticipant.java
 - Create: ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/Ddd4jJavalinRuntime.java
 - Create: ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/JavalinRuntimeState.java
@@ -568,6 +664,7 @@
 - Test: ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/Ddd4jJavalinApplicationLifecycleTest.java
 
 **Interfaces:**
+
 - JavalinLifecycleParticipant exposes order, validate, start, readiness and close.
 - Ddd4jJavalinRuntime exposes start, state, readiness and idempotent close.
 - States are NEW, STARTING, RUNNING, DRAINING and STOPPED.
@@ -589,7 +686,8 @@
 
 - [x] **Step 4: RED/GREEN — rollback before socket publication**
 
-  Start with a failing participant through Ddd4jJavalinApplication. Require an exception, reverse cleanup and no returned
+  Start with a failing participant through Ddd4jJavalinApplication. Require an exception, reverse cleanup and no
+  returned
   server. Then integrate runtime start before Javalin socket start.
 
 - [x] **Step 5: GREEN — govern the shutdown hook**
@@ -604,18 +702,22 @@
 ### Task 14: Phase D — MQ automatic initialization and production fail-closed behavior
 
 **Files:**
+
 - Create: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/JavalinMqListenerScanner.java
-- Create: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/JavalinMqLifecycleParticipant.java
+- Create:
+  ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/JavalinMqLifecycleParticipant.java
 - Create: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/Ddd4jJavalinMqProperties.java
 - Modify: ddd4j-javalin-mq/ddd4j-javalin-mq-core/pom.xml
 - Modify: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/AbstractDdd4jMqGuiceModule.java
 - Modify: every broker-specific Ddd4j*MqGuiceModule.java
 - Test: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/test/java/io/ddd4j/javalin/mq/core/JavalinMqListenerScannerTest.java
-- Test: ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/test/java/io/ddd4j/javalin/mq/core/JavalinMqLifecycleParticipantTest.java
+- Test:
+  ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/test/java/io/ddd4j/javalin/mq/core/JavalinMqLifecycleParticipantTest.java
 - Test: affected broker integration tests
 
 **Interfaces:**
-- JavalinMqListenerScanner.scan(Injector, Collection<String>) returns deterministic MQListener entries.
+
+- JavalinMqListenerScanner.scan (Injector, Collection<String>) returns deterministic MQListener entries.
 - The mq-core POM declares ClassGraph directly; listener discovery must not rely on a transitive dependency.
 - Ddd4jJavalinMqProperties declares role PRODUCER_ONLY, CONSUMER_ONLY or BOTH and requireListeners.
 - The participant consumes MQClient, MQProperties, MQEventSerialization, optional MQEventStorer and base packages.
@@ -653,17 +755,23 @@
 ### Task 15: Phase D — data component lifecycle ownership
 
 **Files:**
-- Modify: ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/main/java/io/ddd4j/javalin/data/mybatis/Ddd4jMybatisJavalinModule.java
-- Create: ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/main/java/io/ddd4j/javalin/data/mybatis/MybatisRepositoryLifecycleParticipant.java
+
+- Modify:
+  ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/main/java/io/ddd4j/javalin/data/mybatis/Ddd4jMybatisJavalinModule.java
+- Create:
+  ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/main/java/io/ddd4j/javalin/data/mybatis/MybatisRepositoryLifecycleParticipant.java
 - Modify: ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/main/java/io/ddd4j/javalin/data/jpa/Ddd4jJpaJavalinModule.java
 - Create: ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/main/java/io/ddd4j/javalin/data/jpa/JpaLifecycleParticipant.java
-- Test: ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/test/java/io/ddd4j/javalin/data/mybatis/Ddd4jMybatisProductionLifecycleIT.java
-- Test: ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/test/java/io/ddd4j/javalin/data/jpa/Ddd4jJpaProductionLifecycleIT.java
+- Test:
+  ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/test/java/io/ddd4j/javalin/data/mybatis/Ddd4jMybatisProductionLifecycleIT.java
+- Test:
+  ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/test/java/io/ddd4j/javalin/data/jpa/Ddd4jJpaProductionLifecycleIT.java
 
 **Interfaces:**
-- MyBatis participant calls existing initRepositories(Injector) exactly once after Injector creation.
-- Ddd4jJpaJavalinModule(String, Map) owns and closes the EMF it creates.
-- Ddd4jJpaJavalinModule(EntityManagerFactory) treats the supplied EMF as caller-owned and never closes it.
+
+- MyBatis participant calls existing initRepositories (Injector) exactly once after Injector creation.
+- Ddd4jJpaJavalinModule (String, Map) owns and closes the EMF it creates.
+- Ddd4jJpaJavalinModule (EntityManagerFactory) treats the supplied EMF as caller-owned and never closes it.
 - Both participants expose safe readiness checks without leaking connections or EntityManagers.
 
 - [x] **Step 1: RED/GREEN — initialize MyBatis through production bootstrap**
@@ -693,6 +801,7 @@
 ### Task 16: Phase D — truthful readiness, cluster idempotency and production CORS
 
 **Files:**
+
 - Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinReadinessRoutes.java
 - Create: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/IdempotencyDeploymentMode.java
 - Modify: ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinProperties.java
@@ -702,11 +811,13 @@
 - Test: ddd4j-javalin-web/src/test/java/io/ddd4j/javalin/web/Ddd4jJavalinCorsContractTest.java
 
 **Interfaces:**
+
 - /health/liveness reports process liveness.
-- /health/readiness returns 200 only when runtime state is RUNNING and every required participant is ready; otherwise 503.
+- /health/readiness returns 200 only when runtime state is RUNNING and every required participant is ready; otherwise
+  503.
 - /health returns a safe aggregate without credentials or raw exceptions.
 - LOCAL idempotency uses Caffeine. SHARED requires an injected shared IdempotencyGuard. Production rejects LOCAL.
-- Ddd4jJavalinAutoConfiguration(Ddd4jJavalinProperties, IdempotencyGuard) is the explicit SHARED injection path;
+- Ddd4jJavalinAutoConfiguration (Ddd4jJavalinProperties, IdempotencyGuard) is the explicit SHARED injection path;
   the existing constructor remains the DEVELOPMENT/LOCAL path.
 - Production CORS accepts only explicit origins; development may opt into any-host behavior.
 
@@ -733,6 +844,7 @@
 ### Task 17: Phase D — three-line production convergence and publication
 
 **Files:**
+
 - Modify: pom.xml
 - Modify: ddd4j-javalin-testcontainers/src/test/java/io/ddd4j/javalin/testcontainers/BuildLineContractTest.java
 - Modify: .github/workflows/ci.yml
@@ -743,6 +855,7 @@
 - Modify: this plan only after evidence exists.
 
 **Interfaces:**
+
 - 6.7.x and 7.1.x retain Maven 3, POM 4.0 and JDK 17.
 - 7.2.x retains Maven 4, POM 4.1 and JDK 21.
 - All lines expose the same production lifecycle API; differences are limited to Javalin 6 versus 7 APIs.
@@ -755,19 +868,22 @@
 
 - [x] **Step 2: Run complete local gates**
 
-  On each prescribed JDK/Maven line, run clean unit tests and the full javalin-integration-tests profile. Record executed
+  On each prescribed JDK/Maven line, run clean unit tests and the full javalin-integration-tests profile. Record
+  executed
   test, failure, error and skip counts. The existing four ONS/TDMQ/Mica exclusions are the only accepted skips.
   Remove the root POM's unconditional Surefire skip so an ordinary `test` invocation executes child-module tests;
   retain explicit profile control for Testcontainers ITs and add a BuildLineContract assertion against regressions.
 
 - [x] **Step 3: Run production-startup acceptance**
 
-  Start through Ddd4jJavalinApplication in PRODUCTION mode with PostgreSQL/MySQL, one supported broker, OIDC and a shared
+  Start through Ddd4jJavalinApplication in PRODUCTION mode with PostgreSQL/MySQL, one supported broker, OIDC and a
+  shared
   idempotency guard. Assert startup validation, readiness transition, request handling, graceful drain and cleanup.
 
 - [x] **Step 4: Verify workflows before push**
 
-  Require exact branch JDK/Maven, MAVEN_SETTINGS_XML, lifecycle contracts, no job-level continue-on-error, and consistent
+  Require exact branch JDK/Maven, MAVEN_SETTINGS_XML, lifecycle contracts, no job-level continue-on-error, and
+  consistent
   workflow_dispatch support on all three branches.
 
 - [x] **Step 5: Obtain separate commit and push authorization**
@@ -777,7 +893,8 @@
 
 - [ ] **Step 6: Require real GitHub execution**
 
-  Wait for CI and Integration on final SHAs. steps=0, billing annotations, queued jobs and skipped mandatory matrices are
+  Wait for CI and Integration on final SHAs. steps=0, billing annotations, queued jobs and skipped mandatory matrices
+  are
   not success.
 
 - [x] **Step 7: Publish and consume all three Javalin lines**
@@ -817,7 +934,8 @@
   prevents `skip=true` and `skipTests=true` regressions. Corretto 17 with Maven Wrapper 3.9.16 completed the 52-module
   ordinary `clean test` with 152 tests and zero failures/errors/skips. The complete integration profile then completed
   188 tests with zero failures/errors and exactly the four governed ONS/TDMQ/Mica skips. Completion review additionally
-  proved and fixed core-runtime cleanup when SHARED idempotency provisioning fails before socket startup. Task 17 remains open because
+  proved and fixed core-runtime cleanup when SHARED idempotency provisioning fails before socket startup. Task 17
+  remains open because
   compatible synchronization, validation and publication on 7.1.x and 7.2.x require the separate branch/commit/push
   authorization defined in Step 5.
 - 2026-09-10 pre-push workflow audit: origin and github match at `9e4e18e` (6.7.x), `0c64209` (7.1.x) and
@@ -839,31 +957,112 @@
 
 #### Phase A Validation Record
 
-- 2026-09-09 6.7.x RED: protected HTTP request returned 200 instead of 401 because the local Javalin 6 adapter never invoked `WebRequestLifecycle`.
-- 2026-09-09 6.7.x dependency gate: upstream ddd4j 1.0.x build 17 consumer BOM stopped managing the standard `mybatis-plus-jsqlparser`; the Javalin JDK 17 line now centrally pins the upstream-compatible 3.5.9 version.
-- 2026-09-09 6.7.x Web GREEN: real random-port HTTP contracts cover no-token 401, valid-token Subject binding, Request/Trace ID propagation, ThreadContext cleanup, configurable authentication mode, trusted forwarded client IP, duplicate idempotency 409 and disabled-idempotency behavior.
-- 2026-09-09 6.7.x Runtime GREEN: production bootstrap installs the complete core Guice module, registers CommandBus, and closes the Guice runtime on Javalin stop.
-- 2026-09-09 override contract: a business extra module can replace the default SubjectProvider through `Modules.override`; plain module ordering previously failed with duplicate bindings.
-- 2026-09-09 idempotency configuration: custom cache names are registered, configured one-second TTL expires completed keys, and sub-second TTL is rejected because the core/Caffeine APIs only support whole seconds. The ddd4j core default Caffeine registration does not honor per-entry TTL, so Javalin configures global expire-after-write on its local fallback.
-- 2026-09-09 final Phase A batch regression after override/TTL changes: 6.7.x ran 95 tests, 7.1.x ran 80 tests, and 7.2.x ran 74 tests; every clean reactor completed with zero failures/errors/skips.
-- 2026-09-09 Phase A complete: explicit properties bootstrap now applies context path (including public-path mapping), CORS, max request size, global future timeout and lifecycle disablement. Final clean regressions ran 100/85/79 tests on 6.7.x/7.1.x/7.2.x with zero failures/errors/skips.
-- 2026-09-09 Phase B OIDC Steps 1-3: added the shared `ddd4j-javalin-auth-oidc` reactor/BOM module on all three lines. Local RSA/JWKS tests cover issuer, audience, expiry, nbf, RS256 verification and allowlisted principal mapping; HTTP contracts cover public/protected paths, generic 401, provider-unavailable 503 and request-scope cleanup. A real Keycloak 26.2 token was obtained through the realm public client and accepted by protected Javalin 6.7.0, 7.1.0 and 7.2.3 routes. Each OIDC module ran 9 unit tests plus one Keycloak IT with zero failures/errors/skips. Full unit reactors passed on all three lines; upstream Maven 4 effective-model warnings on 7.2.x remain unchanged.
-- 2026-09-09 Phase B auth boundary: renamed the Sa-Token, Spring Security and Shiro Keycloak checks to `*KeycloakSmokeIT` and removed references to a nonexistent sample bridge. These tests prove only container-fixture compatibility; only `ddd4j-javalin-auth-oidc` claims real token/JWKS/HTTP behavior.
-- 2026-09-09 Phase B MyBatis RED/GREEN: replaced the hand-written repository and child injector with the real ddd4j `BaseRepositoryImpl` plus `bindRepository/initRepositories`. The first MySQL run failed because upstream `BaseRepositoryImpl` resolved generic index 0 as the domain type; ddd4j now overrides M/P/Q resolution at indexes 1/2/3 on all three lines. After local installation, the Javalin MySQL CRUD, query, pagination and delete contract passed.
-- 2026-09-09 Phase B JPA RED/GREEN: added `JpaTransactionTemplate` and a real PostgreSQL RESOURCE_LOCAL contract. Successful callbacks commit, failing callbacks roll back, and every invocation closes its EntityManager. The JPA module accepts explicit provider properties and centrally pins Jakarta-compatible JAXB runtime 4.0.6 for Hibernate bootstrap.
-- 2026-09-09 Phase B Step 7 RED/GREEN: DataScope now injects the consumer policy, defaults fail-closed, and proves allow/deny decisions. External binds caller properties, requires explicit Snowflake node IDs when consumed, and supports an injectable offline/real `IpRegionTemplate`. Data Logs proves mutually exclusive success/failure callbacks with a consumer provider; the upstream aspect no longer double-records failures. The invalid empty `Ddd4jLogsJavalinModule` source was removed.
-- 2026-09-09 Phase B Step 8: the PostgreSQL Outbox gate now proves both the successful HTTP order/write-model/read-model/outbox round trip and broker-failure recovery. Failed messages remain PENDING with `last_error`, retry succeeds, status becomes PUBLISHED, and attempts advances to two.
-- 2026-09-09 Phase C Steps 1-3: `persist=true` now fails closed before business handling when `MQEventStorer` is missing or fails. MQ core tests cover ACK-facing persistence order, retry, exponential delivery policy, DEAD transition, lease-loss and Inbox idempotency. All three Javalin lines completed the full Testcontainers matrix; ONS and TDMQ remain explicit managed-service exclusions, and Mica MQTT retains its documented upstream limitation. POM-only governance removed the nonexistent Akka/Jackson wrappers, retained valid aggregators/BOMs and the Excel/Monitor/PF4J upstream-reuse coordinates, and added an exact inventory regression gate.
-- 2026-09-09 Phase C RabbitMQ durability closure: publishing now uses persistent delivery, publisher confirms and `mandatory=true`; a broker `basic.return` for an unroutable message fails the publisher instead of allowing Outbox to mark it PUBLISHED. The real RabbitMQ Testcontainers gate now injects a first-attempt persistence failure and proves NACK/requeue, second-attempt storage, exactly-once business handling and final ACK behavior on 6.7.x, 7.1.x and 7.2.x. Upstream 1.0.x persistence/mandatory-return contracts were also executed under Corretto 8 (2 core + 3 RabbitMQ tests, zero skips), rather than relying on a newer-JDK compile.
-- 2026-09-09 Phase C Step 4 local/publication evidence: 6.7.x, 7.1.x and 7.2.x completed clean-cache consumer compilation against the private repository. Full private-repository deploy succeeded directly for 6.7.x/7.1.x; Maven 4's HTTP transporter failed on an RFC9457 metadata response for 7.2.x, so the already-built Maven 4 artifacts were uploaded with Maven 3.9 `deploy-file` and their Maven 4 generated consumer POMs. GitHub CI and Integration runs for all three final SHAs failed before any step (`steps=[]`), leaving the external Actions/billing gate open; Step 4 and the overall specification remain incomplete until that account-level condition changes.
-- 2026-09-09 6.7.x regression: the 52-module clean unit reactor passed with 91 tests, zero failures/errors/skips. Custom idempotency cache/TTL and unused server-property decisions remain open in Task 9 Step 5.
-- 2026-09-09 7.1.x compatibility: retained Maven 3/JDK 17 and the upstream Javalin 7 adapter; the full clean reactor passed 77 tests with zero failures/errors/skips (`3a0ea69`).
-- 2026-09-09 7.2.x compatibility: retained Maven 4/POM 4.1.0/JDK 21 and the upstream Javalin 7 adapter; the full clean reactor passed 71 tests with zero failures/errors/skips (`ffecb3e`).
-- 2026-09-10 Superpowers completion audit: Task 4 Step 5 and Task 6 Step 1 were implemented but left unchecked. They are now backed by fresh evidence and corrected to complete. Task 6 Step 2 wording was corrected to preserve the established boundary: OIDC proves real Keycloak token/HTTP allow-deny, while Sa-Token/Security/Shiro run independent container smoke contracts.
-- 2026-09-10 build-line hardening: `BuildLineContractTest` now verifies root `java.version`, exact Maven Wrapper/property agreement, Maven 4 external-parent syntax, one test logging provider and direct public-BOM inheritance from `ddd4j-javalin-dependencies`. This exposed and fixed 7.2.x still declaring Java 17/Maven 3, two 6.7.x POMs missing their Maven namespace, all lines silently using NOP logging in tests, and the public BOM failing to export the line-specific Javalin version.
-- 2026-09-10 full local matrix: final branch-correct runs executed 158 tests on 6.7.x, 136 on 7.1.x and 131 on 7.2.x, with zero failures/errors and four explicit skips per line (ONS, TDMQ and two Mica cases). MySQL Repository, PostgreSQL JPA, OIDC Keycloak, every supported broker and PostgreSQL Outbox were observed. The 7.2.x Outbox gate was also run explicitly with `-DskipTests=false`: three tests passed.
-- 2026-09-10 private-repository closure: ddd4j 1.0/2.0/3.0 now publish POM, main JAR, sources and javadoc with valid SNAPSHOT metadata. The five shared sample-order artifacts and their parent POM were published on every line after the clean-cache Javalin reactor exposed the obsolete sample deploy exclusion. A Maven 4 build using a fresh local repository then completed dependency resolution and the entire 52-module unit reactor successfully.
-- 2026-09-10 remaining external gate: repository workflow configuration still validates `MAVEN_SETTINGS_XML`, but the latest GitHub jobs have zero executed steps and an account annotation stating that recent payments failed or the Actions spending limit must be increased. Task 8 Step 6 and Phase C Step 4 remain open until final pushed SHAs execute successfully in GitHub Actions.
-- 2026-09-10 Phase C Step 5 closure: Kafka now waits for broker confirmation and seeks without committing on consumer failure; NATS requires JetStream and the real container provisions a file-backed stream; Pulsar and RocketMQ wait for broker send results; MQTT uses manual ACK; Redis Stream uses synchronous XADD, ACK-after-handler and pending-first recovery. ActiveMQ and SQS retain their synchronous publish plus recover/visibility-reset contracts. The final branch-correct Testcontainers matrices executed 159/137/137 tests on 6.7.x/7.1.x/7.2.x with zero failures/errors and four governed skips per line.
-- 2026-09-10 Phase C Step 6 closure: ddd4j 3.0.x replaced 64 inherited ecosystem BOM imports with explicit managed coordinates, converted all internal Model 4.1 parents to fixed GAV lookup, and added executable parent/effective-model gates. A clean Maven 4 debug validation reports zero `io.ddd4j` effective-model summaries and no imported BOMs; remaining summaries belong to third-party SmallRye, Narayana and Pulsar POMs. Quarkus test and augmentation are preserved through an explicit Mandrel builder setting, and the 121-module clean test plus resumed full install both completed successfully.
-- 2026-09-10 final private publication: ddd4j 1.0.x/2.0.x/3.0.x and ddd4j-javalin 6.7.x/7.1.x/7.2.x all completed clean deploy to the Aliyun snapshot repository under their prescribed JDK/Maven lines. Three independent empty local repositories then consumed the published Javalin BOM/Web artifacts, compiled and ran a random-port health test against Javalin 6.7.0/7.1.0/7.2.3. The latest ddd4j-core and ddd4j-javalin-web POM/JAR metadata resolved, and all downloaded sources/javadoc archives passed ZIP integrity checks. Phase C Step 4 remains open only because final GitHub jobs still terminate before step execution at the organization billing gate.
+- 2026-09-09 6.7.x RED: protected HTTP request returned 200 instead of 401 because the local Javalin 6 adapter never
+  invoked `WebRequestLifecycle`.
+- 2026-09-09 6.7.x dependency gate: upstream ddd4j 1.0.x build 17 consumer BOM stopped managing the standard
+  `mybatis-plus-jsqlparser`; the Javalin JDK 17 line now centrally pins the upstream-compatible 3.5.9 version.
+- 2026-09-09 6.7.x Web GREEN: real random-port HTTP contracts cover no-token 401, valid-token Subject binding,
+  Request/Trace ID propagation, ThreadContext cleanup, configurable authentication mode, trusted forwarded client IP,
+  duplicate idempotency 409 and disabled-idempotency behavior.
+- 2026-09-09 6.7.x Runtime GREEN: production bootstrap installs the complete core Guice module, registers CommandBus,
+  and closes the Guice runtime on Javalin stop.
+- 2026-09-09 override contract: a business extra module can replace the default SubjectProvider through
+  `Modules.override`; plain module ordering previously failed with duplicate bindings.
+- 2026-09-09 idempotency configuration: custom cache names are registered, configured one-second TTL expires completed
+  keys, and sub-second TTL is rejected because the core/Caffeine APIs only support whole seconds. The ddd4j core default
+  Caffeine registration does not honor per-entry TTL, so Javalin configures global expire-after-write on its local
+  fallback.
+- 2026-09-09 final Phase A batch regression after override/TTL changes: 6.7.x ran 95 tests, 7.1.x ran 80 tests, and
+  7.2.x ran 74 tests; every clean reactor completed with zero failures/errors/skips.
+- 2026-09-09 Phase A complete: explicit properties bootstrap now applies context path (including public-path mapping),
+  CORS, max request size, global future timeout and lifecycle disablement. Final clean regressions ran 100/85/79 tests
+  on 6.7.x/7.1.x/7.2.x with zero failures/errors/skips.
+- 2026-09-09 Phase B OIDC Steps 1-3: added the shared `ddd4j-javalin-auth-oidc` reactor/BOM module on all three lines.
+  Local RSA/JWKS tests cover issuer, audience, expiry, nbf, RS256 verification and allowlisted principal mapping; HTTP
+  contracts cover public/protected paths, generic 401, provider-unavailable 503 and request-scope cleanup. A real
+  Keycloak 26.2 token was obtained through the realm public client and accepted by protected Javalin 6.7.0, 7.1.0 and
+  7.2.3 routes. Each OIDC module ran 9 unit tests plus one Keycloak IT with zero failures/errors/skips. Full unit
+  reactors passed on all three lines; upstream Maven 4 effective-model warnings on 7.2.x remain unchanged.
+- 2026-09-09 Phase B auth boundary: renamed the Sa-Token, Spring Security and Shiro Keycloak checks to
+  `*KeycloakSmokeIT` and removed references to a nonexistent sample bridge. These tests prove only container-fixture
+  compatibility; only `ddd4j-javalin-auth-oidc` claims real token/JWKS/HTTP behavior.
+- 2026-09-09 Phase B MyBatis RED/GREEN: replaced the hand-written repository and child injector with the real ddd4j
+  `BaseRepositoryImpl` plus `bindRepository/initRepositories`. The first MySQL run failed because upstream
+  `BaseRepositoryImpl` resolved generic index 0 as the domain type; ddd4j now overrides M/P/Q resolution at indexes
+  1/2/3 on all three lines. After local installation, the Javalin MySQL CRUD, query, pagination and delete contract
+  passed.
+- 2026-09-09 Phase B JPA RED/GREEN: added `JpaTransactionTemplate` and a real PostgreSQL RESOURCE_LOCAL contract.
+  Successful callbacks commit, failing callbacks roll back, and every invocation closes its EntityManager. The JPA
+  module accepts explicit provider properties and centrally pins Jakarta-compatible JAXB runtime 4.0.6 for Hibernate
+  bootstrap.
+- 2026-09-09 Phase B Step 7 RED/GREEN: DataScope now injects the consumer policy, defaults fail-closed, and proves
+  allow/deny decisions. External binds caller properties, requires explicit Snowflake node IDs when consumed, and
+  supports an injectable offline/real `IpRegionTemplate`. Data Logs proves mutually exclusive success/failure callbacks
+  with a consumer provider; the upstream aspect no longer double-records failures. The invalid empty
+  `Ddd4jLogsJavalinModule` source was removed.
+- 2026-09-09 Phase B Step 8: the PostgreSQL Outbox gate now proves both the successful HTTP
+  order/write-model/read-model/outbox round trip and broker-failure recovery. Failed messages remain PENDING with
+  `last_error`, retry succeeds, status becomes PUBLISHED, and attempts advances to two.
+- 2026-09-09 Phase C Steps 1-3: `persist=true` now fails closed before business handling when `MQEventStorer` is missing
+  or fails. MQ core tests cover ACK-facing persistence order, retry, exponential delivery policy, DEAD transition,
+  lease-loss and Inbox idempotency. All three Javalin lines completed the full Testcontainers matrix; ONS and TDMQ
+  remain explicit managed-service exclusions, and Mica MQTT retains its documented upstream limitation. POM-only
+  governance removed the nonexistent Akka/Jackson wrappers, retained valid aggregators/BOMs and the Excel/Monitor/PF4J
+  upstream-reuse coordinates, and added an exact inventory regression gate.
+- 2026-09-09 Phase C RabbitMQ durability closure: publishing now uses persistent delivery, publisher confirms and
+  `mandatory=true`; a broker `basic.return` for an unroutable message fails the publisher instead of allowing Outbox to
+  mark it PUBLISHED. The real RabbitMQ Testcontainers gate now injects a first-attempt persistence failure and proves
+  NACK/requeue, second-attempt storage, exactly-once business handling and final ACK behavior on 6.7.x, 7.1.x and 7.2.x.
+  Upstream 1.0.x persistence/mandatory-return contracts were also executed under Corretto 8 (2 core + 3 RabbitMQ tests,
+  zero skips), rather than relying on a newer-JDK compile.
+- 2026-09-09 Phase C Step 4 local/publication evidence: 6.7.x, 7.1.x and 7.2.x completed clean-cache consumer
+  compilation against the private repository. Full private-repository deploy succeeded directly for 6.7.x/7.1.x; Maven
+  4's HTTP transporter failed on an RFC9457 metadata response for 7.2.x, so the already-built Maven 4 artifacts were
+  uploaded with Maven 3.9 `deploy-file` and their Maven 4 generated consumer POMs. GitHub CI and Integration runs for
+  all three final SHAs failed before any step (`steps=[]`), leaving the external Actions/billing gate open; Step 4 and
+  the overall specification remain incomplete until that account-level condition changes.
+- 2026-09-09 6.7.x regression: the 52-module clean unit reactor passed with 91 tests, zero failures/errors/skips. Custom
+  idempotency cache/TTL and unused server-property decisions remain open in Task 9 Step 5.
+- 2026-09-09 7.1.x compatibility: retained Maven 3/JDK 17 and the upstream Javalin 7 adapter; the full clean reactor
+  passed 77 tests with zero failures/errors/skips (`3a0ea69`).
+- 2026-09-09 7.2.x compatibility: retained Maven 4/POM 4.1.0/JDK 21 and the upstream Javalin 7 adapter; the full clean
+  reactor passed 71 tests with zero failures/errors/skips (`ffecb3e`).
+- 2026-09-10 Superpowers completion audit: Task 4 Step 5 and Task 6 Step 1 were implemented but left unchecked. They are
+  now backed by fresh evidence and corrected to complete. Task 6 Step 2 wording was corrected to preserve the
+  established boundary: OIDC proves real Keycloak token/HTTP allow-deny, while Sa-Token/Security/Shiro run independent
+  container smoke contracts.
+- 2026-09-10 build-line hardening: `BuildLineContractTest` now verifies root `java.version`, exact Maven
+  Wrapper/property agreement, Maven 4 external-parent syntax, one test logging provider and direct public-BOM
+  inheritance from `ddd4j-javalin-dependencies`. This exposed and fixed 7.2.x still declaring Java 17/Maven 3, two 6.7.x
+  POMs missing their Maven namespace, all lines silently using NOP logging in tests, and the public BOM failing to
+  export the line-specific Javalin version.
+- 2026-09-10 full local matrix: final branch-correct runs executed 158 tests on 6.7.x, 136 on 7.1.x and 131 on 7.2.x,
+  with zero failures/errors and four explicit skips per line (ONS, TDMQ and two Mica cases). MySQL Repository,
+  PostgreSQL JPA, OIDC Keycloak, every supported broker and PostgreSQL Outbox were observed. The 7.2.x Outbox gate was
+  also run explicitly with `-DskipTests=false`: three tests passed.
+- 2026-09-10 private-repository closure: ddd4j 1.0/2.0/3.0 now publish POM, main JAR, sources and javadoc with valid
+  SNAPSHOT metadata. The five shared sample-order artifacts and their parent POM were published on every line after the
+  clean-cache Javalin reactor exposed the obsolete sample deploy exclusion. A Maven 4 build using a fresh local
+  repository then completed dependency resolution and the entire 52-module unit reactor successfully.
+- 2026-09-10 remaining external gate: repository workflow configuration still validates `MAVEN_SETTINGS_XML`, but the
+  latest GitHub jobs have zero executed steps and an account annotation stating that recent payments failed or the
+  Actions spending limit must be increased. Task 8 Step 6 and Phase C Step 4 remain open until final pushed SHAs execute
+  successfully in GitHub Actions.
+- 2026-09-10 Phase C Step 5 closure: Kafka now waits for broker confirmation and seeks without committing on consumer
+  failure; NATS requires JetStream and the real container provisions a file-backed stream; Pulsar and RocketMQ wait for
+  broker send results; MQTT uses manual ACK; Redis Stream uses synchronous XADD, ACK-after-handler and pending-first
+  recovery. ActiveMQ and SQS retain their synchronous publish plus recover/visibility-reset contracts. The final
+  branch-correct Testcontainers matrices executed 159/137/137 tests on 6.7.x/7.1.x/7.2.x with zero failures/errors and
+  four governed skips per line.
+- 2026-09-10 Phase C Step 6 closure: ddd4j 3.0.x replaced 64 inherited ecosystem BOM imports with explicit managed
+  coordinates, converted all internal Model 4.1 parents to fixed GAV lookup, and added executable parent/effective-model
+  gates. A clean Maven 4 debug validation reports zero `io.ddd4j` effective-model summaries and no imported BOMs;
+  remaining summaries belong to third-party SmallRye, Narayana and Pulsar POMs. Quarkus test and augmentation are
+  preserved through an explicit Mandrel builder setting, and the 121-module clean test plus resumed full install both
+  completed successfully.
+- 2026-09-10 final private publication: ddd4j 1.0.x/2.0.x/3.0.x and ddd4j-javalin 6.7.x/7.1.x/7.2.x all completed clean
+  deploy to the Aliyun snapshot repository under their prescribed JDK/Maven lines. Three independent empty local
+  repositories then consumed the published Javalin BOM/Web artifacts, compiled and ran a random-port health test against
+  Javalin 6.7.0/7.1.0/7.2.3. The latest ddd4j-core and ddd4j-javalin-web POM/JAR metadata resolved, and all downloaded
+  sources/javadoc archives passed ZIP integrity checks. Phase C Step 4 remains open only because final GitHub jobs still
+  terminate before step execution at the organization billing gate.

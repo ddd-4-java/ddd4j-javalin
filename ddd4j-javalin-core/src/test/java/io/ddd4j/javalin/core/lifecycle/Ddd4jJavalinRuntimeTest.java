@@ -10,7 +10,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Ordered startup, rollback and shutdown contract for the Javalin runtime. */
+/**
+ * Ordered startup, rollback and shutdown contract for the Javalin runtime.
+ */
 class Ddd4jJavalinRuntimeTest {
 
     @Test

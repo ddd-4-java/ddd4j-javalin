@@ -29,9 +29,9 @@ public final class MQOutboxDispatcher {
     /**
      * 创建带投递结果观察器的调度器。
      *
-     * @param store Outbox 持久化端口
-     * @param sender Broker 发送端口
-     * @param policy 投递策略
+     * @param store    Outbox 持久化端口
+     * @param sender   Broker 发送端口
+     * @param policy   投递策略
      * @param observer 旁路观测实现
      */
     public MQOutboxDispatcher(MQOutboxStore store, MQOutboxSender sender, MQDeliveryPolicy policy,
@@ -46,8 +46,8 @@ public final class MQOutboxDispatcher {
      * 调度一批当前可投递消息。
      *
      * @param leaseOwner 当前发布实例标识
-     * @param limit 本轮最多处理数量
-     * @param now 当前时间
+     * @param limit      本轮最多处理数量
+     * @param now        当前时间
      * @return 调度结果
      */
     public MQOutboxDispatchResult dispatch(String leaseOwner, int limit, Instant now) {

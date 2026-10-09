@@ -84,10 +84,10 @@ public class MicaMqttMQClient implements MQClient {
             try {
                 byte[] body = payload.getBytes(StandardCharsets.UTF_8);
                 boolean sent = client.publish(topic, body, qos(), builder -> builder.properties(mqttProperties -> {
-                        if (StrKit.isNotEmpty(event.getMsgId())) {
-                            mqttProperties.addUserProperty(MessageHeaders.HEADER_MESSAGE_ID, event.getMsgId());
-                        }
-                    }));
+                    if (StrKit.isNotEmpty(event.getMsgId())) {
+                        mqttProperties.addUserProperty(MessageHeaders.HEADER_MESSAGE_ID, event.getMsgId());
+                    }
+                }));
                 if (!sent) {
                     log.warn("Publish mica-mqtt [{}] failed (connection lost), reconnecting and retrying", topic);
                     client.reconnect();

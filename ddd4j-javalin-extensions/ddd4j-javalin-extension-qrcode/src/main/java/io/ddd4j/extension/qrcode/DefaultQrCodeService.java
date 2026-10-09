@@ -38,7 +38,9 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-/** Default QR code service with bounded, order-preserving batch execution. */
+/**
+ * Default QR code service with bounded, order-preserving batch execution.
+ */
 public class DefaultQrCodeService implements QrCodeService, AutoCloseable {
 
     public static final int DEFAULT_MAX_BATCH_SIZE = 100;

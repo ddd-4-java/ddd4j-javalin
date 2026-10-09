@@ -18,7 +18,7 @@ public interface FileContentCheckProvider {
     /**
      * 校验文件内部业务内容。
      *
-     * @param file 文件
+     * @param file         文件
      * @param detectedType 真实文件类型
      * @return 是否通过
      * @throws IOException 文件无法读取时抛出

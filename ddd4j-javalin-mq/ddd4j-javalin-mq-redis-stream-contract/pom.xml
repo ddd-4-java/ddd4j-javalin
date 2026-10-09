@@ -12,7 +12,9 @@
 
     <artifactId>ddd4j-javalin-mq-redis-stream-contract</artifactId>
     <description>
-        内联契约：ddd4j 2.0.x ddd4j-mq-redis-stream 的 RedisStreamMQClient/RedisStreamMQProperties 及 Jedis/Lettuce/Redisson 三实现（io.ddd4j.mq.redisstream.*，原包名），供 ddd4j-javalin-mq-redis-stream 的 Guice 桥接编译可达。来源：ddd4j 2.0.x ddd4j-mq/ddd4j-mq-redis-stream。
+        内联契约：ddd4j 2.0.x ddd4j-mq-redis-stream 的 RedisStreamMQClient/RedisStreamMQProperties 及
+        Jedis/Lettuce/Redisson 三实现（io.ddd4j.mq.redisstream.*，原包名），供 ddd4j-javalin-mq-redis-stream 的 Guice
+        桥接编译可达。来源：ddd4j 2.0.x ddd4j-mq/ddd4j-mq-redis-stream。
     </description>
 
     <dependencies>

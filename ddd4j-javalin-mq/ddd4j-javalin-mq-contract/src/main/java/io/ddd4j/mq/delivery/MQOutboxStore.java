@@ -24,9 +24,9 @@ public interface MQOutboxStore {
      * 因而调度器可根据同一数值判断重试或死信。
      *
      * @param leaseOwner 当前发布实例标识
-     * @param now 当前时间
-     * @param limit 最多领取数量
-     * @param policy 投递策略
+     * @param now        当前时间
+     * @param limit      最多领取数量
+     * @param policy     投递策略
      * @return 已领取的消息
      */
     List<MQOutboxRecord> claim(String leaseOwner, Instant now, int limit, MQDeliveryPolicy policy);
@@ -34,8 +34,8 @@ public interface MQOutboxStore {
     /**
      * 仅当租约仍属于当前发布实例时确认消息已发布。
      *
-     * @param messageId 消息标识
-     * @param leaseOwner 租约持有者
+     * @param messageId   消息标识
+     * @param leaseOwner  租约持有者
      * @param publishedAt 发布确认时间
      * @return 是否成功确认
      */
@@ -44,11 +44,11 @@ public interface MQOutboxStore {
     /**
      * 仅当租约仍属于当前发布实例时登记发送失败；实现按策略转为 {@code PENDING} 或 {@code DEAD}。
      *
-     * @param messageId 消息标识
+     * @param messageId  消息标识
      * @param leaseOwner 租约持有者
-     * @param failedAt 失败时间
-     * @param lastError 可诊断失败原因
-     * @param policy 投递策略
+     * @param failedAt   失败时间
+     * @param lastError  可诊断失败原因
+     * @param policy     投递策略
      * @return 是否成功更新
      */
     boolean reschedule(String messageId, String leaseOwner, Instant failedAt, String lastError,
@@ -57,7 +57,7 @@ public interface MQOutboxStore {
     /**
      * 将死信显式重放为待投递状态。
      *
-     * @param messageId 消息标识
+     * @param messageId   消息标识
      * @param availableAt 重放可投递时间
      * @return 是否成功重放
      */

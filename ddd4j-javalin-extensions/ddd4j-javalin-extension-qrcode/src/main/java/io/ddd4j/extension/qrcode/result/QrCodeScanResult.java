@@ -7,7 +7,9 @@ import java.util.List;
 import io.ddd4j.extension.qrcode.model.QrCodeDecodeResult;
 import lombok.Getter;
 
-/** Decoded QR code results with application correlation metadata. */
+/**
+ * Decoded QR code results with application correlation metadata.
+ */
 @Getter
 public final class QrCodeScanResult {
 

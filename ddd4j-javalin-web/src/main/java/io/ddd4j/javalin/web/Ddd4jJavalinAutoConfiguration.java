@@ -69,8 +69,8 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     @Provides
     @Singleton
     Ddd4jJavalinWeb ddd4jJavalinWeb(WebRequestContextFactory contextFactory,
-                                     WebRequestLifecycle lifecycle,
-                                     WebExceptionTranslator translator) {
+                                    WebRequestLifecycle lifecycle,
+                                    WebExceptionTranslator translator) {
         // Guard so this @Provides is skipped when the web layer is disabled; otherwise
         // Guice eagerly resolves all parameter types during injector creation.
         if (!properties.isEnabled()) {
@@ -100,12 +100,16 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
         return new Ddd4jJavalinAutoConfiguration(props);
     }
 
-    /** Current properties. Visible for the bootstrap class. */
+    /**
+     * Current properties. Visible for the bootstrap class.
+     */
     public Ddd4jJavalinProperties getProperties() {
         return properties;
     }
 
-    /** Static accessor for the convenience helpers above (e.g. {@link #withPublicPaths}). */
+    /**
+     * Static accessor for the convenience helpers above (e.g. {@link #withPublicPaths}).
+     */
     public static List<String> defaultPublicPaths() {
         return Arrays.asList("/health", "/health/readiness", "/health/liveness");
     }

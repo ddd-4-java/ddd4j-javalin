@@ -51,7 +51,7 @@ public final class Ddd4jJavalinWeb {
     public Ddd4jJavalinWeb() {
         this(new WebRequestContextFactory(), new WebRequestLifecycle(new BearerSubjectAuthenticator(),
                         new PathWebAccessPolicy(List.of("/health", "/health/readiness", "/health/liveness",
-                                        ReadinessEndpoint.PATH),
+                                ReadinessEndpoint.PATH),
                                 AuthenticationMode.REQUIRED)),
                 new DefaultWebExceptionTranslator(), null, new RuntimeReadinessRegistry());
     }
@@ -64,7 +64,7 @@ public final class Ddd4jJavalinWeb {
     public Ddd4jJavalinWeb(RuntimeReadinessRegistry readinessRegistry) {
         this(new WebRequestContextFactory(), new WebRequestLifecycle(new BearerSubjectAuthenticator(),
                         new PathWebAccessPolicy(List.of("/health", "/health/readiness", "/health/liveness",
-                                        ReadinessEndpoint.PATH),
+                                ReadinessEndpoint.PATH),
                                 AuthenticationMode.REQUIRED)),
                 new DefaultWebExceptionTranslator(), null, readinessRegistry);
     }
@@ -122,7 +122,7 @@ public final class Ddd4jJavalinWeb {
         try {
             requestLifecycle.authenticate(requestContext)
                     // 1.0.x 改挂：ThreadContext 无 bind(Subject)，改为按 SPI key 写入线程上下文
-                            .ifPresent(authentication -> ThreadContext.set(SpiKeys.SUBJECT, authentication.subject()));
+                    .ifPresent(authentication -> ThreadContext.set(SpiKeys.SUBJECT, authentication.subject()));
             idempotencyLifecycle.flatMap(lifecycle -> lifecycle.open(requestContext,
                     context.header(WebHeaders.IDEMPOTENCY_KEY))).ifPresent(state::idempotencyScope);
         } catch (RuntimeException exception) {

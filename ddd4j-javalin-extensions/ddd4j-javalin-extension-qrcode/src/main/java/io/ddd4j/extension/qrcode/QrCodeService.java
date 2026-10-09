@@ -9,7 +9,9 @@ import io.ddd4j.extension.qrcode.command.GenerateQrCodeCommand;
 import io.ddd4j.extension.qrcode.result.QrCodeArtifact;
 import io.ddd4j.extension.qrcode.result.QrCodeScanResult;
 
-/** Framework-neutral QR code application service. */
+/**
+ * Framework-neutral QR code application service.
+ */
 public interface QrCodeService {
 
     QrCodeArtifact generate(GenerateQrCodeCommand command);

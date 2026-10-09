@@ -2,6 +2,7 @@ package io.ddd4j.web.core.auth;
 
 import java.util.Objects;
 import java.util.function.Predicate;
+
 import io.ddd4j.web.core.context.WebRequestContext;
 
 /**

@@ -20,10 +20,14 @@ import io.ddd4j.core.subject.SubjectProvider;
  */
 final class OrderOutboxTestSupport {
 
-    /** 测试会话固定 Bearer Token（与 {@link StubSubject} 的放行令牌一致）。 */
+    /**
+     * 测试会话固定 Bearer Token（与 {@link StubSubject} 的放行令牌一致）。
+     */
     private static final String TEST_TOKEN = "order-outbox-it-token";
 
-    /** 已登录会话的 Bearer 请求头值。 */
+    /**
+     * 已登录会话的 Bearer 请求头值。
+     */
     static final String AUTHORIZATION = "Bearer " + TEST_TOKEN;
 
     static {
@@ -33,7 +37,9 @@ final class OrderOutboxTestSupport {
     private OrderOutboxTestSupport() {
     }
 
-    /** 测试桩 Provider：每次返回独立的桩 Subject。 */
+    /**
+     * 测试桩 Provider：每次返回独立的桩 Subject。
+     */
     private static final class StubSubjectProvider implements SubjectProvider {
 
         @Override
@@ -42,7 +48,9 @@ final class OrderOutboxTestSupport {
         }
     }
 
-    /** 测试桩 Subject：认证放行指定 token，权限/角色全放行。 */
+    /**
+     * 测试桩 Subject：认证放行指定 token，权限/角色全放行。
+     */
     private static final class StubSubject implements Subject {
 
         private AuthPrincipal principal() {

@@ -27,9 +27,9 @@ public final class MQInboxProcessor {
     /**
      * 创建带投递结果观察器的 Inbox 处理器。
      *
-     * @param store Inbox 持久化端口
+     * @param store      Inbox 持久化端口
      * @param consumerId 稳定消费者标识
-     * @param observer 旁路观测实现
+     * @param observer   旁路观测实现
      */
     public MQInboxProcessor(MQInboxStore store, String consumerId, MQDeliveryObserver observer) {
         this.store = Objects.requireNonNull(store, "store must not be null");
@@ -43,9 +43,9 @@ public final class MQInboxProcessor {
     /**
      * 处理一条可靠消息。
      *
-     * @param messageId 生产端稳定消息标识
+     * @param messageId   生产端稳定消息标识
      * @param processedAt 当前处理时间
-     * @param handler 业务处理器
+     * @param handler     业务处理器
      * @return {@code true} 表示首次处理，{@code false} 表示重复消息
      */
     public boolean process(String messageId, Instant processedAt, Runnable handler) {

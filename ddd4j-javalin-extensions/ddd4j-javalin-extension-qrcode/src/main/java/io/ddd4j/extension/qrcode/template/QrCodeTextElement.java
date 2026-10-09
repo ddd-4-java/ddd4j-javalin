@@ -2,7 +2,9 @@ package io.ddd4j.extension.qrcode.template;
 
 import lombok.Getter;
 
-/** 文本外框元素。 */
+/**
+ * 文本外框元素。
+ */
 @Getter
 public final class QrCodeTextElement extends QrCodeFrameElement {
 
@@ -41,10 +43,33 @@ public final class QrCodeTextElement extends QrCodeFrameElement {
             this.text = text;
         }
 
-        public Builder bounds(int x, int y, int width, int height) { this.x = x; this.y = y; this.width = width; this.height = height; return this; }
-        public Builder zIndex(int zIndex) { this.zIndex = zIndex; return this; }
-        public Builder font(String fontName, int fontSize, boolean bold) { this.fontName = fontName; this.fontSize = fontSize; this.bold = bold; return this; }
-        public Builder color(String color) { this.color = color; return this; }
-        public QrCodeTextElement build() { return new QrCodeTextElement(this); }
+        public Builder bounds(int x, int y, int width, int height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            return this;
+        }
+
+        public Builder zIndex(int zIndex) {
+            this.zIndex = zIndex;
+            return this;
+        }
+
+        public Builder font(String fontName, int fontSize, boolean bold) {
+            this.fontName = fontName;
+            this.fontSize = fontSize;
+            this.bold = bold;
+            return this;
+        }
+
+        public Builder color(String color) {
+            this.color = color;
+            return this;
+        }
+
+        public QrCodeTextElement build() {
+            return new QrCodeTextElement(this);
+        }
     }
 }

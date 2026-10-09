@@ -16,6 +16,18 @@ import io.javalin.Javalin;
  */
 public class SaTokenAuthApplication {
 
+    /**
+     * 默认构造方法：启动类仅含静态 {@code main} 入口，无实例状态。
+     */
+    public SaTokenAuthApplication() {
+    }
+
+
+    /**
+     * 启动示例应用：组装 Guice Injector 并在 8080 端口启动 Javalin。
+     *
+     * @param args 命令行参数（未使用）
+     */
     public static void main(String[] args) {
         // 1. 创建 Guice Injector：基础设施 + DDD 注解自动扫描绑定
         Injector injector = Guice.createInjector(

@@ -5,7 +5,11 @@ import io.ddd4j.core.health.ReadinessResult;
 /** 由 Javalin Runtime 统一排序和管理的组件生命周期。 */
 public interface JavalinLifecycleParticipant extends AutoCloseable {
 
-    /** 返回启动顺序；数值较小者先启动、后关闭。 */
+    /**
+     * 返回启动顺序；数值较小者先启动、后关闭。
+     *
+     * @return 启动顺序值
+     */
     int order();
 
     /** 在任何组件启动前执行无副作用校验。 */
@@ -14,7 +18,11 @@ public interface JavalinLifecycleParticipant extends AutoCloseable {
     /** 启动组件。 */
     void start();
 
-    /** 返回不包含凭据和原始异常的就绪状态。 */
+    /**
+     * 返回不包含凭据和原始异常的就绪状态。
+     *
+     * @return 就绪检查结果
+     */
     ReadinessResult readiness();
 
     /** 关闭组件；实现必须支持重复调用。 */

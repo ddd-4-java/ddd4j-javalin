@@ -16,6 +16,13 @@ public final class MybatisRepositoryLifecycleParticipant implements JavalinLifec
     private boolean started;
     private boolean closed;
 
+    /**
+     * Guice 生产构造器。
+     *
+     * @param injector Guice 注入器，用于获取 {@link SqlSession} 并实例化 Repository
+     * @param module   已声明 Mapper 与 Repository 绑定的 MyBatis 装配模块
+     * @throws NullPointerException 任一参数为 {@code null} 时抛出
+     */
     @Inject
     public MybatisRepositoryLifecycleParticipant(Injector injector, Ddd4jMybatisJavalinModule module) {
         this.injector = Objects.requireNonNull(injector, "injector must not be null");

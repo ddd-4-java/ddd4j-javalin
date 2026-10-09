@@ -21,14 +21,14 @@ import lombok.extern.slf4j.Slf4j;
  *   <li><b>SubjectProvider 注册</b>：绑定 {@link SaTokenSubjectProvider} 到 {@link SubjectProvider}
  *       （对标 Spring 的 {@code @Bean SubjectProvider saTokenSubjectProvider()}）</li>
  *   <li><b>Sa-Token 注解处理器注册</b>：注册 ddd4j 扩展的混合登录和内部 API Key 注解处理器</li>
- *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link SubjectKit} 静态注册中心，
+ *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link io.ddd4j.core.util.SubjectKit} 静态注册中心，
  *       保证 {@code SubjectKit.getSubject()} 全局可用（对标 Spring 的 {@code SubjectRegistrar}
  *       BeanPostProcessor，但用 eager 注册替代，无需 BeanPostProcessor）</li>
  *   <li><b>异常处理器</b>：{@link #registerExceptionHandler(Javalin)} 注册 Javalin 异常处理器，
  *       统一 Sa-Token 鉴权异常响应（对标 Spring 的 {@code @ControllerAdvice SaTokenExceptionHandler}）</li>
  * </ol>
  *
- * <h3>使用方式</h3>
+ * <h2>使用方式</h2>
  * <pre>{@code
  * Injector injector = Guice.createInjector(
  *     new Ddd4jGuiceModule(),                // 核心基础设施（SubjectKit 等）
@@ -46,6 +46,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Ddd4jSaTokenJavalinModule extends AbstractAuthJavalinModule {
 
+
+    /**
+     * 构造 Ddd4jSaTokenJavalinModule。
+     */
+    public Ddd4jSaTokenJavalinModule() {
+        super();
+    }
     /**
      * 注册 Javalin 异常处理器：统一 Sa-Token 鉴权异常响应（对标 Spring @ControllerAdvice）。
      *

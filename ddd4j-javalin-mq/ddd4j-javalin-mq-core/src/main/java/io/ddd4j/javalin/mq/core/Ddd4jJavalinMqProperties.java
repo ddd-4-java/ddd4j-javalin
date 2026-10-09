@@ -8,10 +8,19 @@ import lombok.Setter;
 @Setter
 public class Ddd4jJavalinMqProperties {
 
+    /**
+     * 默认构造方法：以 {@link Role#BOTH}、{@code requireListeners=true} 作为默认策略。
+     */
+    public Ddd4jJavalinMqProperties() {
+    }
+
     /** 应用使用 MQ 的角色。 */
     public enum Role {
+        /** 仅作为生产者，不初始化消费者。 */
         PRODUCER_ONLY,
+        /** 仅作为消费者，不初始化生产者。 */
         CONSUMER_ONLY,
+        /** 既作为生产者也作为消费者。 */
         BOTH;
 
         boolean produces() {

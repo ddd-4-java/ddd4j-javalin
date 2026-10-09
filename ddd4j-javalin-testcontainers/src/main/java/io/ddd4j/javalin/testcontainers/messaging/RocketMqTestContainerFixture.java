@@ -22,11 +22,21 @@ import org.testcontainers.utility.MountableFile;
  * because {@code ddd4j-javalin-mq-rocketmq} resolves the namesrv address.
  */
 public class RocketMqTestContainerFixture extends AbstractTestContainerFixture<GenericContainer<?>> {
+    /**
+     * 默认构造方法：Fixture 仅持有镜像与端口常量，容器由 {@link #newContainer()} 构建。
+     */
+    public RocketMqTestContainerFixture() {
+    }
 
+    /** 默认容器镜像。 */
     public static final String DEFAULT_IMAGE = "apache/rocketmq:5.3.2";
+    /** RocketMQ NameServer 端口。 */
     public static final int NAMESRV_PORT = 9876;
+    /** RocketMQ Broker VIP 端口。 */
     public static final int BROKER_VIP_PORT = 10909;
+    /** RocketMQ Broker 端口。 */
     public static final int BROKER_PORT = 10911;
+    /** 容器内 broker.conf 挂载路径。 */
     public static final String BROKER_CONF = "/home/rocketmq/rocketmq-5.3.2/conf/broker.conf";
 
     @Override

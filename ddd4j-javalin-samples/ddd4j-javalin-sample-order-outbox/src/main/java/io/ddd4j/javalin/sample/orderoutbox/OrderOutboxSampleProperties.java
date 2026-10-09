@@ -12,6 +12,12 @@ import lombok.Data;
 @Data
 public class OrderOutboxSampleProperties {
 
+    /**
+     * 默认构造方法：全部字段取注释中标注的默认值。
+     */
+    public OrderOutboxSampleProperties() {
+    }
+
     /** 基础设施选择：in-memory（默认）或 postgres。 */
     private String infrastructure = "in-memory";
 

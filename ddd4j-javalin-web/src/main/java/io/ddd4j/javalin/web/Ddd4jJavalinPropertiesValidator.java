@@ -12,7 +12,13 @@ public final class Ddd4jJavalinPropertiesValidator {
     private Ddd4jJavalinPropertiesValidator() {
     }
 
-    /** 校验启动所需的全部基础属性。 */
+    /**
+     * 校验启动所需的全部基础属性。
+     *
+     * @param properties 待校验的 Web 层配置，不允许为 {@code null}
+     * @throws NullPointerException     当 {@code properties} 为 {@code null} 时抛出
+     * @throws IllegalArgumentException 当存在非法配置项（端口越界、上下文路径不规范、生产模式缺少 CORS 白名单或未启用共享幂等等）时抛出
+     */
     public static void validate(Ddd4jJavalinProperties properties) {
         Ddd4jJavalinProperties value = Objects.requireNonNull(properties, "properties must not be null");
         require(StrKit.isNotBlank(value.getHost()), "host must not be blank");

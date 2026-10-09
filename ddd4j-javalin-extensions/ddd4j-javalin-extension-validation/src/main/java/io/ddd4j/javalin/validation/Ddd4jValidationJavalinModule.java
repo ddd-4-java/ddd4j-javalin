@@ -17,10 +17,18 @@ public final class Ddd4jValidationJavalinModule extends AbstractModule {
 
     private final List<FileContentCheckProvider> contentCheckProviders;
 
+    /**
+     * 以空的内容检测提供者集合构造模块（仅启用 Office 类型探测）。
+     */
     public Ddd4jValidationJavalinModule() {
         this(Collections.emptyList());
     }
 
+    /**
+     * 以指定的内容检测提供者集合构造模块。
+     *
+     * @param contentCheckProviders 内容检测提供者集合，{@code null} 时按空集合处理
+     */
     public Ddd4jValidationJavalinModule(Collection<FileContentCheckProvider> contentCheckProviders) {
         this.contentCheckProviders = Objects.isNull(contentCheckProviders)
                 ? Collections.emptyList()

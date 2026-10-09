@@ -1,0 +1,235 @@
+================================================================================
+ddd4j-javalin javadoc 门禁 + 全量规范补注  验证证据
+生成日期: 2026-10-09
+仓库/分支: ddd4j-javalin / feature/7.2.x
+工作区根:   E:\workspaces\workspace-ddd4j\workspace-ddd4j-boot\ddd4j-javalin
+================================================================================
+
+【0】自查环境与口径
+- 自查工具: JDK 21.0.4 javadoc CLI (D:/Java/jdk-21.0.4/bin/javadoc)
+- 参数: -Xdoclint:all -Xmaxwarns 1000000 -quiet -encoding UTF-8 -charset UTF-8
+        -notimestamp -J-Duser.language=en -J-Duser.country=US @<argfile>
+- argfile: /tmp/jdoc-reactor.txt = 反应堆 39 个 Java 模块的 116 个 src/main/java 源文件
+        + 全量 classpath (模块 target/classes + ~/.m2 依赖 jar)
+- 判定: missing 组告警 (no comment / no @param / no @return / no main description /
+        default constructor) 与语法类错误 (reference not found / heading sequence /
+        @param name not found) 全部清零 (warnings=0 且 errors=0)
+- 说明: javadoc 告警不改变退出码, 退出码只能反映错误 —— 因此计数以日志
+        "warning:"/"error:" 行为准; 权威门禁为 Maven 构建 (由编排侧执行, 本会话不运行 mvn)
+
+================================================================================
+【1】门禁配置清单 (POM diff 摘要, git diff -- pom.xml ddd4j-javalin-parent/pom.xml)
+================================================================================
+1.1 pom.xml (root)
+    a) properties 段新增三项 (行 74-76):
+         <javadoc.doclint>all</javadoc.doclint>
+         <javadoc.failOnWarning>true</javadoc.failOnWarning>
+         <javadoc.failOnError>true</javadoc.failOnError>
+       注: 父 POM 默认 failOnError=false 会吞掉校验异常造成假绿, 必须显式置 true;
+           -Djavadoc.failOnWarning=false / -Djavadoc.failOnError=false / -Djavadoc.doclint=...
+           仅限缺口盘点与应急关断, MUST NOT 作为常态默认值写入 POM。
+    b) pluginManagement / maven-javadoc-plugin <configuration> 新增 (行 302-319):
+         <doclint>${javadoc.doclint}</doclint>
+         <failOnWarnings>${javadoc.failOnWarning}</failOnWarnings>   (复数 Warnings, 插件参数名)
+         <failOnError>${javadoc.failOnError}</failOnError>
+         <release>${java.version}</release>
+         <additionalOptions> -Xmaxwarns 1000000 </additionalOptions>
+       注: -Xmaxwarns 1000000 突破 javadoc 默认 100 条告警截断, 防止 >=1000 条告警被截断假绿。
+    c) execution attach-javadocs: <phase>package</phase> -> <phase>verify</phase>
+       注: 执行目标 (jar) 绑定 verify 生命周期, 多模块均会执行且告警即失败;
+           report 目标不失败构建, 不能作为门禁。
+    d) 删除 profile disable-javadoc-doclint (原按 [1.8,) 自动激活 -Xdoclint:none)。
+1.2 ddd4j-javalin-parent/pom.xml
+    a) pluginManagement / maven-javadoc-plugin configuration 同步为 ${javadoc.*} 属性
+       + -Xmaxwarns 1000000 + <release> (行 109-122)。
+    b) execution attach-javadocs: <phase>package</phase> -> <phase>verify</phase> (行 125-127)。
+    c) build/plugins 中显式声明 maven-javadoc-plugin (行 161-165), 保证子模块执行。
+    d) release profile 删除 <configuration><doclint>none</doclint></configuration>。
+1.3 双重关闭已移除: 自动激活的 -Xdoclint:none profile 与 release 段 doclint=none 均已删除,
+    doclint=all (含 missing 组) 现为唯一生效配置。
+1.4 属性继承: ddd4j-javalin-parent 的 parent = ddd4j-javalin-dependencies -> root pom,
+    ${javadoc.*} 三属性在 root 定义、全链路生效。
+1.5 BOM/聚合模块 (packaging=pom) 由 maven-javadoc-plugin 自动跳过
+    ("Not executing Javadoc as the project is not a Java classpath-capable package"),
+    门禁不影响 ddd4j-javalin-dependencies 等非 Java 模块。
+
+================================================================================
+【2】批次补注清单 (每批 <=30 文件; 按源文件 mtime 分批, 合计 67 文件)
+================================================================================
+--- 批次1 (mtime 02:20-02:45, 11 文件): link/heading 错误修复 + 缺失注释补齐 ---
+ddd4j-javalin-auth/ddd4j-javalin-auth-satoken/src/main/java/io/ddd4j/javalin/auth/satoken/Ddd4jSaTokenJavalinModule.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-security/src/main/java/io/ddd4j/javalin/auth/security/Ddd4jSecurityJavalinModule.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-shiro/src/main/java/io/ddd4j/javalin/auth/shiro/Ddd4jShiroJavalinModule.java
+ddd4j-javalin-cache/src/main/java/io/ddd4j/javalin/cache/Ddd4jCacheJavalinModule.java
+ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/main/java/io/ddd4j/javalin/data/mybatis/Ddd4jMybatisJavalinModule.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/IdGeneratorProducer.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/RepositoryUtil.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/TenantAwareEntity.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/AbstractTestContainerFixture.java
+ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinApplication.java
+ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/JavalinTestFixture.java
+
+--- 批次2 (mtime 02:45-02:55, 19 文件): mq 模块 17 + testcontainers 2 ---
+ddd4j-javalin-mq/ddd4j-javalin-mq-activemq/src/main/java/io/ddd4j/javalin/mq/activemq/Ddd4jActiveMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/AbstractDdd4jMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/Ddd4jJavalinMqProperties.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/JavalinMqLifecycleParticipant.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-core/src/main/java/io/ddd4j/javalin/mq/core/JavalinMqListenerScanner.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-disruptor/src/main/java/io/ddd4j/javalin/mq/disruptor/Ddd4jDisruptorMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-kafka/src/main/java/io/ddd4j/javalin/mq/kafka/Ddd4jKafkaMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt-mica/src/main/java/io/ddd4j/javalin/mq/mqttmica/Ddd4jMqttMicaMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-mqtt/src/main/java/io/ddd4j/javalin/mq/mqtt/Ddd4jMqttMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-nats/src/main/java/io/ddd4j/javalin/mq/nats/Ddd4jNatsMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-ons/src/main/java/io/ddd4j/javalin/mq/ons/Ddd4jOnsMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-pulsar/src/main/java/io/ddd4j/javalin/mq/pulsar/Ddd4jPulsarMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-rabbitmq/src/main/java/io/ddd4j/javalin/mq/rabbit/Ddd4jRabbitMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-redis-stream/src/main/java/io/ddd4j/javalin/mq/redisstream/Ddd4jRedisStreamMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-rocketmq/src/main/java/io/ddd4j/javalin/mq/rocket/Ddd4jRocketMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-sqs/src/main/java/io/ddd4j/javalin/mq/sqs/Ddd4jSqsMqGuiceModule.java
+ddd4j-javalin-mq/ddd4j-javalin-mq-tdmq/src/main/java/io/ddd4j/javalin/mq/tdmq/Ddd4jTdmqMqGuiceModule.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/Ddd4jTestContainersExtension.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/WireMockTestContainerFixture.java
+
+--- 批次3 (mtime 02:55-03:17, 7 文件): extensions 模块 ---
+ddd4j-javalin-extensions/ddd4j-javalin-extension-qlexpress/src/main/java/io/ddd4j/javalin/extension/qlexpress/Ddd4jQLExpressJavalinModule.java
+ddd4j-javalin-extensions/ddd4j-javalin-extension-qrcode/src/main/java/io/ddd4j/javalin/qrcode/Ddd4jQrCodeJavalinModule.java
+ddd4j-javalin-extensions/ddd4j-javalin-extension-qrcode/src/main/java/io/ddd4j/javalin/qrcode/QrCodeModuleConfig.java
+ddd4j-javalin-extensions/ddd4j-javalin-extension-qrcode/src/main/java/io/ddd4j/javalin/qrcode/QrCodeRoutes.java
+ddd4j-javalin-extensions/ddd4j-javalin-extension-validation/src/main/java/io/ddd4j/javalin/validation/Ddd4jValidationJavalinModule.java
+ddd4j-javalin-extensions/ddd4j-javalin-extension-validation/src/main/java/io/ddd4j/javalin/validation/JavalinFileValidator.java
+ddd4j-javalin-extensions/ddd4j-javalin-extension-validation/src/main/java/io/ddd4j/javalin/validation/JavalinUploadedFileAdapter.java
+
+--- 批次4 (mtime >=03:17, 30 文件): samples 18 + testcontainers 12 ---
+ddd4j-javalin-samples/ddd4j-javalin-sample-auth-satoken/src/main/java/io/ddd4j/javalin/sample/auth/satoken/AuthController.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-auth-satoken/src/main/java/io/ddd4j/javalin/sample/auth/satoken/SaTokenAuthApplication.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-auth-security/src/main/java/io/ddd4j/javalin/sample/auth/security/AuthController.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-auth-security/src/main/java/io/ddd4j/javalin/sample/auth/security/SecurityAuthApplication.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-auth-shiro/src/main/java/io/ddd4j/javalin/sample/auth/shiro/AuthController.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-auth-shiro/src/main/java/io/ddd4j/javalin/sample/auth/shiro/ShiroAuthApplication.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-mybatis-testcontainers/src/main/java/io/ddd4j/javalin/sample/mybatistc/MybatisTestcontainersApplication.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-mybatis-testcontainers/src/main/java/io/ddd4j/javalin/sample/mybatistc/SampleUser.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-mybatis-testcontainers/src/main/java/io/ddd4j/javalin/sample/mybatistc/SampleUserPo.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-mybatis-testcontainers/src/main/java/io/ddd4j/javalin/sample/mybatistc/SampleUserQuery.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-mybatis-testcontainers/src/main/java/io/ddd4j/javalin/sample/mybatistc/SampleUserRepository.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/main/java/io/ddd4j/javalin/sample/orderoutbox/OrderController.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/main/java/io/ddd4j/javalin/sample/orderoutbox/OrderOutboxApplication.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/main/java/io/ddd4j/javalin/sample/orderoutbox/OrderOutboxGuiceModule.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/main/java/io/ddd4j/javalin/sample/orderoutbox/OrderOutboxSampleProperties.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/main/java/io/ddd4j/javalin/sample/orderoutbox/OrderOutboxScheduler.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/main/java/io/ddd4j/javalin/sample/orderoutbox/OrderPostgresGuiceModule.java
+ddd4j-javalin-samples/ddd4j-javalin-sample-order-outbox/src/main/java/io/ddd4j/javalin/sample/orderoutbox/RecordingIntegrationEventPublisher.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/auth/KeycloakTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/cloud/LocalStackTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/database/MariaDbTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/database/MongoDbTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/database/MySqlTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/database/PostgresTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/database/RedisTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/messaging/ActiveMqTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/messaging/JavalinMqLifecycleTestFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/messaging/KafkaTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/messaging/RabbitMqTestContainerFixture.java
+ddd4j-javalin-testcontainers/src/main/java/io/ddd4j/javalin/testcontainers/messaging/RocketMqTestContainerFixture.java
+
+备注:
+- 工作区另有 02:20 之前完成的存量注释改动 (36 个 Java 文件, 见文末【8】附录);
+  git status 合计 103 个 Java 文件 + 3 个 POM = 106 个已跟踪修改文件。
+- 批次1 的代表性修复: 3 个 auth 模块 {@link SubjectKit} 改全限定名 + <h3>改<h2>;
+  cache <h3>改<h2>; mybatis 3 个 {@link} 改全限定 (SqlSessionFactory/SqlSession/TypeHandlerRegistry);
+  web {@link Ddd4jGuiceModule}->{@link Ddd4jCoreGuiceModule}、
+  {@link #configureModules()}->{@link #extraModules()};
+  panache 3 文件补默认/私有构造器注释 (含静态工具类私有构造器)。
+
+================================================================================
+【3】自查告警递减记录 (日志 /tmp/jdoc-r*.log, 统计口径: 唯一 .java 路径)
+================================================================================
+轮次  时间          warnings  errors  问题文件数  说明
+r1    02:26         186       14      67          基线 (doclint all 全开)
+r2    02:52         183       0       57          批次1 后 (errors 清零)
+r3    02:58-03:33   12        12      2           批次2-4 进行中; 余留为 samples 两份
+                                                  AuthController 的 @param 名称不匹配
+                                                  (03:37 已修复; 该轮受并发写入影响仅作参考)
+r4    03:41-03:51   0         0       0           终验 (源码 03:40 后无写入)  <-- 清零
+日志: /tmp/jdoc-r1.log /tmp/jdoc-r2.log /tmp/jdoc-r3.log /tmp/jdoc-r4.log
+      (r4 日志 0 字节 = -quiet 下零诊断; 输出目录 E:/tmp-javadoc-out 于 03:51 全量重建)
+
+================================================================================
+【4】补注统计
+================================================================================
+- 反应堆 116 个源文件中 javadoc 注释块 (/** 起始) 数量: HEAD 268 -> 现 506 (净增 238 个注释块)
+- git diff 新增注释行 (以 * 起始的新增行): 1218 行
+- 修改文件: Java 103 + POM 3 = 106 (git status --short)
+- 覆盖口径: doclint missing 组清零 => 反应堆内全部公共/受保护类型与成员注释齐全
+  (类型用途说明 + 方法 @param 逐参数 / @return 非 void / @throws 声明的检查异常)
+
+================================================================================
+【5】Maven 权威门禁旁证 (只读观察, 本会话未运行 mvn)
+================================================================================
+- 编排侧 Maven 构建 (Maven 4.0.0-rc-6 + JDK21, 03:17 起) 在新门禁配置下为反应堆
+  Java 模块产出 *-javadoc.jar —— failOnWarnings=true 时产出即代表该模块 javadoc 零告警通过。
+- 观测样例 (mtime): ddd4j-javalin-web 03:42:44, sample-auth-security 03:39:47,
+  sample-auth-shiro 03:39:56, sample-order-outbox 03:40:00, mq-tdmq 03:39, mq-sqs 04:00:02。
+- 39 个反应堆 Java 模块均已/正在产出 javadoc jar (观测窗口内无模块因 javadoc 告警失败)。
+
+================================================================================
+【6】红线扫描 (旧来源标识, 构造模式拼接, 排除 node_modules/dist/.git/target)
+================================================================================
+- 8 组构造模式 (教育品牌罗马化家族 / 旧应用家族 / 旧中文品牌字样 / 旧包名 / QQ 邮箱 /
+  云效账号令牌 等): 源码与文档目录命中文件数 = 0 (前 7 组全部 0 命中)。
+- 第 8 组 (构建平台令牌字样) 命中 3 个文件均为存量未改动文档:
+  RELEASE.md, docs/superpowers/reports/2026-08-05-status.md,
+  docs/superpowers/specs/2026-09-07-three-branch-convergence-design.md
+  (git status 显示未修改, 不属本次改动, 保持原样受保护)。
+- target/ 下构建产物 (maven-javadoc-plugin-stale-data.txt 等) 含本地 .m2 依赖路径字样,
+  属第三方依赖构建产物, 非仓库源码。
+
+================================================================================
+【7】遗留与风险
+================================================================================
+- 非反应堆 7 个目录未纳入自查 (不在构建内): extension-akka, extension-jackson,
+  sample-cqrs-person, sample-mq-disruptor, sample-mq-kafka, sample-mq-rabbitmq, sample-rich-model。
+- 测试源码不强求 (仅 ddd4j-javalin-testcontainers 的 BuildLineContractTest 随批更新)。
+- 验证期间 (02:50-03:37) 同一工作区存在并发写入; 终验 r4 在写入静默 (>=3 分钟) 后执行,
+  与磁盘最终状态一致。若后续源码再有改动, 必须重跑同一 argfile 自查并保持 0/0。
+- 权威 Maven 门禁由编排侧执行; 本会话遵守约束未运行 mvn/gradle, 未 git commit/push/切分支。
+- 工作区 106 个已跟踪修改文件均按保护要求以增量方式编辑, 未覆盖任何既有改动。
+
+================================================================================
+【8】附录: 02:20 之前完成的存量注释改动 (36 个 Java 文件)
+================================================================================
+ddd4j-javalin-auth/ddd4j-javalin-auth-core/src/main/java/io/ddd4j/javalin/auth/AbstractAuthJavalinModule.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-license/src/main/java/io/ddd4j/javalin/auth/license/Ddd4jLicenseJavalinModule.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-license/src/main/java/io/ddd4j/javalin/auth/license/LicenseProperties.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-oidc/src/main/java/io/ddd4j/javalin/auth/oidc/Ddd4jOidcJavalinModule.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-oidc/src/main/java/io/ddd4j/javalin/auth/oidc/NimbusOidcTokenVerifier.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-oidc/src/main/java/io/ddd4j/javalin/auth/oidc/OidcAuthenticationException.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-oidc/src/main/java/io/ddd4j/javalin/auth/oidc/OidcHttpAuthentication.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-oidc/src/main/java/io/ddd4j/javalin/auth/oidc/OidcProperties.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-oidc/src/main/java/io/ddd4j/javalin/auth/oidc/OidcProviderUnavailableException.java
+ddd4j-javalin-auth/ddd4j-javalin-auth-oidc/src/main/java/io/ddd4j/javalin/auth/oidc/OidcSubjectProvider.java
+ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/Ddd4jCoreGuiceModule.java
+ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/Ddd4jCoreProperties.java
+ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/Ddd4jJavalinBootstrapContext.java
+ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/Ddd4jJavalinRuntime.java
+ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/JavalinLifecycleParticipant.java
+ddd4j-javalin-core/src/main/java/io/ddd4j/javalin/core/lifecycle/JavalinRuntimeState.java
+ddd4j-javalin-data/ddd4j-javalin-data-crypto/src/main/java/io/ddd4j/javalin/data/crypto/Ddd4jCryptoJavalinModule.java
+ddd4j-javalin-data/ddd4j-javalin-data-datascope/src/main/java/io/ddd4j/javalin/data/datascope/Ddd4jDataScopeJavalinModule.java
+ddd4j-javalin-data/ddd4j-javalin-data-external/src/main/java/io/ddd4j/javalin/data/external/Ddd4jExternalJavalinModule.java
+ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/main/java/io/ddd4j/javalin/data/jpa/Ddd4jJpaJavalinModule.java
+ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/main/java/io/ddd4j/javalin/data/jpa/JpaLifecycleParticipant.java
+ddd4j-javalin-data/ddd4j-javalin-data-jpa/src/main/java/io/ddd4j/javalin/data/jpa/JpaTransactionTemplate.java
+ddd4j-javalin-data/ddd4j-javalin-data-logs/src/main/java/io/ddd4j/javalin/data/logs/Ddd4jApiLogJavalinModule.java
+ddd4j-javalin-data/ddd4j-javalin-data-mybatisplus/src/main/java/io/ddd4j/javalin/data/mybatis/MybatisRepositoryLifecycleParticipant.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/AutoIncrementIdStrategy.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/SnowflakeIdGenerator.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/SnowflakeIdStrategy.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/TenantAwareEntityBase.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/TenantAwareId.java
+ddd4j-javalin-data/ddd4j-javalin-data-panache/src/main/java/io/ddd4j/javalin/data/panache/UuidIdStrategy.java
+ddd4j-javalin-testcontainers/src/test/java/io/ddd4j/javalin/testcontainers/BuildLineContractTest.java
+ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinAutoConfiguration.java
+ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinProperties.java
+ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesLoader.java
+ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinPropertiesValidator.java
+ddd4j-javalin-web/src/main/java/io/ddd4j/javalin/web/Ddd4jJavalinReadinessRoutes.java

@@ -16,8 +16,15 @@ import io.ddd4j.javalin.testcontainers.AbstractTestContainerFixture;
  * Shiro realm resolvers.
  */
 public class KeycloakTestContainerFixture extends AbstractTestContainerFixture<KeycloakContainer> {
+    /**
+     * 默认构造方法：Fixture 仅持有镜像与端口常量，容器由 {@link #newContainer()} 构建。
+     */
+    public KeycloakTestContainerFixture() {
+    }
 
+    /** 默认容器镜像。 */
     public static final String DEFAULT_IMAGE = "quay.io/keycloak/keycloak:26.2";
+    /** 默认 realm 名。 */
     public static final String DEFAULT_REALM = "ddd4j-test";
 
     @Override

@@ -27,17 +27,33 @@ public class OrderController {
 
     private final OrderApplicationService applicationService;
 
+    /**
+     * 注入订单应用服务构造控制器。
+     *
+     * @param applicationService 订单应用服务，不可为 {@code null}
+     * @throws NullPointerException 当 {@code applicationService} 为 {@code null}
+     */
     @Inject
     public OrderController(OrderApplicationService applicationService) {
         this.applicationService = Objects.requireNonNull(applicationService, "applicationService must not be null");
     }
 
+    /**
+     * 注册创建订单 / 添加订单行 / 查询订单三条路由。
+     *
+     * @param app 目标 Javalin 实例
+     */
     public void register(Javalin app) {
         app.unsafe.routes.post("/api/orders", this::create);
         app.unsafe.routes.post("/api/orders/{orderId}/lines", this::addLine);
         app.unsafe.routes.get("/api/orders/{orderId}", this::find);
     }
 
+    /**
+     * POST {@code /api/orders}：创建订单并返回读模型投影。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void create(Context ctx) {
         CreateOrderRequest request = ctx.bodyAsClass(CreateOrderRequest.class);
         String orderId = applicationService.create(
@@ -45,6 +61,11 @@ public class OrderController {
         ctx.json(R.ok(applicationService.find(orderId)));
     }
 
+    /**
+     * POST {@code /api/orders/{orderId}/lines}：为指定订单添加订单行。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void addLine(Context ctx) {
         AddOrderLineRequest request = ctx.bodyAsClass(AddOrderLineRequest.class);
         String orderId = ctx.pathParam("orderId");
@@ -53,13 +74,33 @@ public class OrderController {
         ctx.json(R.ok(applicationService.find(orderId)));
     }
 
+    /**
+     * GET {@code /api/orders/{orderId}}：查询订单读模型投影。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void find(Context ctx) {
         ctx.json(R.ok(applicationService.find(ctx.pathParam("orderId"))));
     }
 
+    /**
+     * 创建订单请求体。
+     *
+     * @param orderNo 订单号
+     * @param buyerId 买家 ID
+     * @param buyerName 买家名称
+     */
     public record CreateOrderRequest(String orderNo, String buyerId, String buyerName) {
     }
 
+    /**
+     * 添加订单行请求体。
+     *
+     * @param goodsId 商品 ID
+     * @param goodsName 商品名称
+     * @param quantity 数量
+     * @param unitPrice 单价
+     */
     public record AddOrderLineRequest(String goodsId, String goodsName, int quantity, BigDecimal unitPrice) {
     }
 }

@@ -15,14 +15,14 @@ import org.apache.shiro.authz.UnauthorizedException;
  * <ol>
  *   <li><b>SubjectProvider 注册</b>：绑定 {@link ShiroSubjectProvider} 到 {@link SubjectProvider}
  *       （对标 Spring 的 {@code @Bean SubjectProvider shiroSubjectProvider()}）</li>
- *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link SubjectKit} 静态注册中心，
+ *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link io.ddd4j.core.util.SubjectKit} 静态注册中心，
  *       保证 {@code SubjectKit.getSubject()} 全局可用（对标 Spring 的 {@code SubjectRegistrar}
  *       BeanPostProcessor，但用 eager 注册替代）</li>
  *   <li><b>异常处理器</b>：{@link #registerExceptionHandler(Javalin)} 注册 Javalin 异常处理器，
  *       统一 Shiro 异常响应（对标 Spring 的 {@code @ControllerAdvice ShiroExceptionHandler}）</li>
  * </ol>
  *
- * <h3>使用方式</h3>
+ * <h2>使用方式</h2>
  * <pre>{@code
  * Injector injector = Guice.createInjector(
  *     new Ddd4jGuiceModule(),                // 核心基础设施
@@ -40,6 +40,13 @@ import org.apache.shiro.authz.UnauthorizedException;
 @Slf4j
 public class Ddd4jShiroJavalinModule extends AbstractAuthJavalinModule {
 
+
+    /**
+     * 构造 Ddd4jShiroJavalinModule。
+     */
+    public Ddd4jShiroJavalinModule() {
+        super();
+    }
     /**
      * 注册 Javalin 异常处理器：统一 Shiro 鉴权异常响应（对标 Spring @ControllerAdvice ShiroExceptionHandler）。
      *

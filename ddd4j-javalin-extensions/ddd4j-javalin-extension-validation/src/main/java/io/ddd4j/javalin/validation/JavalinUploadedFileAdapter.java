@@ -14,6 +14,12 @@ public final class JavalinUploadedFileAdapter implements ValidatableFile {
 
     private final UploadedFile uploadedFile;
 
+    /**
+     * 包装 Javalin 上传文件。
+     *
+     * @param uploadedFile Javalin 上传文件，不可为 {@code null}
+     * @throws NullPointerException 当 {@code uploadedFile} 为 {@code null}
+     */
     public JavalinUploadedFileAdapter(UploadedFile uploadedFile) {
         this.uploadedFile = Objects.requireNonNull(uploadedFile, "uploadedFile must not be null");
     }

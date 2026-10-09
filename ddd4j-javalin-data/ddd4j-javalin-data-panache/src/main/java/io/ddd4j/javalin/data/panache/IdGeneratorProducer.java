@@ -31,6 +31,12 @@ import org.eclipse.microprofile.config.ConfigProvider;
 public class IdGeneratorProducer {
 
     /**
+     * 构造 IdGeneratorProducer（CDI 生产者 Bean，无参构造）。
+     */
+    public IdGeneratorProducer() {
+    }
+
+    /**
      * ID 策略配置项名。
      */
     public static final String ID_STRATEGY_CONFIG = "ddd4j.quarkus.data.id-strategy";

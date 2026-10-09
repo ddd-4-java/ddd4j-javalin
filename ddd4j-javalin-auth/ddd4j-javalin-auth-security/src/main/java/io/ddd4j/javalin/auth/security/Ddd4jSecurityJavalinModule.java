@@ -18,7 +18,7 @@ import org.springframework.security.core.AuthenticationException;
  * <ol>
  *   <li><b>SubjectProvider 注册</b>：绑定 {@link SecuritySubjectProvider} 到 {@link SubjectProvider}
  *       （对标 Spring 的 {@code @Bean SubjectProvider securitySubjectProvider()}）</li>
- *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link SubjectKit} 静态注册中心，
+ *   <li><b>SubjectKit 写回</b>：Injector 创建即把 SubjectProvider 写回 {@link io.ddd4j.core.util.SubjectKit} 静态注册中心，
  *       保证 {@code SubjectKit.getSubject()} 全局可用（对标 Spring 的 {@code SubjectRegistrar}
  *       BeanPostProcessor，但用 eager 注册替代）</li>
  *   <li><b>异常处理器</b>：{@link #registerExceptionHandler(Javalin)} 注册 Javalin 异常处理器，
@@ -30,7 +30,7 @@ import org.springframework.security.core.AuthenticationException;
  * （如通过 Javalin 过滤器从请求头解析 JWT 并填充 SecurityContext）。此模块仅作为兼容选项，
  * 推荐 Javalin 项目使用 sa-token（{@code ddd4j-javalin-auth-satoken}）。
  *
- * <h3>使用方式</h3>
+ * <h2>使用方式</h2>
  * <pre>{@code
  * Injector injector = Guice.createInjector(
  *     new Ddd4jGuiceModule(),                    // 核心基础设施
@@ -48,6 +48,13 @@ import org.springframework.security.core.AuthenticationException;
 @Slf4j
 public class Ddd4jSecurityJavalinModule extends AbstractAuthJavalinModule {
 
+
+    /**
+     * 构造 Ddd4jSecurityJavalinModule。
+     */
+    public Ddd4jSecurityJavalinModule() {
+        super();
+    }
     /**
      * 注册 Javalin 异常处理器：统一 Spring Security 鉴权异常响应
      * （对标 Spring @ControllerAdvice SecurityExceptionHandler）。

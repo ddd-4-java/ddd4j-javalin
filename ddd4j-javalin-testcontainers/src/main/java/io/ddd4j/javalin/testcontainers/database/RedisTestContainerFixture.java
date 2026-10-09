@@ -13,8 +13,15 @@ import org.testcontainers.containers.wait.strategy.Wait;
  * (Redis Streams) integration tests.
  */
 public class RedisTestContainerFixture extends AbstractTestContainerFixture<GenericContainer<?>> {
+    /**
+     * 默认构造方法：Fixture 仅持有镜像与端口常量，容器由 {@link #newContainer()} 构建。
+     */
+    public RedisTestContainerFixture() {
+    }
 
+    /** 默认容器镜像。 */
     public static final String DEFAULT_IMAGE = "redis:7-alpine";
+    /** 容器暴露的端口。 */
     public static final int DEFAULT_PORT = 6379;
 
     @Override

@@ -17,7 +17,14 @@ import java.time.Duration;
 @Setter
 public class Ddd4jJavalinProperties {
 
+    /** 配置键前缀（{@code ddd4j.web.javalin}）。 */
     public static final String PREFIX = "ddd4j.web.javalin";
+
+    /**
+     * 使用全部默认值创建 Web 层配置。
+     */
+    public Ddd4jJavalinProperties() {
+    }
 
     /** Whether the Javalin web layer is enabled. Default {@code true}. */
     private boolean enabled = true;

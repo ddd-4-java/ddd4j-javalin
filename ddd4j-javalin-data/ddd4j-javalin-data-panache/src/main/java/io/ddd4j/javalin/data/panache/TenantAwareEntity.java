@@ -50,6 +50,12 @@ public abstract class TenantAwareEntity extends TenantAwareEntityBase {
     private static final Logger logger = Logger.getLogger(TenantAwareEntity.class);
 
     /**
+     * 构造 TenantAwareEntity（无参，供 JPA/Hibernate 实体化与子类继承使用）。
+     */
+    public TenantAwareEntity() {
+    }
+
+    /**
      * 业务主键（雪花 ID 自动生成）。
      */
     @Id
@@ -58,7 +64,7 @@ public abstract class TenantAwareEntity extends TenantAwareEntityBase {
     public Long id;
 
     /**
-     * 租户 ID 已由 {@link TenantAwareEntityBase#tenantId} 提供，
+     * 租户 ID 字段：基类 {@link TenantAwareEntityBase} 的模板查询按 {@code tenantId} 列过滤，
      * 此处重新声明并标注 {@code @Id}，使其纳入本基类固定的两字段复合主键。
      */
     @Id

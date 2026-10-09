@@ -24,10 +24,19 @@ public class Ddd4jApiLogJavalinModule extends AbstractModule {
 
     private final ApiOperationLogProvider provider;
 
+    /**
+     * 使用默认操作日志提供方创建模块。
+     */
     public Ddd4jApiLogJavalinModule() {
         this(new DefaultApiOperationLogProvider());
     }
 
+    /**
+     * 使用指定操作日志提供方创建模块。
+     *
+     * @param provider 操作日志提供方，可被用户自定义绑定覆盖，不允许为 {@code null}
+     * @throws NullPointerException 当 {@code provider} 为 {@code null} 时抛出
+     */
     public Ddd4jApiLogJavalinModule(ApiOperationLogProvider provider) {
         this.provider = java.util.Objects.requireNonNull(provider, "provider must not be null");
     }

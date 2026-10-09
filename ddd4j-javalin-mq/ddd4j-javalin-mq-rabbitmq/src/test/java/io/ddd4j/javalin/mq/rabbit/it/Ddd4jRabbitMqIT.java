@@ -138,11 +138,11 @@ class Ddd4jRabbitMqIT {
             AtomicReference<String> storedMessageId = new AtomicReference<>();
             io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.start(
                     mqClient, List.of(listener), mqProps, new JsonMQEventSerialization(), event -> {
-                if (storeAttempts.incrementAndGet() == 1) {
-                    throw new IllegalStateException("simulated persistence outage");
-                }
-                storedMessageId.set(event.getMsgId());
-            });
+                        if (storeAttempts.incrementAndGet() == 1) {
+                            throw new IllegalStateException("simulated persistence outage");
+                        }
+                        storedMessageId.set(event.getMsgId());
+                    });
 
             Thread.sleep(3000);
             MQEvent event = new MQEvent();
@@ -162,7 +162,9 @@ class Ddd4jRabbitMqIT {
         }
     }
 
-    /** Listener bean invoked by the ddd4j consume pipeline; records the delivered event. */
+    /**
+     * Listener bean invoked by the ddd4j consume pipeline; records the delivered event.
+     */
     public static class SmokeListener {
 
         final AtomicReference<MQEvent> received = new AtomicReference<>();
@@ -173,7 +175,9 @@ class Ddd4jRabbitMqIT {
         }
     }
 
-    /** Listener used to prove that storage failure is nacked and redelivered before business handling. */
+    /**
+     * Listener used to prove that storage failure is nacked and redelivered before business handling.
+     */
     public static class RedeliveryListener {
 
         final AtomicReference<MQEvent> received = new AtomicReference<>();

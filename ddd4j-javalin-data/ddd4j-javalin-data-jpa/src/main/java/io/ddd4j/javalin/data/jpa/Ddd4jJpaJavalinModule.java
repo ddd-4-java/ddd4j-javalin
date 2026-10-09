@@ -42,7 +42,9 @@ public class Ddd4jJpaJavalinModule extends AbstractModule {
         this.suppliedFactory = null;
     }
 
-    /** 使用调用方管理的 EntityManagerFactory。该工厂不会被 Javalin 关闭。 */
+    /**
+     * 使用调用方管理的 EntityManagerFactory。该工厂不会被 Javalin 关闭。
+     */
     public Ddd4jJpaJavalinModule(EntityManagerFactory factory) {
         this.persistenceUnitName = null;
         this.properties = Collections.emptyMap();

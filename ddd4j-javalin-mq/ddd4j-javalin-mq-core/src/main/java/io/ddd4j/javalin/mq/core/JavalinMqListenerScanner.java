@@ -18,10 +18,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-/** 扫描应用包内的 MQEventListener 并从 Guice 获取监听器实例。 */
+/**
+ * 扫描应用包内的 MQEventListener 并从 Guice 获取监听器实例。
+ */
 public final class JavalinMqListenerScanner {
 
-    /** 扫描并返回顺序稳定、route 唯一的监听器。 */
+    /**
+     * 扫描并返回顺序稳定、route 唯一的监听器。
+     */
     public List<MQListener> scan(Injector injector, Collection<String> basePackages) {
         Objects.requireNonNull(injector, "injector must not be null");
         Objects.requireNonNull(basePackages, "basePackages must not be null");

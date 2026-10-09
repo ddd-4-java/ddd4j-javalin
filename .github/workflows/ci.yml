@@ -15,9 +15,9 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    branches: [feature/7.1.x]
+    branches: [ feature/7.1.x ]
   pull_request:
-    branches: [feature/7.1.x]
+    branches: [ feature/7.1.x ]
 
 permissions:
   contents: read

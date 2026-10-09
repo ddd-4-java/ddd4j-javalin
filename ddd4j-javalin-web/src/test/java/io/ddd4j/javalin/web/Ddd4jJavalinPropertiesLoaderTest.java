@@ -10,7 +10,9 @@ import java.util.Properties;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Production configuration source and precedence contract. */
+/**
+ * Production configuration source and precedence contract.
+ */
 class Ddd4jJavalinPropertiesLoaderTest {
 
     @Test

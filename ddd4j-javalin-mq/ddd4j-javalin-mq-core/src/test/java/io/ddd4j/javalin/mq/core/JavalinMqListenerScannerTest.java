@@ -10,7 +10,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Real classpath and Guice listener discovery contract. */
+/**
+ * Real classpath and Guice listener discovery contract.
+ */
 class JavalinMqListenerScannerTest {
 
     @Test

@@ -2,35 +2,40 @@
 
 - **日期**：2026-09-07
 - **状态**：待实施（设计已在会话中批准，待文件审阅）
-- **目标**：将 `feature/6.7.x`、`feature/7.1.x`、`feature/7.2.x` 分别收敛到 ddd4j 1.0.x、2.0.x、3.0.x，并以版本解析、单元测试、Testcontainers round-trip 和 GitHub Actions 形成可复验的三线证据。
+- **目标**：将 `feature/6.7.x`、`feature/7.1.x`、`feature/7.2.x` 分别收敛到 ddd4j
+  1.0.x、2.0.x、3.0.x，并以版本解析、单元测试、Testcontainers round-trip 和 GitHub Actions 形成可复验的三线证据。
 - **规格事实源**：本文件；历史能力矩阵、Testcontainers 和生产就绪文档作为背景资料，不覆盖本文件的三线版本约束。
 
 ## 1. 背景与现状
 
-本仓库已有较完整的 Guice + Javalin 适配实现、共享 Testcontainers Fixture、MQ round-trip IT 和三个版本分支，但正式分支尚未形成一致、可构建、可由 CI 复验的版本矩阵。
+本仓库已有较完整的 Guice + Javalin 适配实现、共享 Testcontainers Fixture、MQ round-trip IT 和三个版本分支，但正式分支尚未形成一致、可构建、可由
+CI 复验的版本矩阵。
 
 2026-09-07 只读审计确认：
 
-| 分支 | 当前问题 |
-|---|---|
+| 分支            | 当前问题                                                                                                                                                                                                                        |
+|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `feature/6.7.x` | 正式分支仍指向 `ddd4j 2.0.x.20260730-SNAPSHOT`；完成 1.0.x 改挂和兼容桥的成果位于 `opt/retarget-1.0.x`，尚未收敛进正式分支；`javalin.version=7.2.2` 仅用于父 BOM 解析、实际依赖另由 `javalin6.version=6.7.0` 覆盖，表达不清晰。 |
-| `feature/7.1.x` | 指向过期的 `ddd4j 2.0.x.20260730-SNAPSHOT`；错误使用 Maven 4 `modelVersion 4.1.0` 和 `<subprojects>`；CI workflow 仍监听 `feature/7.2.x`，因此本分支没有 Actions 运行记录。 |
-| `feature/7.2.x` | ddd4j/Javalin/项目版本声明正确；Maven 4 聚合结构正确；独立 IT workflow 仍使用 JDK 17，而 ddd4j 3.0.x 基线要求 JDK 21；最新 CI 在上游 3.0.x 父 POM 解析阶段失败。 |
+| `feature/7.1.x` | 指向过期的 `ddd4j 2.0.x.20260730-SNAPSHOT`；错误使用 Maven 4 `modelVersion 4.1.0` 和 `<subprojects>`；CI workflow 仍监听 `feature/7.2.x`，因此本分支没有 Actions 运行记录。                                                     |
+| `feature/7.2.x` | ddd4j/Javalin/项目版本声明正确；Maven 4 聚合结构正确；独立 IT workflow 仍使用 JDK 17，而 ddd4j 3.0.x 基线要求 JDK 21；最新 CI 在上游 3.0.x 父 POM 解析阶段失败。                                                                |
 
-上游 ddd4j 1.0.x、2.0.x 已出现成功 deploy 记录；3.0.x 最新 deploy 尚未成功。上游发布状态必须作为 7.2.x 远程消费验证的前置证据，不能以本地 Maven 缓存代替。
+上游 ddd4j 1.0.x、2.0.x 已出现成功 deploy 记录；3.0.x 最新 deploy 尚未成功。上游发布状态必须作为 7.2.x 远程消费验证的前置证据，不能以本地
+Maven 缓存代替。
 
 ## 2. 目标版本矩阵
 
-| ddd4j-javalin 分支 | 项目版本 | Javalin | ddd4j | Maven 模型 | 构建 JDK |
-|---|---|---|---|---|---|
-| `feature/6.7.x` | `6.7.x.20260630-SNAPSHOT` | `6.7.0` | `1.0.x.20260630-SNAPSHOT` | Maven 3 / `4.0.0` / `<modules>` | JDK 17（消费 Java 8 core） |
-| `feature/7.1.x` | `7.1.x.20260630-SNAPSHOT` | `7.1.0` | `2.0.x.20260630-SNAPSHOT` | Maven 3 / `4.0.0` / `<modules>` | JDK 17 |
-| `feature/7.2.x` | `7.2.x.20260630-SNAPSHOT` | `7.2.3` | `3.0.x.20260630-SNAPSHOT` | Maven 4 / `4.1.0` / `<subprojects>` | JDK 21 |
+| ddd4j-javalin 分支 | 项目版本                  | Javalin | ddd4j                     | Maven 模型                          | 构建 JDK                   |
+|--------------------|---------------------------|---------|---------------------------|-------------------------------------|----------------------------|
+| `feature/6.7.x`    | `6.7.x.20260630-SNAPSHOT` | `6.7.0` | `1.0.x.20260630-SNAPSHOT` | Maven 3 / `4.0.0` / `<modules>`     | JDK 17（消费 Java 8 core） |
+| `feature/7.1.x`    | `7.1.x.20260630-SNAPSHOT` | `7.1.0` | `2.0.x.20260630-SNAPSHOT` | Maven 3 / `4.0.0` / `<modules>`     | JDK 17                     |
+| `feature/7.2.x`    | `7.2.x.20260630-SNAPSHOT` | `7.2.3` | `3.0.x.20260630-SNAPSHOT` | Maven 4 / `4.1.0` / `<subprojects>` | JDK 21                     |
 
 ### 2.1 强制约束
 
-1. 使用 ddd4j 1.0.x 或 2.0.x 的分支必须采用 Maven 3 模型：命名空间/POM schema `4.0.0`、`modelVersion 4.0.0`、聚合元素 `<modules>/<module>`。
-2. 使用 ddd4j 3.0.x 的分支必须采用 Maven 4 模型：命名空间/POM schema `4.1.0`、`modelVersion 4.1.0`、聚合元素 `<subprojects>/<subproject>`。
+1. 使用 ddd4j 1.0.x 或 2.0.x 的分支必须采用 Maven 3 模型：命名空间/POM schema `4.0.0`、`modelVersion 4.0.0`、聚合元素
+   `<modules>/<module>`。
+2. 使用 ddd4j 3.0.x 的分支必须采用 Maven 4 模型：命名空间/POM schema `4.1.0`、`modelVersion 4.1.0`、聚合元素
+   `<subprojects>/<subproject>`。
 3. `feature/7.1.x` 不允许保留 Maven 4 wrapper、`4.1.0` schema 或 `<subprojects>`。
 4. 每条分支只能声明一个清晰的 Javalin 运行版本；6.7.x 不得再用 `javalin.version=7.2.2` 表示一个非运行时版本。
 5. 不使用 Git worktree，不创建新 worktree，不以已有 worktree 作为实现或验证目录。
@@ -43,7 +48,8 @@
 
 ### 3.1 feature/6.7.x
 
-以 `opt/retarget-1.0.x` 为 1.0.x 兼容候选基线，逐项吸收正式 `feature/6.7.x` 在候选分叉后新增的 Web、auth-core、Surefire 和文档修复。不得直接按分支头盲目覆盖；合并前先生成提交清单和冲突矩阵，按以下类别裁决：
+以 `opt/retarget-1.0.x` 为 1.0.x 兼容候选基线，逐项吸收正式 `feature/6.7.x` 在候选分叉后新增的 Web、auth-core、Surefire
+和文档修复。不得直接按分支头盲目覆盖；合并前先生成提交清单和冲突矩阵，按以下类别裁决：
 
 - **必须保留候选实现**：`ddd4j-javalin-guice-bridge`、1.0.x 缺失契约的兼容实现、Javalin 6 API 适配、1.0.x 依赖版本。
 - **必须吸收正式分支实现**：后续 Web 6 API 修复、auth-core 对称性修复、测试解锁。
@@ -62,7 +68,8 @@
 
 ### 3.3 feature/7.2.x
 
-保留 Maven 4 `4.1.0/<subprojects>` 和 Javalin 7.2.3，修正 CI/IT 为 JDK 21 + Maven 4 wrapper。远程消费验证必须等待 ddd4j 3.0.x deploy 成功并可从干净 Maven 仓库解析。
+保留 Maven 4 `4.1.0/<subprojects>` 和 Javalin 7.2.3，修正 CI/IT 为 JDK 21 + Maven 4 wrapper。远程消费验证必须等待 ddd4j
+3.0.x deploy 成功并可从干净 Maven 仓库解析。
 
 ## 4. 能力对齐边界
 
@@ -95,29 +102,31 @@ flowchart TB
 
 ### 5.1 版本策略
 
-本次继续使用 `testcontainers-bom 1.20.6`，避免把三分支收敛与 Testcontainers 2.x 主版本升级混为一个变更。官方 modules 目录用于确认 Java 模块类别、推荐容器类型和镜像家族；实际 tag 必须结合 ARM64、上游客户端协议和既有 round-trip 证据锁定。
+本次继续使用 `testcontainers-bom 1.20.6`，避免把三分支收敛与 Testcontainers 2.x 主版本升级混为一个变更。官方 modules
+目录用于确认 Java 模块类别、推荐容器类型和镜像家族；实际 tag 必须结合 ARM64、上游客户端协议和既有 round-trip 证据锁定。
 
 ### 5.2 容器矩阵
 
-| 能力 | 容器/API | 镜像基线 | 验证行为 |
-|---|---|---|---|
-| MySQL | `MySQLContainer` | `mysql:8.0` | schema + CRUD + transaction |
-| PostgreSQL | `PostgreSQLContainer` | `postgres:16-alpine` | outbox/数据 round-trip |
-| MariaDB | `MariaDBContainer` | `mariadb:11` | JDBC readiness/CRUD |
-| MongoDB | `MongoDBContainer` | `mongo:7` | connection + document round-trip |
-| Redis | `GenericContainer`（1.20.6 兼容） | `redis:7-alpine` | ping + stream/cache round-trip |
-| Kafka | `KafkaContainer` | 先保留已验证的 `confluentinc/cp-kafka:7.5.0` | publish/consume/ack |
-| RabbitMQ | `RabbitMQContainer` | `rabbitmq:3.13.7-management-alpine` | exchange/bind/publish/consume |
-| Artemis | `GenericContainer` | `apache/activemq-artemis:2.39.0` | JMS round-trip |
-| RocketMQ | `GenericContainer` | `apache/rocketmq:5.3.2` | nameserver+broker round-trip |
-| Pulsar | `GenericContainer` | `apachepulsar/pulsar:3.2.0` | namespace ready + round-trip |
-| NATS | `GenericContainer` | `nats:2-alpine` | publish/subscribe |
-| MQTT | `GenericContainer` | `eclipse-mosquitto:2.0` | publish/subscribe |
-| SQS | `LocalStackContainer`，若 1.20.6 API兼容 | `localstack/localstack:3.4` | queue/send/receive/delete |
-| Keycloak | `KeycloakContainer` 社区模块 | `quay.io/keycloak/keycloak:24.0` | realm/token/auth decision |
-| WireMock | 模块或兼容 `GenericContainer` | `wiremock/wiremock:3.5.0` | stubbed HTTP response |
+| 能力       | 容器/API                                 | 镜像基线                                     | 验证行为                         |
+|------------|------------------------------------------|----------------------------------------------|----------------------------------|
+| MySQL      | `MySQLContainer`                         | `mysql:8.0`                                  | schema + CRUD + transaction      |
+| PostgreSQL | `PostgreSQLContainer`                    | `postgres:16-alpine`                         | outbox/数据 round-trip           |
+| MariaDB    | `MariaDBContainer`                       | `mariadb:11`                                 | JDBC readiness/CRUD              |
+| MongoDB    | `MongoDBContainer`                       | `mongo:7`                                    | connection + document round-trip |
+| Redis      | `GenericContainer`（1.20.6 兼容）        | `redis:7-alpine`                             | ping + stream/cache round-trip   |
+| Kafka      | `KafkaContainer`                         | 先保留已验证的 `confluentinc/cp-kafka:7.5.0` | publish/consume/ack              |
+| RabbitMQ   | `RabbitMQContainer`                      | `rabbitmq:3.13.7-management-alpine`          | exchange/bind/publish/consume    |
+| Artemis    | `GenericContainer`                       | `apache/activemq-artemis:2.39.0`             | JMS round-trip                   |
+| RocketMQ   | `GenericContainer`                       | `apache/rocketmq:5.3.2`                      | nameserver+broker round-trip     |
+| Pulsar     | `GenericContainer`                       | `apachepulsar/pulsar:3.2.0`                  | namespace ready + round-trip     |
+| NATS       | `GenericContainer`                       | `nats:2-alpine`                              | publish/subscribe                |
+| MQTT       | `GenericContainer`                       | `eclipse-mosquitto:2.0`                      | publish/subscribe                |
+| SQS        | `LocalStackContainer`，若 1.20.6 API兼容 | `localstack/localstack:3.4`                  | queue/send/receive/delete        |
+| Keycloak   | `KeycloakContainer` 社区模块             | `quay.io/keycloak/keycloak:24.0`             | realm/token/auth decision        |
+| WireMock   | 模块或兼容 `GenericContainer`            | `wiremock/wiremock:3.5.0`                    | stubbed HTTP response            |
 
-ONS 和 TDMQ 是托管服务，没有本地开源等价镜像，继续作为明确排除项。Mica MQTT 只有在测试方法实际带有 `@Disabled` 或以独立可观察失败记录证明不兼容时才可跳过；注释不能代替禁用机制和测试报告。
+ONS 和 TDMQ 是托管服务，没有本地开源等价镜像，继续作为明确排除项。Mica MQTT 只有在测试方法实际带有 `@Disabled`
+或以独立可观察失败记录证明不兼容时才可跳过；注释不能代替禁用机制和测试报告。
 
 ## 6. GitHub Actions 与私服配置
 
@@ -128,7 +137,8 @@ ONS 和 TDMQ 是托管服务，没有本地开源等价镜像，继续作为明�
 3. 使用 Maven 自身的只读解析命令验证私服访问；不得再依赖未配置的 `ALIYUN_PACKAGES_USERNAME/PASSWORD` 做独立 curl 自检。
 4. 6.7.x/7.1.x 使用 JDK 17 + Maven 3；7.2.x 使用 JDK 21 + Maven 4 wrapper。
 5. workflow 的 `push`、`pull_request`、concurrency group 和说明必须匹配所在分支。
-6. Testcontainers 矩阵默认是验收门禁；只有已登记的上游缺陷可以针对单项显式豁免，不能对整个 job 使用 `continue-on-error: true`。
+6. Testcontainers 矩阵默认是验收门禁；只有已登记的上游缺陷可以针对单项显式豁免，不能对整个 job 使用
+   `continue-on-error: true`。
 
 ## 7. TDD 与验证门禁
 
@@ -183,11 +193,11 @@ flowchart LR
 
 ## 10. 风险与对策
 
-| 风险 | 对策 |
-|---|---|
-| 6.7 候选分支内联了已由新 1.0.x 发布提供的类型 | 先做类/构件清单差分，只保留真实缺口。 |
-| Maven SNAPSHOT 元数据缓存导致假通过 | 使用独立临时 local repository 加 `-U` 验证。 |
-| 三分支连续修改落错分支 | 每次写入前后记录 branch、HEAD、status；跨分支依赖本地提交检查点，不使用 worktree。 |
-| 容器并行导致 ARM64/OOM 不稳定 | 按 broker 分批串行执行；保留已有内存和 readiness 策略。 |
-| 3.0.x 尚未成功 deploy | 7.2.x 本地结构验证可继续，远程消费/CI 完成状态保持阻塞，直到上游 deploy 有成功证据。 |
-| 私服凭据泄漏 | workflow 不打印 settings；另行轮换本地 remote URL 中暴露过的 Codeup 凭据。 |
+| 风险                                          | 对策                                                                                 |
+|-----------------------------------------------|--------------------------------------------------------------------------------------|
+| 6.7 候选分支内联了已由新 1.0.x 发布提供的类型 | 先做类/构件清单差分，只保留真实缺口。                                                |
+| Maven SNAPSHOT 元数据缓存导致假通过           | 使用独立临时 local repository 加 `-U` 验证。                                         |
+| 三分支连续修改落错分支                        | 每次写入前后记录 branch、HEAD、status；跨分支依赖本地提交检查点，不使用 worktree。   |
+| 容器并行导致 ARM64/OOM 不稳定                 | 按 broker 分批串行执行；保留已有内存和 readiness 策略。                              |
+| 3.0.x 尚未成功 deploy                         | 7.2.x 本地结构验证可继续，远程消费/CI 完成状态保持阻塞，直到上游 deploy 有成功证据。 |
+| 私服凭据泄漏                                  | workflow 不打印 settings；另行轮换本地 remote URL 中暴露过的 Codeup 凭据。           |

@@ -54,22 +54,30 @@ public abstract class JavalinTestFixture {
     protected Injector injector;
     protected HttpClient client;
 
-    /** Override to scan DDD annotations in extra packages. Default: empty (no scan). */
+    /**
+     * Override to scan DDD annotations in extra packages. Default: empty (no scan).
+     */
     protected String[] basePackages() {
         return new String[0];
     }
 
-    /** Override to add extra Guice modules (auth, data, mq, …). Default: none. */
+    /**
+     * Override to add extra Guice modules (auth, data, mq, …). Default: none.
+     */
     protected Module[] extraModules() {
         return new Module[0];
     }
 
-    /** Override to add extra routes after the ddd4j lifecycle hooks are installed. */
+    /**
+     * Override to add extra routes after the ddd4j lifecycle hooks are installed.
+     */
     protected void configureRoutes(Javalin app) {
         // no-op by default
     }
 
-    /** Override to assert against the {@link Injector} post-creation. */
+    /**
+     * Override to assert against the {@link Injector} post-creation.
+     */
     protected void afterInjector(Injector injector) {
         // no-op by default
     }
@@ -119,23 +127,31 @@ public abstract class JavalinTestFixture {
         }
     }
 
-    /** Build a URL to {@code path} on the running test server. */
+    /**
+     * Build a URL to {@code path} on the running test server.
+     */
     protected java.net.URI url(String path) {
         return java.net.URI.create("http://localhost:" + app.port() + path);
     }
 
-    /** Convenience: send an HTTP request and return the response. */
+    /**
+     * Convenience: send an HTTP request and return the response.
+     */
     protected java.net.http.HttpResponse<String> http(java.net.http.HttpRequest request) throws Exception {
         return client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
     }
 
-    /** Convenience: send an HTTP request with a custom body handler. */
+    /**
+     * Convenience: send an HTTP request with a custom body handler.
+     */
     protected <T> java.net.http.HttpResponse<T> http(java.net.http.HttpRequest request,
                                                      java.net.http.HttpResponse.BodyHandler<T> handler) throws Exception {
         return client.send(request, handler);
     }
 
-    /** Run an assertion callback against the live {@link Injector}. */
+    /**
+     * Run an assertion callback against the live {@link Injector}.
+     */
     protected void withInjector(Consumer<Injector> assertion) {
         assertion.accept(injector);
     }

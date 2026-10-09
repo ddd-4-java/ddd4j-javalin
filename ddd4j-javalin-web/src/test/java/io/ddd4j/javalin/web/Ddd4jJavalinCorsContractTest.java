@@ -10,7 +10,9 @@ import java.net.http.HttpResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Production CORS allowlist contract. */
+/**
+ * Production CORS allowlist contract.
+ */
 class Ddd4jJavalinCorsContractTest {
 
     @Test

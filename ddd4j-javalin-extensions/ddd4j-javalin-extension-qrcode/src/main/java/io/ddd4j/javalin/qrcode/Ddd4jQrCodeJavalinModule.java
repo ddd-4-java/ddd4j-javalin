@@ -10,7 +10,9 @@ import io.javalin.Javalin;
 
 import java.util.Objects;
 
-/** Guice assembly for the framework-neutral QR code service. */
+/**
+ * Guice assembly for the framework-neutral QR code service.
+ */
 public class Ddd4jQrCodeJavalinModule extends AbstractModule implements AutoCloseable {
 
     private final QrCodeModuleConfig config;
@@ -35,7 +37,9 @@ public class Ddd4jQrCodeJavalinModule extends AbstractModule implements AutoClos
         this.ownsService = ownsService;
     }
 
-    /** Registers routes only when explicitly enabled in the supplied configuration. */
+    /**
+     * Registers routes only when explicitly enabled in the supplied configuration.
+     */
     public void registerRoutes(Javalin app) {
         if (config.isRoutesEnabled()) {
             new QrCodeRoutes(service, config).register(app);

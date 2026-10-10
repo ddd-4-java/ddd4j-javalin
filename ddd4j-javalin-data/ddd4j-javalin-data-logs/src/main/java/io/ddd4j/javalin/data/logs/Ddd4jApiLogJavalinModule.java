@@ -24,14 +24,24 @@ public class Ddd4jApiLogJavalinModule extends AbstractModule {
 
     private final ApiOperationLogProvider provider;
 
+    /**
+     * 构造 Ddd4jApiLogJavalinModule Guice 模块实例。
+     */
     public Ddd4jApiLogJavalinModule() {
         this(new DefaultApiOperationLogProvider());
     }
 
+    /**
+     * 构造 Ddd4jApiLogJavalinModule Guice 模块实例。
+     * @param provider 提供者实例。
+     */
     public Ddd4jApiLogJavalinModule(ApiOperationLogProvider provider) {
         this.provider = java.util.Objects.requireNonNull(provider, "provider must not be null");
     }
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
         bind(ApiOperationLogProvider.class).toInstance(provider);

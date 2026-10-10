@@ -10,6 +10,9 @@ import io.ddd4j.sample.richmodel.order.infrastructure.persistence.InMemoryOrderR
  */
 public class JavalinRichModelModule extends AbstractModule {
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
         InMemoryOrderRepository repository = new InMemoryOrderRepository();

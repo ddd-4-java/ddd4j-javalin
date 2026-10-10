@@ -14,6 +14,11 @@ public class TestUserRepository extends BaseRepositoryImpl<
         TestUserRepository.TestUserQuery,
         Long> {
 
+    /**
+     * 测试用户聚合根模型。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     @Data
     @EqualsAndHashCode(callSuper = false)
     public static class TestUserModel extends AggregateRoot<Long> {
@@ -21,12 +26,21 @@ public class TestUserRepository extends BaseRepositoryImpl<
         private String username;
         private String email;
 
+        /**
+         * 返回聚合根标识。
+         * @return 聚合根标识。
+         */
         @Override
         public Long id() {
             return id;
         }
     }
 
+    /**
+     * 测试用户查询条件对象。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     public static class TestUserQuery extends Query<TestUserModel> {
     }
 }

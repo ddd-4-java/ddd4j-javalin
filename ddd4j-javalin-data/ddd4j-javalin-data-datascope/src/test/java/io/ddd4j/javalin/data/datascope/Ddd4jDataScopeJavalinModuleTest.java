@@ -35,6 +35,11 @@ class Ddd4jDataScopeJavalinModuleTest {
         assertThat(validator.isValid("denied", null)).isFalse();
     }
 
+    /**
+     * 数据域生效契约断言载体。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     static class Contract {
         @RequiresDataPermissions(dataType = "tenant")
         private String tenantId;

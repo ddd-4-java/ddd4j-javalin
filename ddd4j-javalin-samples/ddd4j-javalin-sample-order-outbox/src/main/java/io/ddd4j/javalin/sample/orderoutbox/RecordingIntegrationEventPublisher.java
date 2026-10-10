@@ -17,6 +17,10 @@ public final class RecordingIntegrationEventPublisher implements IntegrationEven
 
     private final List<OutboxMessage> published = new CopyOnWriteArrayList<>();
 
+    /**
+     * 记录发件箱消息以便测试断言。
+     * @param message 异常消息。
+     */
     @Override
     public void publish(OutboxMessage message) {
         published.add(Objects.requireNonNull(message, "message must not be null"));

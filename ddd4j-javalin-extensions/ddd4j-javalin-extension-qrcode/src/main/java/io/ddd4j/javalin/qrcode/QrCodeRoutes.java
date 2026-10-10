@@ -24,11 +24,20 @@ public class QrCodeRoutes {
     private final QrCodeService service;
     private final QrCodeModuleConfig config;
 
+    /**
+     * 构造 QrCodeRoutes 实例并初始化依赖。
+     * @param service 二维码服务。
+     * @param config 二维码模块配置。
+     */
     public QrCodeRoutes(QrCodeService service, QrCodeModuleConfig config) {
         this.service = Objects.requireNonNull(service, "service must not be null");
         this.config = Objects.requireNonNull(config, "config must not be null");
     }
 
+    /**
+     * 注册二维码路由。
+     * @param app Javalin 应用实例。
+     */
     public void register(Javalin app) {
         Objects.requireNonNull(app, "app must not be null");
         app.unsafe.routes.post(config.getBasePath() + "/render", this::render);

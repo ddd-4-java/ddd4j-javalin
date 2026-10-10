@@ -29,6 +29,10 @@ class MybatisRepositoryLifecycleParticipantTest {
             return null;
         });
         Ddd4jMybatisJavalinModule module = new Ddd4jMybatisJavalinModule(null) {
+            /**
+             * 初始化仓储。
+             * @param ignored 注入器（本方法未使用）。
+             */
             @Override
             public void initRepositories(Injector ignored) {
                 initializations.incrementAndGet();

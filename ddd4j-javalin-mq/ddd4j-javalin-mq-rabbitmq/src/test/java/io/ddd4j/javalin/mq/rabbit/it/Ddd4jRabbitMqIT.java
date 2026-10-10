@@ -167,6 +167,10 @@ class Ddd4jRabbitMqIT {
 
         final AtomicReference<MQEvent> received = new AtomicReference<>();
 
+        /**
+         * 接收到冒烟测试消息时的回调。
+         * @param event 事件消息。
+         */
         @MQEventListener(topic = TOPIC, tags = TAG, group = "it-rabbit-consumer")
         public void onSmoke(MQEvent event) {
             received.set(event);
@@ -179,6 +183,10 @@ class Ddd4jRabbitMqIT {
         final AtomicReference<MQEvent> received = new AtomicReference<>();
         final AtomicInteger invocations = new AtomicInteger();
 
+        /**
+         * 接收到消息时的回调。
+         * @param event 事件消息。
+         */
         @MQEventListener(topic = TOPIC, tags = TAG, group = "it-rabbit-redelivery-consumer")
         public void onMessage(MQEvent event) {
             invocations.incrementAndGet();

@@ -42,6 +42,7 @@ class Ddd4jPulsarMqIT {
 
     private static final String TOPIC = "ddd4j.it.pulsar";
 
+    // 镜像来源：https://testcontainers.com/modules/pulsar（Testcontainers Pulsar 模块，已钉精确版本）
     @SuppressWarnings("resource")
     private static final GenericContainer<?> PULSAR = new GenericContainer<>(
             DockerImageName.parse("apachepulsar/pulsar:3.2.0"))
@@ -123,6 +124,10 @@ class Ddd4jPulsarMqIT {
 
         final AtomicReference<MQEvent> received = new AtomicReference<>();
 
+        /**
+         * 接收到冒烟测试消息时的回调。
+         * @param event 事件消息。
+         */
         @MQEventListener(topic = TOPIC, tags = "*", group = "it-pulsar-consumer")
         public void onSmoke(MQEvent event) {
             received.set(event);

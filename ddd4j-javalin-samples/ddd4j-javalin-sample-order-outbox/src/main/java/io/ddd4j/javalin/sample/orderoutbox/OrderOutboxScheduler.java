@@ -30,10 +30,20 @@ public final class OrderOutboxScheduler {
     private ScheduledExecutorService executor;
     private ScheduledFuture<?> handle;
 
+    /**
+     * 构造 OrderOutboxScheduler 实例并初始化依赖。
+     * @param publisher 发件箱消息发布器。
+     * @param properties 配置属性。
+     */
     public OrderOutboxScheduler(OutboxPublisher publisher, OrderOutboxSampleProperties properties) {
         this(publisher::dispatchPending, properties);
     }
 
+    /**
+     * 构造 OrderOutboxScheduler 实例并初始化依赖。
+     * @param publisher 发件箱消息发布器。
+     * @param properties 配置属性。
+     */
     public OrderOutboxScheduler(TransactionalOutboxPublisher publisher, OrderOutboxSampleProperties properties) {
         this(publisher::publishPending, properties);
     }
@@ -91,6 +101,11 @@ public final class OrderOutboxScheduler {
         }
     }
 
+    /**
+     * 发件箱分发动作抽象。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     @FunctionalInterface
     private interface OutboxDispatch {
 

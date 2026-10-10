@@ -58,6 +58,10 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
 
     private static final AtomicBoolean SCHEMA_READY = new AtomicBoolean();
 
+    /**
+     * 返回 Postgres 模式额外安装的模块。
+     * @return 额外模块数组。
+     */
     @Override
     protected Module[] extraModules() {
         POSTGRES.start();
@@ -68,6 +72,9 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
         dataSource.setPassword(POSTGRES.getPassword());
         return new Module[]{
                 new AbstractModule() {
+                    /**
+                     * 装配 Guice 绑定。
+                     */
                     @Override
                     protected void configure() {
                         bind(DataSource.class).toInstance(dataSource);
@@ -77,6 +84,10 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
         };
     }
 
+    /**
+     * 注册应用测试路由。
+     * @param app Javalin 应用实例。
+     */
     @Override
     protected void configureRoutes(Javalin app) {
         injector.getInstance(OrderController.class).register(app);

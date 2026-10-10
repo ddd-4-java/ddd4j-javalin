@@ -24,11 +24,19 @@ public final class OidcSubjectProvider implements SubjectProvider {
     private final OidcSubject subject;
     private final OidcTokenVerifier verifier;
 
+    /**
+     * 构造 OidcSubjectProvider 实例并初始化依赖。
+     * @param verifier 令牌验证器。
+     */
     public OidcSubjectProvider(OidcTokenVerifier verifier) {
         this.verifier = Objects.requireNonNull(verifier, "verifier must not be null");
         this.subject = new OidcSubject(verifier);
     }
 
+    /**
+     * 返回请求作用域的认证主体。
+     * @return 请求作用域的认证主体，使用后需调用 {@link OidcSubjectScope#close()} 关闭。
+     */
     @Override
     public Subject getSubject() {
         return subject;

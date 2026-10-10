@@ -16,22 +16,37 @@ public final class MybatisRepositoryLifecycleParticipant implements JavalinLifec
     private boolean started;
     private boolean closed;
 
+    /**
+     * 构造 MybatisRepositoryLifecycleParticipant 实例并初始化依赖。
+     * @param injector Guice 注入器。
+     * @param module MyBatis 装配模块。
+     */
     @Inject
     public MybatisRepositoryLifecycleParticipant(Injector injector, Ddd4jMybatisJavalinModule module) {
         this.injector = Objects.requireNonNull(injector, "injector must not be null");
         this.module = Objects.requireNonNull(module, "module must not be null");
     }
 
+    /**
+     * 返回组件启动顺序，数值越小越先启动。
+     * @return 启动顺序值。
+     */
     @Override
     public int order() {
         return 100;
     }
 
+    /**
+     * 启动前校验组件状态与依赖。
+     */
     @Override
     public void validate() {
         // Guice 已在创建参与者时验证 Injector 与 Module 依赖。
     }
 
+    /**
+     * 启动组件。
+     */
     @Override
     public synchronized void start() {
         if (started) {
@@ -41,6 +56,10 @@ public final class MybatisRepositoryLifecycleParticipant implements JavalinLifec
         started = true;
     }
 
+    /**
+     * 返回组件就绪状态。
+     * @return 就绪状态。
+     */
     @Override
     public synchronized ReadinessResult readiness() {
         return started && !closed
@@ -48,6 +67,9 @@ public final class MybatisRepositoryLifecycleParticipant implements JavalinLifec
                 : ReadinessResult.unavailable("data:mybatis", "not initialized");
     }
 
+    /**
+     * 关闭 MyBatis 注入器并释放资源。
+     */
     @Override
     public synchronized void close() {
         if (closed) {

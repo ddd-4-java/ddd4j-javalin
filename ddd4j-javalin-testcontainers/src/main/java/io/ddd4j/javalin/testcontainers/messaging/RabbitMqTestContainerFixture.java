@@ -16,13 +16,23 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class RabbitMqTestContainerFixture extends AbstractTestContainerFixture<RabbitMQContainer> {
 
+    /** 默认容器镜像（已钉精确版本）。镜像来源：<a href="https://testcontainers.com/modules/rabbitmq">Testcontainers RabbitMQ 模块</a>。 */
     public static final String DEFAULT_IMAGE = "rabbitmq:3.13.7-management-alpine";
 
+    /**
+     * 创建并配置测试容器。
+     * @return 配置完成的容器实例。
+     */
     @Override
     public RabbitMQContainer newContainer() {
         return new RabbitMQContainer(DockerImageName.parse(DEFAULT_IMAGE)).withReuse(true);
     }
 
+    /**
+     * 由容器解析连接字符串。
+     * @param container 已启动的测试容器。
+     * @return 容器连接串。
+     */
     @Override
     protected String resolveConnectionString(RabbitMQContainer container) {
         return container.getAmqpUrl();

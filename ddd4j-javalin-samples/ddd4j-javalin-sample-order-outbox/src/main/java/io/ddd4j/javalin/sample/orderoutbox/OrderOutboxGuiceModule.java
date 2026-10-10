@@ -27,6 +27,9 @@ public class OrderOutboxGuiceModule extends AbstractModule {
 
     private final InMemoryOrderAdapters adapters = new InMemoryOrderAdapters();
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
         bind(InMemoryOrderAdapters.class).toInstance(adapters);

@@ -18,15 +18,27 @@ public class Ddd4jDisruptorMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
     private final DisruptorMQClient client;
 
+    /**
+     * 构造 Ddd4jDisruptorMqGuiceModule Guice 模块实例。
+     * @param client MQ 客户端实例。
+     */
     public Ddd4jDisruptorMqGuiceModule(DisruptorMQClient client) {
         this(client, new DisruptorMQProperties());
     }
 
+    /**
+     * 构造 Ddd4jDisruptorMqGuiceModule Guice 模块实例。
+     * @param client MQ 客户端实例。
+     * @param properties 配置属性。
+     */
     public Ddd4jDisruptorMqGuiceModule(DisruptorMQClient client, DisruptorMQProperties properties) {
         super(properties);
         this.client = Objects.requireNonNull(client, "client");
     }
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
         super.configure();
@@ -34,6 +46,10 @@ public class Ddd4jDisruptorMqGuiceModule extends AbstractDdd4jMqGuiceModule {
         bind(DisruptorMQClient.class).toInstance(client);
     }
 
+    /**
+     * 提供 MQ 客户端。
+     * @return MQ 客户端实例。
+     */
     @Provides
     @Singleton
     public MQClient mqClient() {

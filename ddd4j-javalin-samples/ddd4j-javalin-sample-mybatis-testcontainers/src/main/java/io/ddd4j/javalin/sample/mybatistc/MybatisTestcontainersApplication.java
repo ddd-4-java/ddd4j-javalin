@@ -22,6 +22,12 @@ public final class MybatisTestcontainersApplication {
     private MybatisTestcontainersApplication() {
     }
 
+    /**
+     * 启动集成测试示例应用。
+     * @param dataSource 数据源。
+     * @param args 命令行参数。
+     * @return 启动后的 Javalin 应用。
+     */
     public static Javalin run(DataSource dataSource, String... args) {
         Ddd4jMybatisJavalinModule mybatisModule = new Ddd4jMybatisJavalinModule(dataSource)
                 .addMapper(SampleUserMapper.class);

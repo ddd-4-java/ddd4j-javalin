@@ -25,7 +25,7 @@ import org.eclipse.microprofile.config.ConfigProvider;
  * 覆盖此默认生产者，实现完全自定义的 ID 生成逻辑。
  *
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
- * @since 3.3.x
+ * @since 7.1.x
  */
 @ApplicationScoped
 public class IdGeneratorProducer {

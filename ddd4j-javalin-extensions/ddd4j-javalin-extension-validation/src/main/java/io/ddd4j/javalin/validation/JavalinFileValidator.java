@@ -17,6 +17,10 @@ public final class JavalinFileValidator {
 
     private final FileValidationService validationService;
 
+    /**
+     * 构造 JavalinFileValidator 实例并初始化依赖。
+     * @param validationService 文件校验服务。
+     */
     public JavalinFileValidator(FileValidationService validationService) {
         this.validationService = Objects.requireNonNull(validationService, "validationService must not be null");
     }

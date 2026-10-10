@@ -16,6 +16,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * 人员 CQRS 装配模块测试。
+ * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * @since 7.1.x
+ */
 class JavalinPersonCqrsModuleTest {
 
     @Test

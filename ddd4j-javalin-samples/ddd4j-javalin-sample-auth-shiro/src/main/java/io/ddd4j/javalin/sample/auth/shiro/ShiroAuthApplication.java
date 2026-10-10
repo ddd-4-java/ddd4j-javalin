@@ -14,6 +14,10 @@ import io.javalin.Javalin;
  */
 public class ShiroAuthApplication {
 
+    /**
+     * 示例程序入口。
+     * @param args 命令行参数。
+     */
     public static void main(String[] args) {
         Injector injector = Guice.createInjector(
                 new Ddd4jGuiceModule(),

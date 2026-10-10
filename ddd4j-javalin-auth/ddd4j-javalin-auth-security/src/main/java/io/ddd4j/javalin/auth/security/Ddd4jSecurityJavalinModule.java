@@ -73,6 +73,10 @@ public class Ddd4jSecurityJavalinModule extends AbstractAuthJavalinModule {
                         + exception.getMessage() + "\"}"));
     }
 
+    /**
+     * 返回 Spring Security 的认证主体提供者。
+     * @return 认证主体提供者；返回 {@code null} 表示不额外绑定。
+     */
     @Override
     protected SubjectProvider subjectProvider() {
         return new SecuritySubjectProvider();

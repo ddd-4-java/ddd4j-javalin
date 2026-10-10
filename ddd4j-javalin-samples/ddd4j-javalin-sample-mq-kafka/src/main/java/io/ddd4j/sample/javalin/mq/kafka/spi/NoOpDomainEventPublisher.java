@@ -12,11 +12,21 @@ import java.util.Collection;
  */
 public class NoOpDomainEventPublisher implements DomainEventPublisher {
 
+    /**
+     * 空实现：忽略事件。
+     * @param <T> 类型参数。
+     * @param event 事件消息。
+     */
     @Override
     public <T> void publish(DomainEvent<T> event) {
         System.out.println("[DomainEvent] " + event.getClass().getSimpleName());
     }
 
+    /**
+     * 空实现：忽略事件集合。
+     * @param <T> 类型参数。
+     * @param events 领域事件集合。
+     */
     @Override
     public <T> void publishAll(Collection<DomainEvent<T>> events) {
         if (events != null) {

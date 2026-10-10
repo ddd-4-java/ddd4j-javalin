@@ -18,6 +18,10 @@ import java.util.Map;
 @ApplicationService
 public class AuthController {
 
+    /**
+     * 注册认证示例路由。
+     * @param app Javalin 应用实例。
+     */
     public void register(Javalin app) {
         app.unsafe.routes.post("/auth/login", this::login);
         app.unsafe.routes.post("/auth/logout", this::logout);
@@ -27,6 +31,10 @@ public class AuthController {
         app.unsafe.routes.get("/auth/status", this::status);
     }
 
+    /**
+     * 处理登录请求。
+     * @param ctx Javalin 请求上下文。
+     */
     public void login(Context ctx) {
         String userId = ctx.queryParam("userId");
         AuthPrincipal principal = new AuthPrincipal()
@@ -44,11 +52,19 @@ public class AuthController {
         ctx.json(result);
     }
 
+    /**
+     * 处理登出请求。
+     * @param ctx Javalin 请求上下文。
+     */
     public void logout(Context ctx) {
         SubjectKit.logout();
         ctx.json(Map.of("success", true));
     }
 
+    /**
+     * 返回当前登录用户信息。
+     * @param ctx Javalin 请求上下文。
+     */
     public void me(Context ctx) {
         AuthPrincipal principal = SubjectKit.getPrincipal();
         if (principal == null) {
@@ -62,18 +78,30 @@ public class AuthController {
         ctx.json(result);
     }
 
+    /**
+     * 校验当前会话是否拥有指定权限，无权限时返回 403。
+     * @param ctx Javalin 请求上下文。
+     */
     public void checkPermission(Context ctx) {
         String permission = ctx.queryParam("permission");
         boolean has = SubjectKit.hasPermission(permission);
         ctx.json(Map.of("permission", permission, "has", has));
     }
 
+    /**
+     * 校验当前会话是否拥有指定角色，无权限时返回 403。
+     * @param ctx Javalin 请求上下文。
+     */
     public void checkRole(Context ctx) {
         String role = ctx.queryParam("role");
         boolean has = SubjectKit.hasRole(role);
         ctx.json(Map.of("role", role, "has", has));
     }
 
+    /**
+     * 返回认证服务状态。
+     * @param ctx Javalin 请求上下文。
+     */
     public void status(Context ctx) {
         ctx.json(Map.of("login", SubjectKit.isLogin()));
     }

@@ -19,6 +19,15 @@ public class Order {
     private final String status;
     private final BigDecimal totalAmount;
 
+    /**
+     * 构造 Order 实例并初始化依赖。
+     * @param id 标识值。
+     * @param orderNo 订单号。
+     * @param buyerId 买家标识。
+     * @param buyerName 买家名称。
+     * @param status 状态。
+     * @param totalAmount 订单总金额。
+     */
     public Order(String id, String orderNo, String buyerId, String buyerName, String status, BigDecimal totalAmount) {
         this.id = id;
         this.orderNo = orderNo;
@@ -30,6 +39,10 @@ public class Order {
 
     /**
      * 静态工厂方法：创建新订单。
+     * @param orderNo 订单编号。
+     * @param buyerId 买家标识。
+     * @param buyerName 买家名称。
+     * @return 创建出的订单聚合。
      */
     public static Order create(String orderNo, String buyerId, String buyerName) {
         return new Order(
@@ -42,10 +55,34 @@ public class Order {
         );
     }
 
+    /**
+     * 返回订单标识。
+     * @return 订单标识。
+     */
     public String getId() { return id; }
+    /**
+     * 返回订单号。
+     * @return 方法执行结果。
+     */
     public String getOrderNo() { return orderNo; }
+    /**
+     * 返回买家标识。
+     * @return 方法执行结果。
+     */
     public String getBuyerId() { return buyerId; }
+    /**
+     * 返回买家名称。
+     * @return 方法执行结果。
+     */
     public String getBuyerName() { return buyerName; }
+    /**
+     * 返回订单状态。
+     * @return 订单状态。
+     */
     public String getStatus() { return status; }
+    /**
+     * 返回订单总金额。
+     * @return 方法执行结果。
+     */
     public BigDecimal getTotalAmount() { return totalAmount; }
 }

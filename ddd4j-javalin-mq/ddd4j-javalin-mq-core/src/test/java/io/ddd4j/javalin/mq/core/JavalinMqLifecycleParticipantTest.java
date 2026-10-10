@@ -132,7 +132,16 @@ class JavalinMqLifecycleParticipantTest {
         return MQListener.of(bean, method, method.getAnnotation(MQEventListener.class));
     }
 
+    /**
+     * MQ 生命周期测试用的消息监听 Bean。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     public static final class ListenerBean {
+        /**
+         * 接收到消息事件时的回调。
+         * @param event 事件消息。
+         */
         @MQEventListener(topic = "orders", group = "production")
         public void onEvent(MQEvent event) {
         }
@@ -161,6 +170,11 @@ class JavalinMqLifecycleParticipantTest {
         assertThat((Object) BaseContext.get(MqContextPropagator.SNAPSHOT_REGISTRY_KEY)).isNull();
     }
 
+    /**
+     * 记录消息收发动作的测试 MQ 客户端。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class RecordingClient implements MQClient {
         private final AtomicInteger producerInitializations = new AtomicInteger();
         private final AtomicInteger consumerInitializations = new AtomicInteger();
@@ -168,11 +182,20 @@ class JavalinMqLifecycleParticipantTest {
         private final AtomicInteger closes = new AtomicInteger();
         private boolean failConsumer;
 
+        /**
+         * 返回 MQ 客户端实现标识。
+         * @return 实现标识。
+         */
         @Override
         public String impl() {
             return "recording";
         }
 
+        /**
+         * 初始化生产者并返回事件回调。
+         * @param properties 配置属性。
+         * @return 事件回调。
+         */
         @Override
         public Consumer<MQEvent> initProducer(MQProperties properties) {
             producerInitializations.incrementAndGet();
@@ -180,6 +203,12 @@ class JavalinMqLifecycleParticipantTest {
             };
         }
 
+        /**
+         * 初始化消费者订阅。
+         * @param listener 消息监听器。
+         * @param properties 配置属性。
+         * @return 订阅成功返回 {@code true}。
+         */
         @Override
         public boolean initConsumer(MQListener listener, MQProperties properties) {
             consumerInitializations.incrementAndGet();
@@ -189,23 +218,48 @@ class JavalinMqLifecycleParticipantTest {
             return true;
         }
 
+        /**
+         * 启动组件。
+         */
         @Override
         public void start() {
             starts.incrementAndGet();
         }
 
+        /**
+         * 关闭组件并释放资源。
+         */
         @Override
         public void close() {
             closes.incrementAndGet();
         }
     }
 
+    /**
+     * 记录序列化动作的测试序列化器。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class RecordingSerialization implements MQEventSerialization {
+        /**
+         * 反序列化消息。
+         * @param <S> 类型参数。
+         * @param <T> 类型参数。
+         * @param source 序列化源对象。
+         * @param type 目标类型。
+         * @return 方法执行结果。
+         */
         @Override
         public <S, T> T deserialize(S source, Class<T> type) {
             return type.cast(source);
         }
 
+        /**
+         * 序列化消息。
+         * @param <T> 类型参数。
+         * @param source 序列化源对象。
+         * @return 序列化结果。
+         */
         @Override
         public <T> T serialize(Object source) {
             @SuppressWarnings("unchecked")
@@ -214,6 +268,11 @@ class JavalinMqLifecycleParticipantTest {
         }
     }
 
+    /**
+     * MQ 生命周期测试的 Guice 模块。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class TestMqModule extends AbstractDdd4jMqGuiceModule {
         private final RecordingClient client;
 
@@ -223,12 +282,19 @@ class JavalinMqLifecycleParticipantTest {
             this.client = client;
         }
 
+        /**
+         * 装配 Guice 绑定。
+         */
         @Override
         protected void configure() {
             super.configure();
             bind(MQClient.class).toInstance(client);
         }
 
+        /**
+         * 提供 MQ 客户端。
+         * @return MQ 客户端实例。
+         */
         public MQClient mqClient() {
             return client;
         }

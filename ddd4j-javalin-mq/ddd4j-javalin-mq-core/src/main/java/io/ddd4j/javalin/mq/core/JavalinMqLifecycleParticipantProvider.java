@@ -36,6 +36,10 @@ final class JavalinMqLifecycleParticipantProvider implements Provider<JavalinMqL
         this.scanner = scanner;
     }
 
+    /**
+     * 创建并返回生命周期参与者。
+     * @return 生命周期参与者实例。
+     */
     @Override
     public JavalinMqLifecycleParticipant get() {
         return new JavalinMqLifecycleParticipant(

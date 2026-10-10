@@ -19,6 +19,11 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * 对接身份提供方容器的 OIDC 集成测试。
+ * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * @since 7.1.x
+ */
 @Tag("integration")
 class OidcKeycloakIT {
 

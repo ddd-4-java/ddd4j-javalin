@@ -9,6 +9,11 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * OIDC 配置与构建器单元测试。
+ * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * @since 7.1.x
+ */
 class OidcPropertiesTest {
 
     @Test

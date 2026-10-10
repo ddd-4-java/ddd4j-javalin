@@ -24,11 +24,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JavalinTestFixtureDemoTest extends JavalinTestFixture {
 
+    /**
+     * 返回测试扫描的基础包。
+     * @return 基础包名列表。
+     */
     @Override
     protected String[] basePackages() {
         return new String[0];
     }
 
+    /**
+     * 注册应用测试路由。
+     * @param app Javalin 应用实例。
+     */
     @Override
     protected void configureRoutes(Javalin app) {
         app.unsafe.routes.get("/demo/hello", ctx -> ctx.result("hello, ddd4j"));

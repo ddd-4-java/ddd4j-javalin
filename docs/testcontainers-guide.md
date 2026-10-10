@@ -6,20 +6,20 @@
 
 | 服务 / 镜像 | Java 适配方式 | 分类 |
 |---|---|---|
-| MySQL `mysql:8.0` | `org.testcontainers:mysql` / `MySQLContainer` | Testcontainers 官方模块 |
-| PostgreSQL `postgres:16-alpine` | `org.testcontainers:postgresql` / `PostgreSQLContainer` | Testcontainers 官方模块 |
-| MariaDB `mariadb:11` | `org.testcontainers:mariadb` / `MariaDBContainer` | Testcontainers 官方模块 |
-| MongoDB `mongo:7` | `org.testcontainers:mongodb` / `MongoDBContainer` | Testcontainers 官方模块 |
+| MySQL `mysql:8.0.46` | `org.testcontainers:mysql` / `MySQLContainer` | Testcontainers 官方模块 |
+| PostgreSQL `postgres:16.15-alpine` | `org.testcontainers:postgresql` / `PostgreSQLContainer` | Testcontainers 官方模块 |
+| MariaDB `mariadb:11.4.13` | `org.testcontainers:mariadb` / `MariaDBContainer` | Testcontainers 官方模块 |
+| MongoDB `mongo:7.0.43` | `org.testcontainers:mongodb` / `MongoDBContainer` | Testcontainers 官方模块 |
 | Kafka `confluentinc/cp-kafka:7.5.0` | `org.testcontainers:kafka` / `KafkaContainer` | Testcontainers 官方模块 |
 | RabbitMQ `rabbitmq:3.13.7-management-alpine` | `org.testcontainers:rabbitmq` / `RabbitMQContainer` | Testcontainers 官方模块 |
-| LocalStack `localstack/localstack:3.4` | `org.testcontainers:localstack` / `LocalStackContainer` | Testcontainers 官方模块 |
-| Keycloak `quay.io/keycloak/keycloak:26.2` | `com.github.dasniko:testcontainers-keycloak:3.7.0` | 社区模块；对应 TC 1.20.6 / Keycloak 26.2 |
-| Redis `redis:7-alpine` | `GenericContainer` | 通用容器封装 |
+| LocalStack `localstack/localstack:3.4.0` | `org.testcontainers:localstack` / `LocalStackContainer` | Testcontainers 官方模块 |
+| Keycloak `quay.io/keycloak/keycloak:26.2.5` | `com.github.dasniko:testcontainers-keycloak:3.7.0` | 社区模块；对应 TC 1.20.6 / Keycloak 26.2.5 |
+| Redis `redis:7.4.11-alpine` | `GenericContainer` | 通用容器封装 |
 | ActiveMQ Artemis `apache/activemq-artemis:2.39.0` | `GenericContainer` | 通用容器封装 |
 | RocketMQ `apache/rocketmq:5.3.2` | `GenericContainer` | 通用容器封装 |
 | Pulsar `apachepulsar/pulsar:3.2.0` | `GenericContainer` | 通用容器封装 |
-| NATS `nats:2-alpine` | `GenericContainer` | 通用容器封装 |
-| MQTT `eclipse-mosquitto:2.0` | `GenericContainer` | 通用容器封装 |
+| NATS `nats:2.10.29-alpine` | `GenericContainer` | 通用容器封装 |
+| MQTT `eclipse-mosquitto:2.0.22` | `GenericContainer` | 通用容器封装 |
 | WireMock `wiremock/wiremock:3.5.0` | WireMock standalone | HTTP 测试依赖，不是容器模块 |
 
 镜像标签由集中式 fixture 固定，禁止 `latest`。版本选型参考 [Testcontainers 模块目录](https://testcontainers.com/modules/) 和 [Keycloak 社区模块版本矩阵](https://github.com/dasniko/testcontainers-keycloak/blob/main/docs/versions.md)。

@@ -41,6 +41,10 @@ public final class OidcProperties {
         }
     }
 
+    /**
+     * 创建配置构建器。
+     * @return 配置构建器。
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -73,31 +77,60 @@ public final class OidcProperties {
         private Set<String> allowedAlgorithms = Collections.singleton("RS256");
         private Duration clockSkew = Duration.ofSeconds(60);
 
+        /**
+         * 设置 OIDC 签发者地址。
+         * @param issuer OIDC 签发者地址。
+         * @return 构建器自身，支持链式调用。
+         */
         public Builder issuer(String issuer) {
             this.issuer = issuer;
             return this;
         }
 
+        /**
+         * 设置 JWKS 地址。
+         * @param jwksUri JWKS 地址。
+         * @return 构建器自身，支持链式调用。
+         */
         public Builder jwksUri(URI jwksUri) {
             this.jwksUri = jwksUri;
             return this;
         }
 
+        /**
+         * 设置受众（audience）集合。
+         * @param audiences 受众集合。
+         * @return 构建器自身，支持链式调用。
+         */
         public Builder audiences(Set<String> audiences) {
             this.audiences = audiences;
             return this;
         }
 
+        /**
+         * 设置允许的签名算法集合。
+         * @param allowedAlgorithms 允许的签名算法集合。
+         * @return 构建器自身，支持链式调用。
+         */
         public Builder allowedAlgorithms(Set<String> allowedAlgorithms) {
             this.allowedAlgorithms = allowedAlgorithms;
             return this;
         }
 
+        /**
+         * 设置允许的时钟偏移。
+         * @param clockSkew 允许的时钟偏移。
+         * @return 构建器自身，支持链式调用。
+         */
         public Builder clockSkew(Duration clockSkew) {
             this.clockSkew = clockSkew;
             return this;
         }
 
+        /**
+         * 构建不可变的 OIDC 配置。
+         * @return 构建出的不可变配置。
+         */
         public OidcProperties build() {
             return new OidcProperties(this);
         }

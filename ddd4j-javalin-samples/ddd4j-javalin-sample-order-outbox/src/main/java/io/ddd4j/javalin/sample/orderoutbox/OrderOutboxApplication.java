@@ -21,6 +21,10 @@ public class OrderOutboxApplication {
 
     private static final String BASE_PACKAGE = "io.ddd4j.javalin.sample.orderoutbox";
 
+    /**
+     * 示例程序入口。
+     * @param args 命令行参数。
+     */
     public static void main(String[] args) {
         OrderOutboxGuiceModule module = new OrderOutboxGuiceModule();
         Javalin app = Ddd4jJavalinApplication.run(args, BASE_PACKAGE, module);

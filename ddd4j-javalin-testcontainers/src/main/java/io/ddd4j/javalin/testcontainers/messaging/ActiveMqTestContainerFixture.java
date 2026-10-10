@@ -14,10 +14,17 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class ActiveMqTestContainerFixture extends AbstractTestContainerFixture<GenericContainer<?>> {
 
+    /** 默认容器镜像（已钉精确版本）。镜像来源：<a href="https://testcontainers.com/modules/artemis">Testcontainers ActiveMQ Artemis 模块</a>。 */
     public static final String DEFAULT_IMAGE = "apache/activemq-artemis:2.39.0";
+    /** OpenWire 协议端口。 */
     public static final int OPENWIRE_PORT = 61616;
+    /** 管理控制台端口。 */
     public static final int ADMIN_PORT = 8161;
 
+    /**
+     * 创建并配置测试容器。
+     * @return 配置完成的容器实例。
+     */
     @Override
     public GenericContainer<?> newContainer() {
         return new GenericContainer<>(DockerImageName.parse(DEFAULT_IMAGE))
@@ -26,6 +33,11 @@ public class ActiveMqTestContainerFixture extends AbstractTestContainerFixture<G
                 .withReuse(true);
     }
 
+    /**
+     * 由容器解析连接字符串。
+     * @param container 已启动的测试容器。
+     * @return 容器连接串。
+     */
     @Override
     protected String resolveConnectionString(GenericContainer<?> container) {
         return String.format("tcp://%s:%d",

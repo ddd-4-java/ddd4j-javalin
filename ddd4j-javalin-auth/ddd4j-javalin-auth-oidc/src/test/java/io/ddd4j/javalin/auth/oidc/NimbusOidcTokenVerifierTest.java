@@ -25,6 +25,11 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Nimbus OIDC 验签器单元测试。
+ * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * @since 7.1.x
+ */
 class NimbusOidcTokenVerifierTest {
 
     private RSAKey rsaKey;

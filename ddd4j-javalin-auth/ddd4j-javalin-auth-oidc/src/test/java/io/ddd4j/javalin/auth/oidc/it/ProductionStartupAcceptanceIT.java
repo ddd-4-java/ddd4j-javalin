@@ -131,6 +131,9 @@ class ProductionStartupAcceptanceIT {
 
     private AbstractModule participantModule(JavalinLifecycleParticipant participant) {
         return new AbstractModule() {
+            /**
+             * 装配集成测试所需的 Guice 绑定。
+             */
             @Override
             protected void configure() {
                 Multibinder.newSetBinder(binder(), JavalinLifecycleParticipant.class)
@@ -171,31 +174,64 @@ class ProductionStartupAcceptanceIT {
                 HttpResponse.BodyHandlers.ofString());
     }
 
+    /**
+     * 生产验收场景的消息监听器，用于验证启动流程中的消息投递。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     public static final class ProductionListener {
+        /**
+         * 接收到消息事件时的回调。
+         * @param event 事件消息。
+         */
         @MQEventListener(topic = TOPIC, group = "production-acceptance")
         public void onEvent(MQEvent event) {
             RECEIVED.set(event);
         }
     }
 
+    /**
+     * 测试用的共享幂等锁守卫。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class SharedGuard implements IdempotencyGuard {
         private final Set<String> keys = ConcurrentHashMap.newKeySet();
 
+        /**
+         * 尝试获取幂等锁。
+         * @param key 幂等键。
+         * @param ttl 锁的有效期。
+         * @return 获取成功返回 {@code true}；已被占用返回 {@code false}。
+         */
         @Override
         public boolean acquire(String key, Duration ttl) {
             return keys.add(key);
         }
 
+        /**
+         * 标记幂等键处理完成。
+         * @param key 幂等键。
+         */
         @Override
         public void complete(String key) {
         }
 
+        /**
+         * 释放幂等锁。
+         * @param key 幂等键。
+         */
         @Override
         public void release(String key) {
             keys.remove(key);
         }
     }
 
+    /**
+     * 基于 JDBC 探活的启动参与者测试替身。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class JdbcParticipant implements JavalinLifecycleParticipant {
         private final Connection connection;
         private final AtomicBoolean closed = new AtomicBoolean();
@@ -204,9 +240,16 @@ class ProductionStartupAcceptanceIT {
             this.connection = connection;
         }
 
+        /**
+         * 返回启动顺序，数值越小越先启动。
+         * @return 启动顺序值。
+         */
         @Override
         public int order() { return 50; }
 
+        /**
+         * 启动前校验组件状态。
+         */
         @Override
         public void validate() {
             try {
@@ -218,9 +261,16 @@ class ProductionStartupAcceptanceIT {
             }
         }
 
+        /**
+         * 空启动实现，仅用于占位。
+         */
         @Override
         public void start() { }
 
+        /**
+         * 返回就绪状态。
+         * @return 就绪状态。
+         */
         @Override
         public ReadinessResult readiness() {
             try {
@@ -232,6 +282,9 @@ class ProductionStartupAcceptanceIT {
             }
         }
 
+        /**
+         * 关闭组件并释放资源。
+         */
         @Override
         public void close() {
             try {

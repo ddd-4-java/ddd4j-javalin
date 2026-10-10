@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * <p>与 {@link TenantAwareEntity}（固定 {@code 租户ID + 雪花ID} 两字段复合主键）不同，
  * 本类 <b>不声明</b> {@code @IdClass}，由子类自行定义主键字段与 {@code @IdClass}，
- * 以支持任意复合主键（如 cloud-das 的 {@code (tenantId, uid, utype, assetType)} 四字段主键）。
+ * 以支持任意复合主键（如 {@code (tenantId, uid, utype, assetType)} 四字段主键）。
  *
  * <p>本类仅提供：
  * <ul>
@@ -31,7 +31,7 @@ import java.util.Map;
  * <p><b>注意</b>：本类不声明主键字段（包括 {@code tenantId}），
  * 由子类根据自身复合主键需求自行声明并标注 {@code @Id}。
  *
- * <h2>使用示例（对标 cloud-das 的 UserAssetBaseEntity 四字段主键）</h2>
+ * <h2>使用示例（四字段复合主键）</h2>
  * <pre>{@code
  * @Entity
  * @IdClass(UserAssetId.class) // 业务自定义四字段主键类
@@ -64,7 +64,7 @@ import java.util.Map;
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  * @see TenantAwareEntity
  * @see RepositoryUtil
- * @since 3.3.x
+ * @since 7.1.x
  */
 @MappedSuperclass
 public abstract class TenantAwareEntityBase extends PanacheEntityBase {
@@ -146,6 +146,13 @@ public abstract class TenantAwareEntityBase extends PanacheEntityBase {
 
     /**
      * 使用 Panache {@link Parameters} 的分页重载。
+     * @param <T> 实体类型。
+     * @param query JPQL 查询语句。
+     * @param params 查询参数，占位符与取值一一对应。
+     * @param sort 排序描述。
+     * @param page 页码（从 0 开始）。
+     * @param pageSize 每页记录数。
+     * @return 分页结果。
      */
     public static <T extends TenantAwareEntityBase> Page<T> toPage(String query, Parameters params, Sort sort, long page, long pageSize) {
         return toPage(query, params.map(), sort, page, pageSize);
@@ -162,6 +169,10 @@ public abstract class TenantAwareEntityBase extends PanacheEntityBase {
         return delete("tenantId=:tenantId and uid=:uid", Parameters.with("uid", uid).and("tenantId", tenantId));
     }
 
+    /**
+     * 返回对象的字符串表示。
+     * @return 方法执行结果。
+     */
     @Override
     public String toString() {
         return String.format("%s", this.getClass().getSimpleName());

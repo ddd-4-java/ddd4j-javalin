@@ -15,6 +15,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Javalin 文件校验单元测试。
+ * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * @since 7.1.x
+ */
 class JavalinFileValidatorTest {
 
     private final JavalinFileValidator validator = new JavalinFileValidator(new FileValidationService());

@@ -23,12 +23,21 @@ import org.testcontainers.utility.MountableFile;
  */
 public class RocketMqTestContainerFixture extends AbstractTestContainerFixture<GenericContainer<?>> {
 
+    /** 默认容器镜像（已钉精确版本）。RocketMQ 暂无专属 Testcontainers 模块，模块清单参见 <a href="https://testcontainers.com/modules/">Testcontainers 模块目录</a>。 */
     public static final String DEFAULT_IMAGE = "apache/rocketmq:5.3.2";
+    /** NameServer 端口。 */
     public static final int NAMESRV_PORT = 9876;
+    /** Broker VIP 端口。 */
     public static final int BROKER_VIP_PORT = 10909;
+    /** Broker 端口。 */
     public static final int BROKER_PORT = 10911;
+    /** Broker 配置文件路径。 */
     public static final String BROKER_CONF = "/home/rocketmq/rocketmq-5.3.2/conf/broker.conf";
 
+    /**
+     * 创建并配置测试容器。
+     * @return 配置完成的容器实例。
+     */
     @Override
     public GenericContainer<?> newContainer() {
         return new FixedHostPortGenericContainer<>(DEFAULT_IMAGE)
@@ -47,6 +56,11 @@ public class RocketMqTestContainerFixture extends AbstractTestContainerFixture<G
                 .withReuse(true);
     }
 
+    /**
+     * 由容器解析连接字符串。
+     * @param container 已启动的测试容器。
+     * @return 容器连接串。
+     */
     @Override
     protected String resolveConnectionString(GenericContainer<?> container) {
         return String.format("%s:%d", container.getHost(),

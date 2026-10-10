@@ -10,6 +10,10 @@ import io.ddd4j.core.subject.SubjectProvider;
  */
 public class AnonymousSubjectProvider implements SubjectProvider {
 
+    /**
+     * 返回请求作用域的认证主体。
+     * @return 认证主体。
+     */
     @Override
     public Subject getSubject() {
         return null;

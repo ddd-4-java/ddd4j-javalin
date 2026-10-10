@@ -67,6 +67,11 @@ class Ddd4jJavalinRuntimeTest {
         assertThat(runtime.readiness().ready()).isFalse();
     }
 
+    /**
+     * 记录生命周期回调的测试参与者。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class RecordingParticipant implements JavalinLifecycleParticipant {
         private final int order;
         private final String name;
@@ -80,16 +85,26 @@ class Ddd4jJavalinRuntimeTest {
             this.failStart = failStart;
         }
 
+        /**
+         * 返回组件启动顺序，数值越小越先启动。
+         * @return 启动顺序值。
+         */
         @Override
         public int order() {
             return order;
         }
 
+        /**
+         * 启动前校验组件状态与依赖。
+         */
         @Override
         public void validate() {
             events.add("validate:" + name);
         }
 
+        /**
+         * 启动组件。
+         */
         @Override
         public void start() {
             events.add("start:" + name);
@@ -98,17 +113,29 @@ class Ddd4jJavalinRuntimeTest {
             }
         }
 
+        /**
+         * 返回组件就绪状态。
+         * @return 就绪状态。
+         */
         @Override
         public ReadinessResult readiness() {
             return ReadinessResult.ready(name);
         }
 
+        /**
+         * 关闭组件并释放资源。
+         */
         @Override
         public void close() {
             events.add("close:" + name);
         }
     }
 
+    /**
+     * 记录关闭动作的测试组件。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class RecordingCloseable implements AutoCloseable {
         private final List<String> events;
         private final AtomicInteger closeCount = new AtomicInteger();
@@ -117,6 +144,9 @@ class Ddd4jJavalinRuntimeTest {
             this.events = events;
         }
 
+        /**
+         * 关闭组件并释放资源。
+         */
         @Override
         public void close() {
             if (closeCount.getAndIncrement() == 0) {

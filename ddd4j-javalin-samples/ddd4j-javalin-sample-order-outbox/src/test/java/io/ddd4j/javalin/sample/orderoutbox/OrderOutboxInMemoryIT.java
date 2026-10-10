@@ -28,11 +28,19 @@ class OrderOutboxInMemoryIT extends JavalinTestFixture {
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
+    /**
+     * 返回内存模式额外安装的模块。
+     * @return 额外模块数组。
+     */
     @Override
     protected Module[] extraModules() {
         return new Module[]{new OrderOutboxGuiceModule()};
     }
 
+    /**
+     * 注册应用测试路由。
+     * @param app Javalin 应用实例。
+     */
     @Override
     protected void configureRoutes(Javalin app) {
         injector.getInstance(OrderController.class).register(app);

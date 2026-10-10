@@ -14,16 +14,28 @@ public final class JpaLifecycleParticipant implements JavalinLifecycleParticipan
     private boolean started;
     private boolean closed;
 
+    /**
+     * 构造 JpaLifecycleParticipant 实例并初始化依赖。
+     * @param factory 实体管理器工厂。
+     * @param ownsFactory 是否由本参与者负责关闭工厂。
+     */
     public JpaLifecycleParticipant(EntityManagerFactory factory, boolean ownsFactory) {
         this.factory = Objects.requireNonNull(factory, "factory must not be null");
         this.ownsFactory = ownsFactory;
     }
 
+    /**
+     * 返回组件启动顺序，数值越小越先启动。
+     * @return 启动顺序值。
+     */
     @Override
     public int order() {
         return 100;
     }
 
+    /**
+     * 启动前校验组件状态与依赖。
+     */
     @Override
     public void validate() {
         if (!factory.isOpen()) {
@@ -31,12 +43,19 @@ public final class JpaLifecycleParticipant implements JavalinLifecycleParticipan
         }
     }
 
+    /**
+     * 启动组件。
+     */
     @Override
     public synchronized void start() {
         validate();
         started = true;
     }
 
+    /**
+     * 返回组件就绪状态。
+     * @return 就绪状态。
+     */
     @Override
     public synchronized ReadinessResult readiness() {
         try {
@@ -48,6 +67,9 @@ public final class JpaLifecycleParticipant implements JavalinLifecycleParticipan
         }
     }
 
+    /**
+     * 关闭实体管理器工厂并释放资源。
+     */
     @Override
     public synchronized void close() {
         if (closed) {

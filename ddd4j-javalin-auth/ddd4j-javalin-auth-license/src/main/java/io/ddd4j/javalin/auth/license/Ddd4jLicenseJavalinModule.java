@@ -24,14 +24,24 @@ public class Ddd4jLicenseJavalinModule extends AbstractAuthJavalinModule {
 
     private final LicenseProperties properties;
 
+    /**
+     * 构造 Ddd4jLicenseJavalinModule Guice 模块实例。
+     */
     public Ddd4jLicenseJavalinModule() {
         this(new LicenseProperties());
     }
 
+    /**
+     * 构造 Ddd4jLicenseJavalinModule Guice 模块实例。
+     * @param properties 配置属性。
+     */
     public Ddd4jLicenseJavalinModule(LicenseProperties properties) {
         this.properties = properties;
     }
 
+    /**
+     * 执行子类自定义绑定装配。
+     */
     @Override
     protected void configureModule() {
         bind(LicenseProperties.class).toInstance(properties);

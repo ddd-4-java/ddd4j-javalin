@@ -27,17 +27,29 @@ public class OrderController {
 
     private final OrderApplicationService applicationService;
 
+    /**
+     * 构造 OrderController 并注入依赖。
+     * @param applicationService 订单应用服务。
+     */
     @Inject
     public OrderController(OrderApplicationService applicationService) {
         this.applicationService = Objects.requireNonNull(applicationService, "applicationService must not be null");
     }
 
+    /**
+     * 注册订单路由。
+     * @param app Javalin 应用实例。
+     */
     public void register(Javalin app) {
         app.unsafe.routes.post("/api/orders", this::create);
         app.unsafe.routes.post("/api/orders/{orderId}/lines", this::addLine);
         app.unsafe.routes.get("/api/orders/{orderId}", this::find);
     }
 
+    /**
+     * 创建订单。
+     * @param ctx Javalin 请求上下文。
+     */
     public void create(Context ctx) {
         CreateOrderRequest request = ctx.bodyAsClass(CreateOrderRequest.class);
         String orderId = applicationService.create(
@@ -45,6 +57,10 @@ public class OrderController {
         ctx.json(R.ok(applicationService.find(orderId)));
     }
 
+    /**
+     * 为订单追加商品明细。
+     * @param ctx Javalin 请求上下文。
+     */
     public void addLine(Context ctx) {
         AddOrderLineRequest request = ctx.bodyAsClass(AddOrderLineRequest.class);
         String orderId = ctx.pathParam("orderId");
@@ -53,13 +69,34 @@ public class OrderController {
         ctx.json(R.ok(applicationService.find(orderId)));
     }
 
+    /**
+     * 按订单号查询订单详情。
+     * @param ctx Javalin 请求上下文。
+     */
     public void find(Context ctx) {
         ctx.json(R.ok(applicationService.find(ctx.pathParam("orderId"))));
     }
 
+    /**
+     * 创建订单请求参数。
+     * @param orderNo 订单编号。
+     * @param buyerId 买方标识。
+     * @param buyerName 买方名称。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     public record CreateOrderRequest(String orderNo, String buyerId, String buyerName) {
     }
 
+    /**
+     * 订单追加明细请求参数。
+     * @param goodsId 商品标识。
+     * @param goodsName 商品名称。
+     * @param quantity 数量。
+     * @param unitPrice 单价。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     public record AddOrderLineRequest(String goodsId, String goodsName, int quantity, BigDecimal unitPrice) {
     }
 }

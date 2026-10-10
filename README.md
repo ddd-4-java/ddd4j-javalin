@@ -44,10 +44,10 @@ ddd4j-javalin 是其中"Guice Runtime + Javalin 7 Web"的实现轨,目标是为�
 
 | 类别 | 镜像 | Module |
 |---|---|---|
-| RDBMS | `mysql:8.0` / `postgres:16-alpine` / `mariadb:11` | `ddd4j-javalin-testcontainers` |
-| NoSQL | `mongo:7` / `redis:7-alpine` | `ddd4j-javalin-testcontainers` |
-| MQ | `confluentinc/cp-kafka:7.5.0` / `rabbitmq:3.13.7-management-alpine` / `apache/activemq-artemis:2.39.0` / `apache/rocketmq:5.3.2` / `apachepulsar/pulsar:3.2.0` / `nats:2-alpine` / `eclipse-mosquitto:2.0` / `localstack/localstack:3.4` | `ddd4j-javalin-testcontainers` |
-| Auth | `quay.io/keycloak/keycloak:26.2` | `ddd4j-javalin-testcontainers` |
+| RDBMS | `mysql:8.0.46` / `postgres:16.15-alpine` / `mariadb:11.4.13` | `ddd4j-javalin-testcontainers` |
+| NoSQL | `mongo:7.0.43` / `redis:7.4.11-alpine` | `ddd4j-javalin-testcontainers` |
+| MQ | `confluentinc/cp-kafka:7.5.0` / `rabbitmq:3.13.7-management-alpine` / `apache/activemq-artemis:2.39.0` / `apache/rocketmq:5.3.2` / `apachepulsar/pulsar:3.2.0` / `nats:2.10.29-alpine` / `eclipse-mosquitto:2.0.22` / `localstack/localstack:3.4.0` | `ddd4j-javalin-testcontainers` |
+| Auth | `quay.io/keycloak/keycloak:26.2.5` | `ddd4j-javalin-testcontainers` |
 | HTTP Mock | `wiremock/wiremock:3.5.0` | `ddd4j-javalin-testcontainers` |
 
 ## 跑集成测试

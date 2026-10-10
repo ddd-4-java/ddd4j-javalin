@@ -32,6 +32,9 @@ import javax.sql.DataSource;
  */
 public class OrderPostgresGuiceModule extends AbstractModule {
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
         // DataSource 由调用方绑定；幂等端口使用内存降级（示例无 Redis 依赖）。

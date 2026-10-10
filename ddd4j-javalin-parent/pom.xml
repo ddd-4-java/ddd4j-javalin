@@ -109,11 +109,26 @@
                         <charset>${project.build.sourceEncoding}</charset>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <docencoding>${project.build.sourceEncoding}</docencoding>
+                        <!-- Javadoc 零告警门禁：doclint 全开（含 missing 缺失注释组）+ 任何告警/错误即构建失败。
+                             告警或错误一律中断构建，禁止任何形式的放宽档。 -->
+                        <doclint>${javadoc.doclint}</doclint>
+                        <failOnWarnings>${javadoc.failOnWarning}</failOnWarnings>
+                        <failOnError>${javadoc.failOnError}</failOnError>
+                        <!-- -Xmaxwarns 999 / -Xmaxerrs 999：突破 javadoc 默认 100 条告警/错误截断，
+                             防止大量告警被截断成假绿 -->
+                        <additionalOptions>
+                            <additionalOption>-Xmaxwarns</additionalOption>
+                            <additionalOption>999</additionalOption>
+                            <additionalOption>-Xmaxerrs</additionalOption>
+                            <additionalOption>999</additionalOption>
+                        </additionalOptions>
                     </configuration>
                     <executions>
+                        <!-- 执行目标（jar）绑定 verify 生命周期：缺注释/告警直接失败构建；
+                             report 目标不失败构建，不能作为门禁 -->
                         <execution>
                             <id>attach-javadocs</id>
-                            <phase>package</phase>
+                            <phase>verify</phase>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
@@ -148,6 +163,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <!-- Javadoc 零告警门禁：执行目标（jar）默认绑定 verify 生命周期，多模块均执行，告警即失败 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -312,9 +332,8 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${maven-javadoc-plugin.version}</version>
-                        <configuration>
-                            <doclint>none</doclint>
-                        </configuration>
+                        <!-- Javadoc 零告警门禁：告警或错误一律中断构建，禁止任何形式的放宽档。
+                             原 <doclint>none</doclint> 放宽档已删除，门禁配置继承 pluginManagement。 -->
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>

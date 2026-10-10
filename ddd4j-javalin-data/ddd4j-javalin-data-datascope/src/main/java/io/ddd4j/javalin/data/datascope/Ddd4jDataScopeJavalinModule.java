@@ -21,14 +21,24 @@ public class Ddd4jDataScopeJavalinModule extends AbstractModule {
 
     private final DataScopeProvider provider;
 
+    /**
+     * 构造 Ddd4jDataScopeJavalinModule Guice 模块实例。
+     */
     public Ddd4jDataScopeJavalinModule() {
         this((dataType, data) -> false);
     }
 
+    /**
+     * 构造 Ddd4jDataScopeJavalinModule Guice 模块实例。
+     * @param provider 提供者实例。
+     */
     public Ddd4jDataScopeJavalinModule(DataScopeProvider provider) {
         this.provider = Objects.requireNonNull(provider, "provider must not be null");
     }
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
         bind(DataScopeProvider.class).toInstance(provider);

@@ -13,7 +13,7 @@ import java.util.Enumeration;
 /**
  * 类雪花算法的 Hibernate 主键生成器：时间戳 + 节点 ID + 毫秒内序列，保证单机内递增、多节点可区分。
  * <p>
- * 对标 cloud-das 的 {@code SequenceGenerator} + {@code IdGenerator} 组合，
+ * 组合「时间戳序列」与「节点标识」两段式 ID 生成职责，
  * 作为 Quarkus Panache 实体的 {@code @GenericGenerator} 策略使用。
  * </p>
  */
@@ -31,6 +31,9 @@ public class SnowflakeIdGenerator implements IdentifierGenerator {
     private volatile long lastTimestamp = -1L;
     private volatile long sequence = 0L;
 
+    /**
+     * 构造 SnowflakeIdGenerator 实例。
+     */
     public SnowflakeIdGenerator() {
         this.nodeId = createNodeId();
     }
@@ -69,6 +72,13 @@ public class SnowflakeIdGenerator implements IdentifierGenerator {
         return nodeId & MAX_NODE_ID;
     }
 
+    /**
+     * 为实体生成雪花主键。
+     * @param session Hibernate 共享会话。
+     * @param object 待分配主键的实体对象。
+     * @return 生成的雪花主键。
+     * @throws HibernateException 生成主键失败时抛出。
+     */
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
         return generateId();

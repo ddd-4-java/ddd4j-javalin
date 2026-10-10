@@ -11,6 +11,11 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+/**
+ * 通用 OIDC 模块装配测试。
+ * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * @since 7.1.x
+ */
 class Ddd4jOidcJavalinModuleTest {
 
     @Test

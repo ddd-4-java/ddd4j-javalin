@@ -16,6 +16,7 @@ import lombok.Setter;
 @Setter
 public class Ddd4jCoreProperties {
 
+    /** 配置项前缀。 */
     public static final String PREFIX = "ddd4j.core";
 
     /** Whether the ddd4j core layer (SPI bindings + GuiceContext registration) is enabled. Default {@code true}. */

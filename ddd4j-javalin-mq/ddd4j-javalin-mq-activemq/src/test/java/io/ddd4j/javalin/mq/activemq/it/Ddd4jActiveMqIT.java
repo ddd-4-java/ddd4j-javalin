@@ -115,6 +115,10 @@ class Ddd4jActiveMqIT {
 
         final AtomicReference<MQEvent> received = new AtomicReference<>();
 
+        /**
+         * 接收到冒烟测试消息时的回调。
+         * @param event 事件消息。
+         */
         @MQEventListener(topic = TOPIC, tags = TAG, group = "it-activemq-consumer")
         public void onSmoke(MQEvent event) {
             received.set(event);

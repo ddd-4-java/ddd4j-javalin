@@ -41,11 +41,19 @@ class MybatisTestcontainersIT extends JavalinTestFixture {
 
     private HikariDataSource dataSource;
 
+    /**
+     * 返回集成测试扫描的基础包。
+     * @return 基础包名列表。
+     */
     @Override
     protected String[] basePackages() {
         return new String[]{"io.ddd4j.javalin.sample.mybatistc"};
     }
 
+    /**
+     * 返回额外安装的 MyBatis 测试模块。
+     * @return 额外模块数组。
+     */
     @Override
     protected Module[] extraModules() {
         MYSQL.start();

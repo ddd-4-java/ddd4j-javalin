@@ -18,15 +18,27 @@ public class Ddd4jActiveMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
     private final ActiveMQClient client;
 
+    /**
+     * 构造 Ddd4jActiveMqGuiceModule Guice 模块实例。
+     * @param client MQ 客户端实例。
+     */
     public Ddd4jActiveMqGuiceModule(ActiveMQClient client) {
         this(client, new ActiveMQProperties());
     }
 
+    /**
+     * 构造 Ddd4jActiveMqGuiceModule Guice 模块实例。
+     * @param client MQ 客户端实例。
+     * @param properties 配置属性。
+     */
     public Ddd4jActiveMqGuiceModule(ActiveMQClient client, ActiveMQProperties properties) {
         super(properties);
         this.client = Objects.requireNonNull(client, "client");
     }
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
         super.configure();
@@ -34,6 +46,10 @@ public class Ddd4jActiveMqGuiceModule extends AbstractDdd4jMqGuiceModule {
         bind(ActiveMQClient.class).toInstance(client);
     }
 
+    /**
+     * 提供 MQ 客户端。
+     * @return MQ 客户端实例。
+     */
     @Provides
     @Singleton
     public MQClient mqClient() {

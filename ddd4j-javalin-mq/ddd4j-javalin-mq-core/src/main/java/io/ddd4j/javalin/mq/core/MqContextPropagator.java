@@ -58,7 +58,7 @@ import java.util.function.Consumer;
  * 后调 {@link #discard(String)}。</p>
  *
  * @author ddd4j-javalin
- * @since 6.7.x
+ * @since 7.1.x
  */
 @Slf4j
 final class MqContextPropagator {
@@ -121,6 +121,9 @@ final class MqContextPropagator {
             ThreadContext.setResources(this.snapshot);
         }
 
+        /**
+         * 关闭组件并释放资源。
+         */
         @Override
         public void close() {
             if (closed) {
@@ -149,6 +152,7 @@ final class MqContextPropagator {
      *   <li>registry 容量达到 {@code maxSnapshots} → 拒绝 capture 并
      *       log warn（不抛异常，避免业务中断）</li>
      * </ul>
+     * @param event 事件消息。
      */
     static void capture(MQEvent event) {
         if (Objects.isNull(event) || Objects.isNull(event.getMsgId()) || event.getMsgId().isEmpty()) {
@@ -178,6 +182,8 @@ final class MqContextPropagator {
      *
      * <p>保护策略：snapshot 写入时间超过 TTL 时拒绝使用并 remove（避免
      * broker 永久不消费导致的累积）。</p>
+     * @param event 事件消息。
+     * @return 恢复上下文后用于关闭的句柄。
      */
     static AutoCloseable restore(MQEvent event) {
         if (Objects.isNull(event) || Objects.isNull(event.getMsgId()) || event.getMsgId().isEmpty()) {
@@ -210,6 +216,7 @@ final class MqContextPropagator {
      * 包内访问点：消息重投时（如 RabbitMQ requeue）回填 snapshot。
      * 一般不需要手动调用，默认 {@link #restore(MQEvent)} 已
      * 同时 remove；此处提供手动兜底用于自定义 ack 装饰器。
+     * @param msgId 消息标识。
      */
     @SuppressWarnings("unused")
     static void discard(String msgId) {
@@ -221,6 +228,7 @@ final class MqContextPropagator {
     /**
      * 包内访问点：批量清理（运维/调试用），删除所有过期 snapshot。
      * 可周期性调用以回收内存。
+     * @return 本次清理的过期条目数。
      */
     static int purgeExpired() {
         Map<String, TimedSnapshot> registry = registry();
@@ -241,6 +249,8 @@ final class MqContextPropagator {
     /**
      * 包内访问点：包装 {@link Consumer}{@code <MQEvent>} producer，
      * 在 accept 前 capture 当前线程上下文。
+     * @param delegate 被包装的原始事件消费者。
+     * @return 包装后的事件消费者。
      */
     static Consumer<MQEvent> wrap(Consumer<MQEvent> delegate) {
         if (Objects.isNull(delegate)) {
@@ -256,6 +266,9 @@ final class MqContextPropagator {
      * 包内访问点：用 JDK {@link Proxy} 包装 listener bean，
      * invoke 前按 msgId 重建 ThreadContext，invoke 后自动恢复。
      * 任何失败（snapshot 缺失 / 过期）都降级为"无上下文"调用。
+     * @param originalBean 原始监听器 Bean 实例。
+     * @param listener 消息监听器。
+     * @return 包装后的监听器 Bean。
      */
     static Object wrapListenerBean(Object originalBean, MQListener listener) {
         if (Objects.isNull(originalBean)) {
@@ -271,6 +284,14 @@ final class MqContextPropagator {
                 originalBean.getClass().getClassLoader(),
                 interfaces,
                 new InvocationHandler() {
+                    /**
+                     * 调用目标方法并在前后传播 MQ 上下文。
+                     * @param proxy 代理实例。
+                     * @param method 被调用的方法。
+                     * @param args 命令行参数。
+                     * @return 目标方法的返回值。
+                     * @throws Throwable 调用过程中出现异常时抛出。
+                     */
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                         // 仅 MQEvent 参数的方法需要 ThreadContext 透传；

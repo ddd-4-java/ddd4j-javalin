@@ -64,6 +64,10 @@ public abstract class TenantAwareEntity extends TenantAwareEntityBase {
     @Id
     public String tenantId;
 
+    /**
+     * 返回对象的字符串表示。
+     * @return 方法执行结果。
+     */
     @Override
     public String toString() {
         return String.format("%s<%s:%s>", this.getClass().getSimpleName(), tenantId, id);

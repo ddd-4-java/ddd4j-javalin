@@ -21,6 +21,11 @@ public class Ddd4jTestContainersExtension implements ExecutionCondition {
 
     private static final String DOCKER_HOST = System.getenv("DOCKER_HOST");
 
+    /**
+     * 判断当前测试条件下是否需要执行扩展。
+     * @param context JUnit 扩展上下文。
+     * @return 条件评估结果。
+     */
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
         if (DOCKER_HOST == null || DOCKER_HOST.isBlank()) {

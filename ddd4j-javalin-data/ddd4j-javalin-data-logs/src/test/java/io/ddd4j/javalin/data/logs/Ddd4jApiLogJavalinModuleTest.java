@@ -42,6 +42,9 @@ class Ddd4jApiLogJavalinModuleTest {
         };
         Injector injector = Guice.createInjector(
                 new Ddd4jApiLogJavalinModule() {
+                    /**
+                     * 装配 Guice 绑定。
+                     */
                     @Override
                     protected void configure() {
                         bind(ApiOperationLogProvider.class).toInstance(custom);
@@ -57,11 +60,30 @@ class Ddd4jApiLogJavalinModuleTest {
         AtomicInteger returned = new AtomicInteger();
         AtomicInteger throwing = new AtomicInteger();
         ApiOperationLogProvider provider = new ApiOperationLogProvider() {
+            /**
+             * 切面前置通知实现。
+             * @param point point 参数。
+             * @param operation operation 参数。
+             */
             @Override public void doBefore(org.aspectj.lang.JoinPoint point, Operation operation) { before.incrementAndGet(); }
+            /**
+             * 切面返回通知实现。
+             * @param point point 参数。
+             * @param operation operation 参数。
+             * @param result 对象参数。
+             * @param stopwatch stopwatch 参数。
+             */
             @Override public void afterReturing(org.aspectj.lang.JoinPoint point, Operation operation,
                                                 Object result, com.google.common.base.Stopwatch stopwatch) {
                 returned.incrementAndGet();
             }
+            /**
+             * 切面异常通知实现。
+             * @param point point 参数。
+             * @param operation operation 参数。
+             * @param error 根因异常。
+             * @param stopwatch stopwatch 参数。
+             */
             @Override public void afterThrowing(org.aspectj.lang.JoinPoint point, Operation operation,
                                                 Throwable error, com.google.common.base.Stopwatch stopwatch) {
                 throwing.incrementAndGet();
@@ -88,6 +110,11 @@ class Ddd4jApiLogJavalinModuleTest {
         return method.getAnnotation(Operation.class);
     }
 
+    /**
+     * 记录日志切面回调的契约载体。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     static class LoggedContract {
         @Operation(summary = "test")
         void invoke() {

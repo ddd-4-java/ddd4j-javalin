@@ -86,6 +86,9 @@ class Ddd4jJavalinApplicationTest {
         InMemorySubjectProvider provider = new InMemorySubjectProvider(new InMemorySubject(event -> {
         }));
         Javalin app = Ddd4jJavalinApplication.run(new String[]{"0"}, "", new AbstractModule() {
+            /**
+             * 装配 Guice 绑定。
+             */
             @Override
             protected void configure() {
                 bind(SubjectProvider.class).toInstance(provider);

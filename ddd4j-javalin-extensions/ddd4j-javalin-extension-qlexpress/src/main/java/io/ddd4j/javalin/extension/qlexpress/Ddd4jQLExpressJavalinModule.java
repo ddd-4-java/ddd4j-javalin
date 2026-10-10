@@ -18,6 +18,9 @@ import io.ddd4j.extension.qlexpress.QLExpressEngineBuilder;
  */
 public class Ddd4jQLExpressJavalinModule extends AbstractModule {
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
     }

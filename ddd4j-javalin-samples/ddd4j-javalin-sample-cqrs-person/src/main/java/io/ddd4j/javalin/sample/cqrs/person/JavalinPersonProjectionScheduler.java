@@ -8,6 +8,11 @@ import io.ddd4j.sample.cqrs.person.query.PersonListView;
 
 import java.util.Objects;
 
+/**
+ * 人员读侧投影调度器，周期性刷新读模型。
+ * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+ * @since 7.1.x
+ */
 public class JavalinPersonProjectionScheduler {
 
     private final PersonListView view;
@@ -18,6 +23,12 @@ public class JavalinPersonProjectionScheduler {
 
     private ViewScheduler.ViewScheduleHandle handle;
 
+    /**
+     * 构造 JavalinPersonProjectionScheduler 实例并初始化依赖。
+     * @param view 人员读模型视图。
+     * @param runner 投影执行器。
+     * @param scheduler 视图调度器。
+     */
     @Inject
     public JavalinPersonProjectionScheduler(
             PersonListView view,
@@ -29,10 +40,16 @@ public class JavalinPersonProjectionScheduler {
         this.scheduler = scheduler;
     }
 
+    /**
+     * 启动读侧投影调度。
+     */
     public void start() {
         handle = scheduler.schedule(view.getName(), view.getCron(), () -> runner.runOnce(view));
     }
 
+    /**
+     * 停止读侧投影调度。
+     */
     public void stop() {
         if (Objects.nonNull(handle)) {
             handle.cancel();

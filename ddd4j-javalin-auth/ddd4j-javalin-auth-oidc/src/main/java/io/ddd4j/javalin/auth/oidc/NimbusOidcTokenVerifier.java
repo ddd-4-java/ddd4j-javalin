@@ -28,6 +28,10 @@ public final class NimbusOidcTokenVerifier implements OidcTokenVerifier {
     private final OidcProperties properties;
     private final ConfigurableJWTProcessor<SecurityContext> processor;
 
+    /**
+     * 构造 NimbusOidcTokenVerifier 实例并初始化依赖。
+     * @param properties 配置属性。
+     */
     public NimbusOidcTokenVerifier(OidcProperties properties) {
         this.properties = Objects.requireNonNull(properties, "properties must not be null");
         try {
@@ -45,6 +49,13 @@ public final class NimbusOidcTokenVerifier implements OidcTokenVerifier {
         }
     }
 
+    /**
+     * 验证 OIDC 令牌并返回认证主体。
+     * @param token 访问令牌。
+     * @return 验证通过的认证主体。
+     * @throws OidcAuthenticationException 令牌无效时抛出。
+     * @throws OidcProviderUnavailableException OIDC 提供方不可用时抛出。
+     */
     @Override
     public AuthPrincipal verify(String token) {
         if (StrKit.isBlank(token)) {

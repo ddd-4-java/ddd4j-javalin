@@ -30,7 +30,7 @@ import java.io.Serializable;
  * @param <T> 主键类型（如 Long / String）
  * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
  * @see SnowflakeIdGenerator
- * @since 3.3.x
+ * @since 7.1.x
  */
 public interface IdGenerationStrategy<T extends Serializable> {
 

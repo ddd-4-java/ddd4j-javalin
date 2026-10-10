@@ -31,7 +31,7 @@ import java.util.function.Consumer;
  *   <li>Reusable Java 11 {@link HttpClient}</li>
  *   <li>Convenience URL builder: {@link #url(String)}</li>
  *   <li>Hook for subclasses to add extra modules / routes via
- *       {@link #configureModules()} and {@link #configureRoutes(Javalin)}</li>
+ *       {@link #extraModules()} and {@link #configureRoutes(Javalin)}</li>
  * </ul>
  *
  * <p>Typical usage:
@@ -50,26 +50,41 @@ import java.util.function.Consumer;
  */
 public abstract class JavalinTestFixture {
 
+    /** Javalin 应用实例。 */
     protected Javalin app;
+    /** Guice 注入器。 */
     protected Injector injector;
+    /** HTTP 测试客户端。 */
     protected HttpClient client;
 
-    /** Override to scan DDD annotations in extra packages. Default: empty (no scan). */
+    /**
+     * Override to scan DDD annotations in extra packages. Default: empty (no scan).
+     * @return 基础包名列表。
+     */
     protected String[] basePackages() {
         return new String[0];
     }
 
-    /** Override to add extra Guice modules (auth, data, mq, …). Default: none. */
+    /**
+     * Override to add extra Guice modules (auth, data, mq, …). Default: none.
+     * @return 额外模块数组。
+     */
     protected Module[] extraModules() {
         return new Module[0];
     }
 
-    /** Override to add extra routes after the ddd4j lifecycle hooks are installed. */
+    /**
+     * Override to add extra routes after the ddd4j lifecycle hooks are installed.
+     * @param app Javalin 应用实例。
+     */
     protected void configureRoutes(Javalin app) {
         // no-op by default
     }
 
-    /** Override to assert against the {@link Injector} post-creation. */
+    /**
+     * Override to assert against the {@link Injector} post-creation.
+     * @param injector Guice 注入器。
+     */
     protected void afterInjector(Injector injector) {
         // no-op by default
     }
@@ -119,23 +134,40 @@ public abstract class JavalinTestFixture {
         }
     }
 
-    /** Build a URL to {@code path} on the running test server. */
+    /**
+     * Build a URL to {@code path} on the running test server.
+     * @param path 请求路径。
+     * @return 目标资源的 URI。
+     */
     protected java.net.URI url(String path) {
         return java.net.URI.create("http://localhost:" + app.port() + path);
     }
 
-    /** Convenience: send an HTTP request and return the response. */
+    /**
+     * Convenience: send an HTTP request and return the response.
+     * @param request HTTP 请求。
+     * @return HTTP 响应。
+     */
     protected java.net.http.HttpResponse<String> http(java.net.http.HttpRequest request) throws Exception {
         return client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
     }
 
-    /** Convenience: send an HTTP request with a custom body handler. */
+    /**
+     * Convenience: send an HTTP request with a custom body handler.
+     * @param <T> 响应体类型。
+     * @param request HTTP 请求。
+     * @param handler 响应体处理器。
+     * @return HTTP 响应。
+     */
     protected <T> java.net.http.HttpResponse<T> http(java.net.http.HttpRequest request,
                                                      java.net.http.HttpResponse.BodyHandler<T> handler) throws Exception {
         return client.send(request, handler);
     }
 
-    /** Run an assertion callback against the live {@link Injector}. */
+    /**
+     * Run an assertion callback against the live {@link Injector}.
+     * @param assertion 断言回调。
+     */
     protected void withInjector(Consumer<Injector> assertion) {
         assertion.accept(injector);
     }
@@ -147,6 +179,9 @@ public abstract class JavalinTestFixture {
      * constructor (tracked upstream as ddd4j 2.0.x issue).
      */
     private static final class MinimalSpiModule extends AbstractModule {
+        /**
+         * 装配 Guice 绑定。
+         */
         @Override
         protected void configure() {
             bind(SubjectProvider.class).to(GuiceSubjectProvider.class).in(Singleton.class);

@@ -253,14 +253,28 @@ class MqContextPropagatorTest {
         return event;
     }
 
+    /**
+     * 上下文捕获断言接口。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     interface CapturableBeanInterface {
         void handle(MQEvent event);
     }
 
+    /**
+     * 上下文捕获断言 Bean 实现。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     static final class CapturableBean implements CapturableBeanInterface {
         volatile boolean invoked;
         volatile String lastSeenCapturable;
 
+        /**
+         * 处理事件消息。
+         * @param event 事件消息。
+         */
         @Override
         public void handle(MQEvent event) {
             this.invoked = true;

@@ -72,6 +72,9 @@ class Ddd4jJavalinApplicationLifecycleTest {
 
     private AbstractModule lifecycleModule(JavalinLifecycleParticipant... participants) {
         return new AbstractModule() {
+            /**
+             * 装配 Guice 绑定。
+             */
             @Override
             protected void configure() {
                 Multibinder<JavalinLifecycleParticipant> binder = Multibinder.newSetBinder(
@@ -83,6 +86,11 @@ class Ddd4jJavalinApplicationLifecycleTest {
         };
     }
 
+    /**
+     * 记录生命周期回调的测试参与者。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class RecordingParticipant implements JavalinLifecycleParticipant {
         private final int order;
         private final String name;
@@ -96,16 +104,26 @@ class Ddd4jJavalinApplicationLifecycleTest {
             this.failStart = failStart;
         }
 
+        /**
+         * 返回组件启动顺序，数值越小越先启动。
+         * @return 启动顺序值。
+         */
         @Override
         public int order() {
             return order;
         }
 
+        /**
+         * 启动前校验组件状态与依赖。
+         */
         @Override
         public void validate() {
             events.add("validate:" + name);
         }
 
+        /**
+         * 启动组件。
+         */
         @Override
         public void start() {
             events.add("start:" + name);
@@ -114,11 +132,18 @@ class Ddd4jJavalinApplicationLifecycleTest {
             }
         }
 
+        /**
+         * 返回组件就绪状态。
+         * @return 就绪状态。
+         */
         @Override
         public ReadinessResult readiness() {
             return ReadinessResult.ready(name);
         }
 
+        /**
+         * 关闭组件并释放资源。
+         */
         @Override
         public void close() {
             events.add("close:" + name);

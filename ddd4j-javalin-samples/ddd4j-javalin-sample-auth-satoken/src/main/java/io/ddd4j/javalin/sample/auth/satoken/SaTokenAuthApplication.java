@@ -16,6 +16,10 @@ import io.javalin.Javalin;
  */
 public class SaTokenAuthApplication {
 
+    /**
+     * 示例程序入口。
+     * @param args 命令行参数。
+     */
     public static void main(String[] args) {
         // 1. 创建 Guice Injector：基础设施 + DDD 注解自动扫描绑定
         Injector injector = Guice.createInjector(

@@ -39,6 +39,10 @@ class AbstractAuthJavalinModuleTest {
     @Test
     void shouldBindAndRegisterSubjectProvider() {
         Injector injector = Guice.createInjector(new AbstractAuthJavalinModule() {
+            /**
+             * 返回模块定制的认证主体提供者。
+             * @return 认证主体提供者；返回 {@code null} 表示不额外绑定。
+             */
             @Override
             protected SubjectProvider subjectProvider() {
                 return new StubSubjectProvider();
@@ -58,6 +62,9 @@ class AbstractAuthJavalinModuleTest {
     @Test
     void shouldSkipSubjectProviderBindingWhenAbsent() {
         Injector injector = Guice.createInjector(new AbstractAuthJavalinModule() {
+            /**
+             * 执行被测模块的自定义绑定装配。
+             */
             @Override
             protected void configureModule() {
                 bind(String.class).toInstance("custom");

@@ -303,6 +303,16 @@ class BuildLineContractTest {
         return count;
     }
 
+    /**
+     * 从契约文档解析出的版本对齐行。
+     *
+     * @param ddd4jVersion ddd4j 版本。
+     * @param javalinVersion Javalin 版本。
+     * @param modelVersion 模型版本。
+     * @param aggregateElement 聚合根元素标识。
+     * @param jdkVersion JDK 版本。
+     * @param mavenVersion Maven 版本。
+     */
     private record BuildLine(String ddd4jVersion,
                              String javalinVersion,
                              String modelVersion,

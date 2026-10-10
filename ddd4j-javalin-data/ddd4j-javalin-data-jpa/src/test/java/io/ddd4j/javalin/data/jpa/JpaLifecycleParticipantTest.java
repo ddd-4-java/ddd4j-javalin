@@ -47,6 +47,9 @@ class JpaLifecycleParticipantTest {
     private Ddd4jJavalinRuntime runtime(JavalinLifecycleParticipant first,
                                         JavalinLifecycleParticipant second) {
         return Guice.createInjector(Ddd4jCoreGuiceModule.defaults(), new AbstractModule() {
+            /**
+             * 装配 Guice 绑定。
+             */
             @Override
             protected void configure() {
                 Multibinder<JavalinLifecycleParticipant> participants = Multibinder.newSetBinder(
@@ -59,31 +62,53 @@ class JpaLifecycleParticipantTest {
 
     private JavalinLifecycleParticipant failingParticipant() {
         return new JavalinLifecycleParticipant() {
+            /**
+             * 返回组件启动顺序，数值越小越先启动。
+             * @return 启动顺序值。
+             */
             @Override
             public int order() {
                 return 200;
             }
 
+            /**
+             * 启动前校验组件状态与依赖。
+             */
             @Override
             public void validate() {
             }
 
+            /**
+             * 启动组件。
+             */
             @Override
             public void start() {
                 throw new IllegalStateException("later participant failed");
             }
 
+            /**
+             * 返回组件就绪状态。
+             * @return 就绪状态。
+             */
             @Override
             public io.ddd4j.core.health.ReadinessResult readiness() {
                 return io.ddd4j.core.health.ReadinessResult.ready("failure-fixture");
             }
 
+            /**
+             * 关闭组件并释放资源。
+             */
             @Override
             public void close() {
             }
         };
     }
 
+    /**
+     * 记录实体管理器工厂关闭动作的测试替身。
+     * @author <a href="https://github.com/partme-ai">PartMe.AI</a>
+     * @since 7.1.x
+     */
     private static final class RecordingFactory {
         private final AtomicBoolean open = new AtomicBoolean(true);
         private final AtomicInteger closes = new AtomicInteger();

@@ -26,15 +26,29 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
     private final SequenceProperties sequenceProperties;
     private final IpRegionTemplate ipRegionTemplate;
 
+    /**
+     * 构造 Ddd4jExternalJavalinModule Guice 模块实例。
+     */
     public Ddd4jExternalJavalinModule() {
         this(new ExternalProperties(), new SequenceProperties(), IpRegionTemplate.none());
     }
 
+    /**
+     * 构造 Ddd4jExternalJavalinModule Guice 模块实例。
+     * @param externalProperties 外部化配置属性。
+     * @param sequenceProperties 序列生成配置。
+     */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
                                      SequenceProperties sequenceProperties) {
         this(externalProperties, sequenceProperties, IpRegionTemplate.none());
     }
 
+    /**
+     * 构造 Ddd4jExternalJavalinModule Guice 模块实例。
+     * @param externalProperties 外部化配置属性。
+     * @param sequenceProperties 序列生成配置。
+     * @param ipRegionTemplate IP 归属地模板。
+     */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
                                      SequenceProperties sequenceProperties,
                                      IpRegionTemplate ipRegionTemplate) {
@@ -45,6 +59,9 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
         this.ipRegionTemplate = Objects.requireNonNull(ipRegionTemplate, "ipRegionTemplate must not be null");
     }
 
+    /**
+     * 装配 Guice 绑定。
+     */
     @Override
     protected void configure() {
         bind(IpRegionTemplate.class).toInstance(ipRegionTemplate);

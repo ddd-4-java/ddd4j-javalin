@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  *   <li>Reusable Java 11 {@link HttpClient}</li>
  *   <li>Convenience URL builder: {@link #url(String)}</li>
  *   <li>Hook for subclasses to add extra modules / routes via
- *       {@link #configureModules()} and {@link #configureRoutes(Javalin)}</li>
+ *       {@link #extraModules()} and {@link #configureRoutes(Javalin)}</li>
  * </ul>
  *
  * <p>Typical usage:
@@ -53,26 +53,47 @@ import java.util.function.Consumer;
  */
 public abstract class JavalinTestFixture {
 
+    /** 随机端口启动的 Javalin 应用实例（每个测试方法启动/停止）。 */
     protected Javalin app;
+
+    /** 组装完成的 Guice {@link Injector}，供子类断言或取绑定。 */
     protected Injector injector;
+
+    /** 复用的 Java 11 {@link HttpClient}，用于向被测应用发请求。 */
     protected HttpClient client;
 
-    /** Override to scan DDD annotations in extra packages. Default: empty (no scan). */
+    /**
+     * Override to scan DDD annotations in extra packages. Default: empty (no scan).
+     *
+     * @return 需要扫描 DDD 注解的包名数组；默认空数组表示不扫描
+     */
     protected String[] basePackages() {
         return new String[0];
     }
 
-    /** Override to add extra Guice modules (auth, data, mq, …). Default: none. */
+    /**
+     * Override to add extra Guice modules (auth, data, mq, …). Default: none.
+     *
+     * @return 额外追加的 Guice 模块数组；默认空数组表示仅使用内置模块
+     */
     protected Module[] extraModules() {
         return new Module[0];
     }
 
-    /** Override to add extra routes after the ddd4j lifecycle hooks are installed. */
+    /**
+     * Override to add extra routes after the ddd4j lifecycle hooks are installed.
+     *
+     * @param app 已装配 ddd4j 生命周期钩子的 Javalin 实例
+     */
     protected void configureRoutes(Javalin app) {
         // no-op by default
     }
 
-    /** Override to assert against the {@link Injector} post-creation. */
+    /**
+     * Override to assert against the {@link Injector} post-creation.
+     *
+     * @param injector 组装完成的 Guice 注入器
+     */
     protected void afterInjector(Injector injector) {
         // no-op by default
     }
@@ -124,23 +145,46 @@ public abstract class JavalinTestFixture {
         }
     }
 
-    /** Build a URL to {@code path} on the running test server. */
+    /**
+     * Build a URL to {@code path} on the running test server.
+     *
+     * @param path 以 {@code /} 开头的请求路径
+     * @return 指向被测服务器随机端口的完整 URI
+     */
     protected java.net.URI url(String path) {
         return java.net.URI.create("http://localhost:" + app.port() + path);
     }
 
-    /** Convenience: send an HTTP request and return the response. */
+    /**
+     * Convenience: send an HTTP request and return the response.
+     *
+     * @param request 已构造好的 HTTP 请求
+     * @return 以字符串形式读取响应体的响应对象
+     * @throws Exception 请求发送或响应读取失败
+     */
     protected java.net.http.HttpResponse<String> http(java.net.http.HttpRequest request) throws Exception {
         return client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
     }
 
-    /** Convenience: send an HTTP request with a custom body handler. */
+    /**
+     * Convenience: send an HTTP request with a custom body handler.
+     *
+     * @param <T>     响应体目标类型
+     * @param request 已构造好的 HTTP 请求
+     * @param handler 自定义的响应体处理器
+     * @return 按指定 handler 读取响应体的响应对象
+     * @throws Exception 请求发送或响应读取失败
+     */
     protected <T> java.net.http.HttpResponse<T> http(java.net.http.HttpRequest request,
                                                      java.net.http.HttpResponse.BodyHandler<T> handler) throws Exception {
         return client.send(request, handler);
     }
 
-    /** Run an assertion callback against the live {@link Injector}. */
+    /**
+     * Run an assertion callback against the live {@link Injector}.
+     *
+     * @param assertion 面向注入器的断言回调
+     */
     protected void withInjector(Consumer<Injector> assertion) {
         assertion.accept(injector);
     }

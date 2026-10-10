@@ -17,7 +17,7 @@ import java.time.Duration;
  * broker brought up by Testcontainers. 公共骨架（Guice 装配断言 + publish/consume
  * round-trip）继承自 {@link AbstractMqIntegrationTest}。
  *
- * <p>The {@code eclipse-mosquitto:2.0} image ships a restrictive default config (listens
+ * <p>The {@code eclipse-mosquitto:2.0.22} image ships a restrictive default config (listens
  * on localhost only), so the container is started with the bundled {@code mosquitto-no-auth.conf}
  * ({@code listener 1883} + {@code allow_anonymous true}) to make the broker reachable from
  * the test JVM.
@@ -25,13 +25,15 @@ import java.time.Duration;
  * <p>Paho v3 has no user properties, so the message id travels inside the serialized
  * {@link io.ddd4j.mq.event.MQEvent} payload.
  */
+// 测试镜像来源: https://testcontainers.com/modules/mosquitto/ （无 org.testcontainers 第一方 Java 模块，保留 GenericContainer）
 @Tag("integration")
 @JunitJupiterTestContainers
 class Ddd4jMqttMqIT extends AbstractMqIntegrationTest<MqttMQProperties, MqttMQClient> {
 
     @SuppressWarnings("resource")
     private static final GenericContainer<?> MOSQUITTO = new GenericContainer<>(
-            DockerImageName.parse("eclipse-mosquitto:2.0"))
+            // 钉版：原浮动标签 2.0 → 2.0.22（digest 一致）
+            DockerImageName.parse("eclipse-mosquitto:2.0.22"))
             .withExposedPorts(1883)
             .withCommand("/usr/sbin/mosquitto", "-c", "/mosquitto-no-auth.conf");
 

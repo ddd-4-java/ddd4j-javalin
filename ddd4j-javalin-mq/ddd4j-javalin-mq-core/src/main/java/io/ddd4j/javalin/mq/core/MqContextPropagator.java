@@ -133,7 +133,9 @@ final class MqContextPropagator {
 
     /**
      * 类级缓存：避免 {@link #registry()} 中 BaseContext.get → inject 的 check-then-act 竞态。
-     * volatile 保证跨线程可见性；首次初始化后所有线程直接读缓存，不再进入竞态分支。
+     * volatile 保证跨线程可见性。缓存仅在与 {@link BaseContext} 中条目为<b>同一实例</b>时生效；
+     * 一旦条目被外部 {@code remove} / {@code inject} 替换，缓存立即失效并重新绑定，
+     * 保证 {@code BaseContext.get(SNAPSHOT_REGISTRY_KEY)} 始终能读到活跃快照表。
      */
     private static volatile Map<String, TimedSnapshot> cachedRegistry;
 
@@ -293,23 +295,23 @@ final class MqContextPropagator {
 
     private static Map<String, TimedSnapshot> registry() {
         Map<String, TimedSnapshot> result = cachedRegistry;
-        if (result != null) {
+        // 身份校验：BaseContext 条目被外部 remove/replace 后缓存即失效（见 cachedRegistry 注释），
+        // 否则 capture 会写入孤儿 Map，BaseContext.get(SNAPSHOT_REGISTRY_KEY) 将查不到任何快照
+        if (result != null && result == BaseContext.get(SNAPSHOT_REGISTRY_KEY)) {
             return result;
         }
         synchronized (MqContextPropagator.class) {
             result = cachedRegistry;
-            if (result != null) {
+            if (result != null && result == BaseContext.get(SNAPSHOT_REGISTRY_KEY)) {
                 return result;
             }
             Map<String, TimedSnapshot> existing = BaseContext.get(SNAPSHOT_REGISTRY_KEY);
-            if (existing != null) {
-                cachedRegistry = existing;
-                return existing;
+            if (Objects.isNull(existing)) {
+                existing = new ConcurrentHashMap<>();
+                BaseContext.inject(SNAPSHOT_REGISTRY_KEY, existing);
             }
-            Map<String, TimedSnapshot> created = new ConcurrentHashMap<>();
-            BaseContext.inject(SNAPSHOT_REGISTRY_KEY, created);
-            cachedRegistry = created;
-            return created;
+            cachedRegistry = existing;
+            return existing;
         }
     }
 

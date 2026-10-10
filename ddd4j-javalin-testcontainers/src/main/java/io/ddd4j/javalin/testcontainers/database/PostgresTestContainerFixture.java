@@ -7,14 +7,19 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Shared PostgreSQL container fixture.
  *
- * <p>Uses {@code postgres:16-alpine} with {@code ddd4j_test} database and
+ * <p>Uses {@code postgres:16.15-alpine} with {@code ddd4j_test} database and
  * {@code test/test} credentials, exposing port 5432.
  */
 public class PostgresTestContainerFixture extends AbstractTestContainerFixture<PostgreSQLContainer<?>> {
 
-    public static final String DEFAULT_IMAGE = "postgres:16-alpine";
+    /** 默认容器镜像（钉版；原浮动别名 16-alpine 与该补丁标签 digest 一致）。 */
+    // 测试镜像来源: https://testcontainers.com/modules/postgresql/
+    public static final String DEFAULT_IMAGE = "postgres:16.15-alpine";
+    /** 默认数据库名。 */
     public static final String DEFAULT_DATABASE = "ddd4j_test";
+    /** 默认用户名。 */
     public static final String DEFAULT_USERNAME = "test";
+    /** 默认密码。 */
     public static final String DEFAULT_PASSWORD = "test";
 
     @Override

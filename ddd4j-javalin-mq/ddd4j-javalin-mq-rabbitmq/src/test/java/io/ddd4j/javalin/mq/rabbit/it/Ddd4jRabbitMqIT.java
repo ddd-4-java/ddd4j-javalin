@@ -17,6 +17,7 @@ import io.ddd4j.mq.serialization.JsonMQEventSerialization;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.lang.reflect.Method;
@@ -32,11 +33,16 @@ import static org.awaitility.Awaitility.await;
  * Integration test for {@link Ddd4jRabbitMqGuiceModule} against a real RabbitMQ broker
  * brought up by Testcontainers. 公共骨架继承自 {@link AbstractMqIntegrationTest}；
  * RabbitMQ 差异：preInit 中显式指定内置 topic exchange。
+ *
+ * <p>类级 {@code @Testcontainers(disabledWithoutDocker = true)}：无 Docker 环境时整个
+ * 测试类自动跳过，不伪报通过。
  */
 @Tag("integration")
 @JunitJupiterTestContainers
+@Testcontainers(disabledWithoutDocker = true)
 class Ddd4jRabbitMqIT extends AbstractMqIntegrationTest<RabbitMQProperties, RabbitMQClient> {
 
+    // 测试镜像来源: https://testcontainers.com/modules/rabbitmq/
     @SuppressWarnings("resource")
     private static final RabbitMQContainer RABBIT = new RabbitMQContainer(DockerImageName
             .parse(RabbitMqTestContainerFixture.DEFAULT_IMAGE)).withReuse(true);

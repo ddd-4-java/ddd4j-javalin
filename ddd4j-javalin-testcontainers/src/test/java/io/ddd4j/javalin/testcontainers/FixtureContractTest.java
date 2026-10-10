@@ -39,35 +39,35 @@ class FixtureContractTest {
     void mysqlFixtureShouldConstructContainer() {
         MySQLContainer<?> container = new MySqlTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertEquals("mysql:8.0", MySqlTestContainerFixture.DEFAULT_IMAGE);
+        assertEquals("mysql:8.0.46", MySqlTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void postgresFixtureShouldConstructContainer() {
         PostgreSQLContainer<?> container = new PostgresTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertEquals("postgres:16-alpine", PostgresTestContainerFixture.DEFAULT_IMAGE);
+        assertEquals("postgres:16.15-alpine", PostgresTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void mariadbFixtureShouldConstructContainer() {
         MariaDBContainer<?> container = new MariaDbTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertEquals("mariadb:11", MariaDbTestContainerFixture.DEFAULT_IMAGE);
+        assertEquals("mariadb:11.8.9", MariaDbTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void mongodbFixtureShouldConstructContainer() {
         MongoDBContainer container = new MongoDbTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertEquals("mongo:7", MongoDbTestContainerFixture.DEFAULT_IMAGE);
+        assertEquals("mongo:7.0.43", MongoDbTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void redisFixtureShouldConstructContainer() {
         GenericContainer<?> container = new RedisTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertEquals("redis:7-alpine", RedisTestContainerFixture.DEFAULT_IMAGE);
+        assertEquals("redis:7.4.11-alpine", RedisTestContainerFixture.DEFAULT_IMAGE);
         assertTrue(container.getExposedPorts().contains(RedisTestContainerFixture.DEFAULT_PORT));
     }
 
@@ -103,17 +103,17 @@ class FixtureContractTest {
     void wireMockFixtureShouldConstructContainer() {
         GenericContainer<?> container = new WireMockTestContainerFixture().newContainer();
         assertNotNull(container);
-        assertEquals("wiremock/wiremock:3.5.0", WireMockTestContainerFixture.DEFAULT_IMAGE);
+        assertEquals("wiremock/wiremock:3.5.4", WireMockTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void keycloakFixtureShouldUsePinnedImage() {
-        assertEquals("quay.io/keycloak/keycloak:26.2", KeycloakTestContainerFixture.DEFAULT_IMAGE);
+        assertEquals("quay.io/keycloak/keycloak:26.2.5", KeycloakTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test
     void localStackFixtureShouldUsePinnedImage() {
-        assertEquals("localstack/localstack:3.4", LocalStackTestContainerFixture.DEFAULT_IMAGE);
+        assertEquals("localstack/localstack:3.4.0", LocalStackTestContainerFixture.DEFAULT_IMAGE);
     }
 
     @Test

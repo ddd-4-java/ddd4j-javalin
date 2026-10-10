@@ -15,7 +15,10 @@ import org.testcontainers.containers.wait.strategy.Wait;
  */
 public class WireMockTestContainerFixture extends AbstractTestContainerFixture<GenericContainer<?>> {
 
-    public static final String DEFAULT_IMAGE = "wiremock/wiremock:3.5.0";
+    /** 默认容器镜像（钉版；原浮动标签 3.5.0 在 Docker Hub 不存在，改用实际存在的补丁标签）。 */
+    // 测试镜像来源: https://testcontainers.com/modules/wiremock/
+    public static final String DEFAULT_IMAGE = "wiremock/wiremock:3.5.4";
+    /** 默认映射端口。 */
     public static final int DEFAULT_PORT = 8080;
 
     @Override

@@ -16,6 +16,8 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class RabbitMqTestContainerFixture extends AbstractTestContainerFixture<RabbitMQContainer> {
 
+    /** 默认容器镜像（已钉补丁标签，非浮动）。 */
+    // 测试镜像来源: https://testcontainers.com/modules/rabbitmq/
     public static final String DEFAULT_IMAGE = "rabbitmq:3.13.7-management-alpine";
 
     @Override

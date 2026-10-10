@@ -30,14 +30,30 @@ public abstract class AbstractDdd4jMqGuiceModule extends AbstractModule {
     private final MQProperties mqProperties;
     private final Ddd4jJavalinMqProperties integrationProperties;
 
+    /**
+     * 无参构造：使用默认 {@link MQProperties} 与默认 {@link Ddd4jJavalinMqProperties}（角色 BOTH）。
+     */
     protected AbstractDdd4jMqGuiceModule() {
         this(new MQProperties(), new Ddd4jJavalinMqProperties());
     }
 
+    /**
+     * 指定 MQ 属性的构造：Javalin 集成策略使用默认值。
+     *
+     * @param mqProperties MQ 连接与主题属性（不能为 {@code null}）
+     */
     protected AbstractDdd4jMqGuiceModule(MQProperties mqProperties) {
         this(mqProperties, new Ddd4jJavalinMqProperties());
     }
 
+    /**
+     * 全参构造。
+     *
+     * @param mqProperties        MQ 连接与主题属性（不能为 {@code null}）
+     * @param integrationProperties Javalin MQ 生命周期策略（角色、是否强制要求监听器，不能为 {@code null}）
+     * @throws IllegalArgumentException {@code mqProperties} 为 {@code null}
+     * @throws NullPointerException     {@code integrationProperties} 为 {@code null}
+     */
     protected AbstractDdd4jMqGuiceModule(MQProperties mqProperties,
                                          Ddd4jJavalinMqProperties integrationProperties) {
         if (mqProperties == null) {
@@ -60,6 +76,11 @@ public abstract class AbstractDdd4jMqGuiceModule extends AbstractModule {
                 .addBinding().to(JavalinMqLifecycleParticipant.class);
     }
 
+    /**
+     * 暴露给子类的 MQ 属性访问器（子类绑定 {@code XxxMQProperties} 时可复用基类实例）。
+     *
+     * @return 构造时传入的 {@link MQProperties} 实例
+     */
     protected MQProperties mqProperties() {
         return mqProperties;
     }

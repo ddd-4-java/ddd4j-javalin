@@ -31,6 +31,8 @@ public abstract class AbstractTestContainerFixture<C extends GenericContainer<?>
      * Modules, etc. By default delegates to {@link #newContainer()} and reads the host /
      * mapped port; subclasses may override when the connection string has a different shape
      * (e.g. Keycloak realms, Kafka brokers).
+     *
+     * @return 连接串（JDBC URL 或等价形式）
      */
     public String connectionString() {
         C container = newContainer();
@@ -44,6 +46,9 @@ public abstract class AbstractTestContainerFixture<C extends GenericContainer<?>
 
     /**
      * Hook for subclasses to format the connection string from the started container.
+     *
+     * @param container 已启动的容器实例
+     * @return 由容器映射端口与主机拼装的连接串
      */
     protected abstract String resolveConnectionString(C container);
 }

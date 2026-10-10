@@ -12,7 +12,9 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class LocalStackTestContainerFixture extends AbstractTestContainerFixture<LocalStackContainer> {
 
-    public static final String DEFAULT_IMAGE = "localstack/localstack:3.4";
+    /** 默认容器镜像（钉版；原浮动别名 3.4 与该补丁标签 digest 一致）。 */
+    // 测试镜像来源: https://testcontainers.com/modules/localstack/
+    public static final String DEFAULT_IMAGE = "localstack/localstack:3.4.0";
 
     /**
      * 创建仅启用 SQS 服务的 LocalStack 容器。

@@ -9,6 +9,7 @@ import io.ddd4j.mq.kafka.KafkaMQClient;
 import io.ddd4j.mq.kafka.KafkaMQProperties;
 import org.junit.jupiter.api.Tag;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
@@ -18,11 +19,16 @@ import java.time.Duration;
  * up by Testcontainers. 公共骨架（Guice 装配断言 + publish/consume round-trip）继承自
  * {@link AbstractMqIntegrationTest}；Kafka 差异：container 复用、autoStartConsumers、
  * 分区分配等待与更长的 await 超时。
+ *
+ * <p>类级 {@code @Testcontainers(disabledWithoutDocker = true)}：无 Docker 环境时整个
+ * 测试类自动跳过，不伪报通过。
  */
 @Tag("integration")
 @JunitJupiterTestContainers
+@Testcontainers(disabledWithoutDocker = true)
 class Ddd4jKafkaMqIT extends AbstractMqIntegrationTest<KafkaMQProperties, KafkaMQClient> {
 
+    // 测试镜像来源: https://testcontainers.com/modules/kafka/
     @SuppressWarnings("resource")
     private static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName
             .parse(KafkaTestContainerFixture.DEFAULT_IMAGE)).withReuse(true);

@@ -16,6 +16,8 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class KafkaTestContainerFixture extends AbstractTestContainerFixture<KafkaContainer> {
 
+    /** 默认容器镜像（已钉补丁标签，非浮动）。 */
+    // 测试镜像来源: https://testcontainers.com/modules/kafka/
     public static final String DEFAULT_IMAGE = "confluentinc/cp-kafka:7.5.0";
 
     @Override

@@ -27,8 +27,10 @@ import java.time.Duration;
 class Ddd4jNatsMqIT extends AbstractMqIntegrationTest<NatsProperties, NatsMQClient> {
 
     @SuppressWarnings("resource")
+    // 测试镜像来源: https://testcontainers.com/modules/nats/ （org.testcontainers 无第一方 nats 工件，社区实现在 io.github.amadeusitgroup，保留 GenericContainer）
     private static final GenericContainer<?> NATS = new GenericContainer<>(
-            DockerImageName.parse("nats:2-alpine"))
+            // 钉版：原浮动标签 2-alpine → 2.15.0-alpine（digest 一致）
+            DockerImageName.parse("nats:2.15.0-alpine"))
             .withCommand("-js")
             .withExposedPorts(4222);
 

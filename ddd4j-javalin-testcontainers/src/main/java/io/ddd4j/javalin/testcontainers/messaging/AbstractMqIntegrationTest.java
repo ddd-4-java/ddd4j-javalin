@@ -49,50 +49,120 @@ public abstract class AbstractMqIntegrationTest<P extends MQProperties, C extend
     /** 统一 smoke tag。 */
     protected static final String TAG = "smoke";
 
+    /**
+     * 子类提供 broker 名称，写入 {@link MQProperties#setBroker} 与 consumer group 前缀。
+     *
+     * @return broker 名称（如 kafka、rabbitmq、rocketmq）
+     */
     protected abstract String brokerName();
 
+    /**
+     * 子类提供测试主题名，round-trip 发布与订阅均使用该主题。
+     *
+     * @return 测试主题名
+     */
     protected abstract String topicName();
 
-    /** 子类持有的静态容器（每个测试方法 start/stop）。 */
+    /**
+     * 子类持有的静态容器（每个测试方法 start/stop）。
+     *
+     * @return 测试容器实例
+     */
     protected abstract GenericContainer<?> container();
 
-    /** 基于已启动容器构造 broker properties（含连接地址与凭证）。 */
+    /**
+     * 基于已启动容器构造 broker properties（含连接地址与凭证）。
+     *
+     * @return broker 特定的连接属性
+     */
     protected abstract P newProperties();
 
+    /**
+     * 基于 broker properties 构造对应的客户端实例。
+     *
+     * @param props broker 特定的连接属性
+     * @return broker 特定的客户端实例
+     */
     protected abstract C newClient(P props);
 
+    /**
+     * 组装客户端与属性对应的 Guice 模块，供契约装配断言使用。
+     *
+     * @param client broker 特定的客户端实例
+     * @param props  broker 特定的连接属性
+     * @return 装配 MQ 契约的 Guice 模块
+     */
     protected abstract Module guiceModule(C client, P props);
 
+    /**
+     * 客户端具体类型，供 {@code injector.getInstance} 契约断言使用。
+     *
+     * @return 客户端具体类型
+     */
     protected abstract Class<C> clientClass();
 
+    /**
+     * consumer group，缺省为 {@code it-<broker>-consumer}。
+     *
+     * @return consumer group 名称
+     */
     protected String consumerGroup() {
         return "it-" + brokerName() + "-consumer";
     }
 
-    /** 事件 tag；{@code null} 表示发布与断言均不带 tag。 */
+    /**
+     * 事件 tag；{@code null} 表示发布与断言均不带 tag。
+     *
+     * @return 事件 tag，或 {@code null}
+     */
     protected String tagName() {
         return TAG;
     }
 
-    /** listener 订阅 tags，默认跟随 {@link #tagName()}；Pulsar 覆写为 {@code *}。 */
+    /**
+     * listener 订阅 tags，默认跟随 {@link #tagName()}；Pulsar 覆写为 {@code *}。
+     *
+     * @return listener 订阅 tags
+     */
     protected String listenerTags() {
         return tagName();
     }
 
-    /** consumer init 完成后、publish 之前的稳定等待。 */
+    /**
+     * consumer init 完成后、publish 之前的稳定等待。
+     *
+     * @return 稳定等待时长，默认 3 秒
+     */
     protected Duration consumerSettleDelay() {
         return Duration.ofSeconds(3);
     }
 
+    /**
+     * round-trip 断言的最长等待时长。
+     *
+     * @return 最长等待时长，默认 20 秒
+     */
     protected Duration awaitTimeout() {
         return Duration.ofSeconds(20);
     }
 
-    /** init 之前的 broker 准备钩子（在 client 创建之后、Guice 装配之前调用）。 */
+    /**
+     * init 之前的 broker 准备钩子（在 client 创建之后、Guice 装配之前调用）。
+     *
+     * @param client   broker 特定的客户端实例
+     * @param props    broker 特定的连接属性
+     * @param mqProps  ddd4j 侧 MQ 开关与 broker 标识属性
+     * @throws Exception broker 准备失败
+     */
     protected void preInit(C client, P props, MQProperties mqProps) throws Exception {
     }
 
-    /** init 之前改写 listener topic 的钩子（默认使用 {@link #topicName()}）。 */
+    /**
+     * init 之前改写 listener topic 的钩子（默认使用 {@link #topicName()}）。
+     *
+     * @param listener 待改写 topic 的监听器
+     * @param props    broker 特定的连接属性
+     */
     protected void adaptListenerTopic(MQListener listener, P props) {
     }
 
@@ -172,6 +242,11 @@ public abstract class AbstractMqIntegrationTest<P extends MQProperties, C extend
 
         final AtomicReference<MQEvent> received = new AtomicReference<>();
 
+        /**
+         * 记录消费管线投递到达的事件。
+         *
+         * @param event 投递到达的消息事件
+         */
         @MQEventListener(topic = "", tags = TAG, group = "")
         public void onSmoke(MQEvent event) {
             received.set(event);

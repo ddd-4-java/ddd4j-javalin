@@ -21,7 +21,14 @@ import java.util.Set;
 /** 扫描应用包内的 MQEventListener 并从 Guice 获取监听器实例。 */
 public final class JavalinMqListenerScanner {
 
-    /** 扫描并返回顺序稳定、route 唯一的监听器。 */
+    /**
+     * 扫描并返回顺序稳定、route 唯一的监听器。
+     *
+     * @param injector    提供监听器实例的 Guice Injector，不允许为 {@code null}
+     * @param basePackages 待扫描的基础包名集合，不允许为 {@code null}；空白项会被忽略
+     * @return 按类型与方法签名稳定排序、route 不重复的监听器列表
+     * @throws IllegalStateException 当出现重复 route 时抛出
+     */
     public List<MQListener> scan(Injector injector, Collection<String> basePackages) {
         Objects.requireNonNull(injector, "injector must not be null");
         Objects.requireNonNull(basePackages, "basePackages must not be null");

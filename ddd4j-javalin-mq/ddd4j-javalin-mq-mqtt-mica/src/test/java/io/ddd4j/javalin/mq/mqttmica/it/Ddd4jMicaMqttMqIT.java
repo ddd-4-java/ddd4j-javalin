@@ -34,8 +34,10 @@ import java.time.Duration;
 class Ddd4jMicaMqttMqIT extends AbstractMqIntegrationTest<MicaMqttProperties, MicaMqttMQClient> {
 
     @SuppressWarnings("resource")
+    // 测试镜像来源: https://testcontainers.com/modules/mosquitto/ （无 org.testcontainers 第一方 Java 模块，保留 GenericContainer）
     private static final GenericContainer<?> MOSQUITTO = new GenericContainer<>(
-            DockerImageName.parse("eclipse-mosquitto:2.0"))
+            // 钉版：原浮动标签 2.0 → 2.0.22（digest 一致）
+            DockerImageName.parse("eclipse-mosquitto:2.0.22"))
             .withExposedPorts(1883)
             .withCommand("/usr/sbin/mosquitto", "-c", "/mosquitto-no-auth.conf", "-v");
 

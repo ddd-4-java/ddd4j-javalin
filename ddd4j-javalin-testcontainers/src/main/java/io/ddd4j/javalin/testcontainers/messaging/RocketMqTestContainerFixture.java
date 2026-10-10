@@ -23,10 +23,16 @@ import org.testcontainers.utility.MountableFile;
  */
 public class RocketMqTestContainerFixture extends AbstractTestContainerFixture<GenericContainer<?>> {
 
+    /** 默认容器镜像（已钉补丁标签，非浮动）。 */
+    // 测试镜像来源: https://hub.docker.com/r/apache/rocketmq （testcontainers.com/modules/ 无 rocketmq 模块页，故以 Docker Hub 官方镜像页核对）
     public static final String DEFAULT_IMAGE = "apache/rocketmq:5.3.2";
+    /** NameServer 监听端口。 */
     public static final int NAMESRV_PORT = 9876;
+    /** Broker VIP 通道端口。 */
     public static final int BROKER_VIP_PORT = 10909;
+    /** Broker 服务端口。 */
     public static final int BROKER_PORT = 10911;
+    /** Broker 配置文件路径。 */
     public static final String BROKER_CONF = "/home/rocketmq/rocketmq-5.3.2/conf/broker.conf";
 
     @Override

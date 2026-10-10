@@ -57,7 +57,7 @@ class BuildLineContractTest {
         try (var paths = Files.walk(root)) {
             List<Path> poms = paths
                     .filter(path -> path.getFileName().toString().equals("pom.xml"))
-                    .filter(path -> !path.toString().contains("/target/"))
+                    .filter(path -> !path.toString().replace('\\', '/').contains("/target/"))
                     .toList();
             for (Path pom : poms) {
                 Document document = parse(pom);
@@ -106,7 +106,7 @@ class BuildLineContractTest {
             List<Path> childPoms = paths
                     .filter(path -> path.getFileName().toString().equals("pom.xml"))
                     .filter(path -> !path.equals(root.resolve("pom.xml")))
-                    .filter(path -> !path.toString().contains("/target/"))
+                    .filter(path -> !path.toString().replace('\\', '/').contains("/target/"))
                     .toList();
             for (Path pom : childPoms) {
                 Document document = parse(pom);
@@ -184,7 +184,7 @@ class BuildLineContractTest {
         try (var paths = Files.walk(root)) {
             Set<String> actual = paths.filter(path -> path.getFileName().toString().equals("pom.xml"))
                     .filter(path -> !path.equals(root.resolve("pom.xml")))
-                    .filter(path -> !path.toString().contains("/target/"))
+                    .filter(path -> !path.toString().replace('\\', '/').contains("/target/"))
                     .filter(path -> {
                         Path sources = path.getParent().resolve("src/main/java");
                         if (!Files.isDirectory(sources)) {
@@ -196,7 +196,8 @@ class BuildLineContractTest {
                             throw new IllegalStateException(exception);
                         }
                     })
-                    .map(path -> root.relativize(path.getParent()).toString())
+                    // Windows 反斜杠归一为 /，与 approvedPomOnly 的正斜杠口径一致
+                    .map(path -> root.relativize(path.getParent()).toString().replace('\\', '/'))
                     .collect(java.util.stream.Collectors.toSet());
             assertEquals(approvedPomOnly, actual, "POM-only module governance inventory drifted");
             for (String module : actual) {

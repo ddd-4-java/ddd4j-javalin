@@ -60,7 +60,7 @@ docs/superpowers/
 ## Task N: <任务名>
 **Files:** Modify/Create 清单
 **目标:** 该任务完成后的可验证状态。
-- [ ] **Step N.1:** 具体步骤（含失败测试优先的 TDD 顺序）
+- [ ] **Step N.1:** 具体步骤（含失败测试优先的 TDD 顺序）【规范条目·非工作项】
 ```
 
 ### report（`reports/*-status.md`）

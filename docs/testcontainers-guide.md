@@ -4,25 +4,25 @@
 
 本项目锁定 Testcontainers Java `1.20.6`。Testcontainers 模块目录同时列出官方模块和社区模块；Docker 镜像本身也不等同于 Testcontainers 官方模块。
 
-| 服务 / 镜像 | Java 适配方式 | 分类 |
+| 服务 / 镜像（钉版） | Java 适配方式 | 分类 / 出处 |
 |---|---|---|
-| MySQL `mysql:8.0` | `org.testcontainers:mysql` / `MySQLContainer` | Testcontainers 官方模块 |
-| PostgreSQL `postgres:16-alpine` | `org.testcontainers:postgresql` / `PostgreSQLContainer` | Testcontainers 官方模块 |
-| MariaDB `mariadb:11` | `org.testcontainers:mariadb` / `MariaDBContainer` | Testcontainers 官方模块 |
-| MongoDB `mongo:7` | `org.testcontainers:mongodb` / `MongoDBContainer` | Testcontainers 官方模块 |
-| Kafka `confluentinc/cp-kafka:7.5.0` | `org.testcontainers:kafka` / `KafkaContainer` | Testcontainers 官方模块 |
-| RabbitMQ `rabbitmq:3.13.7-management-alpine` | `org.testcontainers:rabbitmq` / `RabbitMQContainer` | Testcontainers 官方模块 |
-| LocalStack `localstack/localstack:3.4` | `org.testcontainers:localstack` / `LocalStackContainer` | Testcontainers 官方模块 |
-| Keycloak `quay.io/keycloak/keycloak:26.2` | `com.github.dasniko:testcontainers-keycloak:3.7.0` | 社区模块；对应 TC 1.20.6 / Keycloak 26.2 |
-| Redis `redis:7-alpine` | `GenericContainer` | 通用容器封装 |
-| ActiveMQ Artemis `apache/activemq-artemis:2.39.0` | `GenericContainer` | 通用容器封装 |
-| RocketMQ `apache/rocketmq:5.3.2` | `GenericContainer` | 通用容器封装 |
-| Pulsar `apachepulsar/pulsar:3.2.0` | `GenericContainer` | 通用容器封装 |
-| NATS `nats:2-alpine` | `GenericContainer` | 通用容器封装 |
-| MQTT `eclipse-mosquitto:2.0` | `GenericContainer` | 通用容器封装 |
-| WireMock `wiremock/wiremock:3.5.0` | WireMock standalone | HTTP 测试依赖，不是容器模块 |
+| MySQL `mysql:8.0.46` | `org.testcontainers:mysql` / `MySQLContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/mysql/> |
+| PostgreSQL `postgres:16.15-alpine` | `org.testcontainers:postgresql` / `PostgreSQLContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/postgresql/> |
+| MariaDB `mariadb:11.8.9` | `org.testcontainers:mariadb` / `MariaDBContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/mariadb/> |
+| MongoDB `mongo:7.0.43` | `org.testcontainers:mongodb` / `MongoDBContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/mongodb/> |
+| Kafka `confluentinc/cp-kafka:7.5.0` | `org.testcontainers:kafka` / `KafkaContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/kafka/> |
+| RabbitMQ `rabbitmq:3.13.7-management-alpine` | `org.testcontainers:rabbitmq` / `RabbitMQContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/rabbitmq/> |
+| LocalStack `localstack/localstack:3.4.0` | `org.testcontainers:localstack` / `LocalStackContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/localstack/> |
+| ActiveMQ Artemis `apache/activemq-artemis:2.39.0` | `org.testcontainers:activemq` / `ArtemisContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/artemis/> |
+| Pulsar `apachepulsar/pulsar:3.2.0` | `org.testcontainers:pulsar` / `PulsarContainer` | Testcontainers 官方模块 <https://testcontainers.com/modules/pulsar/> |
+| Keycloak `quay.io/keycloak/keycloak:26.2.5` | `com.github.dasniko:testcontainers-keycloak:3.7.0` | 社区模块；对应 TC 1.20.6 <https://testcontainers.com/modules/keycloak/> |
+| Redis `redis:7.4.11-alpine` | `GenericContainer` | 无 org.testcontainers 第一方工件，保留通用容器 <https://testcontainers.com/modules/redis/> |
+| RocketMQ `apache/rocketmq:5.3.2` | `GenericContainer` | 模块目录无 rocketmq 页，按 Docker Hub 官方镜像页核对 <https://hub.docker.com/r/apache/rocketmq> |
+| NATS `nats:2.15.0-alpine` | `GenericContainer` | 无 org.testcontainers 第一方工件（社区在 io.github.amadeusitgroup） <https://testcontainers.com/modules/nats/> |
+| MQTT `eclipse-mosquitto:2.0.22` | `GenericContainer` | 模块目录列出但无 org.testcontainers Java 工件，保留通用容器 <https://testcontainers.com/modules/mosquitto/> |
+| WireMock `wiremock/wiremock:3.5.4` | WireMock 容器 fixture（`GenericContainer`）+ standalone 客户端 | 官方镜像 <https://testcontainers.com/modules/wiremock/> |
 
-镜像标签由集中式 fixture 固定，禁止 `latest`。版本选型参考 [Testcontainers 模块目录](https://testcontainers.com/modules/) 和 [Keycloak 社区模块版本矩阵](https://github.com/dasniko/testcontainers-keycloak/blob/main/docs/versions.md)。
+镜像标签由集中式 fixture 固定（含补丁级钉版，原浮动别名如 `8.0`/`16-alpine`/`11`/`7`/`3.4`/`26.2`/`2-alpine`/`2.0` 已改为固定补丁标签，钉版前后 digest 一致），禁止 `latest`。版本选型参考 [Testcontainers 模块目录](https://testcontainers.com/modules/) 和 [Keycloak 社区模块版本矩阵](https://github.com/dasniko/testcontainers-keycloak/blob/main/docs/versions.md)。
 
 ## 等待与验收策略
 

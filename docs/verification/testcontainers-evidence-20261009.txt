@@ -1,0 +1,128 @@
+Testcontainers 测试治理证据 — ddd4j-javalin
+日期: 2026-10-09
+分支: feature/6.7.x（实际 checkout；任务书标注为 feature/7.2.x —— 未授权切分支，差异见"风险"）
+执行约束: 未运行 mvn/gradle（红线禁止）；全部结论来自 grep/find/javap/curl(Docker Hub API)/Read 静态核验。
+
+================================================================================
+1. 版本与坐标口径（已裁定，不改）
+================================================================================
+testcontainers.version = 1.20.6（ddd4j-javalin-dependencies/pom.xml L47；仓库全局 grep "1.21.4" = 0 命中，
+曾出现的一次 1.21.4 快照为过期读取，实际文件即 1.20.6）
+坐标代际 = 1.x 命名：org.testcontainers:junit-jupiter / kafka / postgresql / mysql / mariadb /
+mongodb / rabbitmq / localstack / activemq / pulsar（本次新增 2 个）——经 testcontainers-bom 1.20.6
+import 管理（dependencies pom L197-215 有显式 version 覆写注释）。
+红线：1.x 与 2.x 两代坐标禁止混用（2.x 命名为 testcontainers-* 前缀，属 quarkus 仓口径）。
+
+================================================================================
+2. 镜像盘点表（钉版前后 / 出处 URL / 存在性核验）
+================================================================================
+出处 URL 约定: https://testcontainers.com/modules/<module>/ 为第一方模块页；
+模块页 404 的（rocketmq 等）用 https://hub.docker.com/r/<org>/<image> 核对。
+存在性核验: Docker Hub API /v2/repositories/<ns>/<image>/tags/<tag> → HTTP 200；
+"漂移锚定"= 把钉版 tag 与原浮动 tag 的 digest 对比，二者一致证明钉版未改变镜像内容。
+
+编号 镜像（钉版后）                        钉版前                  出处 URL                                              核验
+---- -------------------------------------- ---------------------- ----------------------------------------------------- ----
+ 1   mysql:8.0.46                           mysql:8.0              https://testcontainers.com/modules/mysql/             200, digest==8.0        sha256:7dcddc01...
+ 2   postgres:16.15-alpine                  postgres:16-alpine     https://testcontainers.com/modules/postgresql/        200, digest==16-alpine  sha256:721873c3...
+ 3   mariadb:11.8.9                         mariadb:11             https://testcontainers.com/modules/mariadb/           200, digest==11         sha256:6422478c...
+ 4   mongo:7.0.43                           mongo:7                https://testcontainers.com/modules/mongodb/           200, digest==7          sha256:1f995ad6...
+ 5   redis:7.4.11-alpine                    redis:7-alpine         https://testcontainers.com/modules/redis/             200, digest==7-alpine   sha256:858f009f...
+ 6   wiremock/wiremock:3.5.4                wiremock/wiremock:3.5.0(不存在,404) https://testcontainers.com/modules/wiremock/   200                     sha256:6e9dcfd8...
+ 7   quay.io/keycloak/keycloak:26.2.5       quay.io/...:26.2       https://testcontainers.com/modules/keycloak/ (quay API) 200, digest==26.2       sha256:4883630e...
+ 8   localstack/localstack:3.4.0            localstack/localstack:3.4 https://testcontainers.com/modules/localstack/       200, digest==3.4        sha256:54fcf172...
+ 9   confluentinc/cp-kafka:7.5.0            （原已钉版，不变）      https://testcontainers.com/modules/kafka/              200
+10   rabbitmq:3.13.7-management-alpine      （原已钉版，不变）      https://testcontainers.com/modules/rabbitmq/           200
+11   apache/activemq-artemis:2.39.0         （原已钉版，不变）      https://testcontainers.com/modules/artemis/            200
+12   apache/rocketmq:5.3.2                  （原已钉版，不变）      https://hub.docker.com/r/apache/rocketmq               200（modules 无 rocketmq 页）
+13   apachepulsar/pulsar:3.2.0              （原已钉版，不变）      https://testcontainers.com/modules/pulsar/             200
+14   eclipse-mosquitto:2.0.22（内联 IT）    eclipse-mosquitto:2.0  https://testcontainers.com/modules/mosquitto/          200, digest==2.0        sha256:cba7cd79...
+15   nats:2.15.0-alpine（内联 IT）          nats:2-alpine          https://testcontainers.com/modules/nats/               200, digest==2-alpine   sha256:eda962d6...
+16   apache/kafka:3.9.2（sample README）    apache/kafka:latest    https://hub.docker.com/r/apache/kafka                  200（README 示例禁止 latest）
+
+代码中 :latest 残留: grep -rn ":latest" --include=*.java --include=pom.xml --include=*.yml = 0 命中
+（README/docs 中 apache/kafka:latest 已改钉版，见第 6 节）。
+每个镜像引用处均带注释 `// 测试镜像来源: https://testcontainers.com/modules/<module>/`（rocketmq 为
+hub.docker.com 形态并注明 modules 无该模块页；redis/nats/mosquitto/wiremock 注明"无第一方
+org.testcontainers 工件，保留 GenericContainer"）。带注释的 java 文件共 17 个。
+
+================================================================================
+3. 官方容器（第一方模块）替换
+================================================================================
+本次替换 2 处 GenericContainer → 官方容器类：
+ (1) messaging/ActiveMqTestContainerFixture: GenericContainer → org.testcontainers.activemq.ArtemisContainer
+     + pom 新增依赖 org.testcontainers:activemq（1.20.6，BOM 管理）。
+     字节码核验（javap 1.20.6）：ArtemisContainer 构造器暴露 7 端口并 Wait.forLogMessage
+     ".*HTTP Server started.*"，configure() 仅设 ARTEMIS_USER/ARTEMIS_PASSWORD →
+     调用方链式 .withExposedPorts(61616,8161) + .waitingFor(3min) 正确覆盖模块默认等待。
+ (2) ddd4j-javalin-mq-pulsar .../Ddd4jPulsarMqIT: GenericContainer → org.testcontainers.containers.PulsarContainer
+     + pom 新增依赖 org.testcontainers:pulsar（test scope，BOM 管理）。
+     字节码核验：PulsarContainer 构造器暴露 6650/8080 + WaitAllStrategy；configure() 重写
+     command 为 standalone 启动并注入 HTTP /admin/v2/clusters 等待，不触碰 PULSAR_MEM →
+     保留 .withEnv("PULSAR_MEM", ...) 内存限制，删去手工 withExposedPorts/withCommand，链式
+     .waitingFor(log) 覆盖构造器等待策略。
+已是第一方官方容器、无需替换（8 个）：MySQL/PostgreSQL/MariaDB/MongoDB/Kafka(ConfluentKafkaContainer)/
+RabbitMQ/LocalStack/Keycloak(dasniko 社区模块,fixture 直用)。
+无第一方 org.testcontainers 工件、保留 GenericContainer 并注释说明（5 个）：redis（社区 com.redis）、
+rocketmq、mosquitto、nats（社区 io.github.amadeusitgroup）、wiremock。
+
+================================================================================
+4. 测试收编核验（surefire/failsafe includes —— *Test/*IT 是否真被执行）
+================================================================================
+- IT 文件总数: 23（find -name "*IT.java"，全部以 *IT.java 结尾 → 匹配 failsafe includes **/*IT.java）。
+- 绑定 failsafe 的 pom: 23 个（22 个含 IT 的模块 + ddd4j-javalin-testcontainers 本次新增绑定）。
+- 默认构建: ddd4j-javalin-parent pom L74 skipITs=true → *IT 默认不跑（防 Docker 环境崩溃）；
+  surefire 默认 includes 不含 *IT.java，profile 内 surefire 显式 <exclude>**/*IT.java</exclude> →
+  双保险，无"被静默排除、永不可达"的测试。
+- 集成档: 根 pom profile `javalin-integration-tests` (L396) → failsafe skipITs=false +
+  includes **/*IT.java + executions(integration-test, verify) → 23 个 IT 全部可收集。
+- 本次收编修复 1 处: ddd4j-javalin-testcontainers 模块原先无 failsafe 绑定，新增的
+  WireMockContainerIT 不可达 → 该模块 pom 补 failsafe 插件绑定（与其余模块同构）。
+- 不可收集的 0 个: 无 *IT.java 落在 failsafe 未绑定模块。
+- 非测试辅助类（命名含 Test 但无 @Test，或 helper）不计入。
+- 优雅跳过保留: Ddd4jTestContainersExtension（ExecutionCondition，DOCKER_HOST 形态探测）不动；
+  Ddd4jMicaMqttMqIT 的 @Disabled("mica-mqtt AIO 客户端在 macOS arm64 上 publish 静默丢失
+  （核心库缺陷）") 保留未动。
+- 新增测试计入: WireMockContainerIT 在 profile 下由 failsafe 收集（@Tag("integration")）。
+
+================================================================================
+5. 新增测试（1 个）
+================================================================================
+ddd4j-javalin-testcontainers/src/test/java/io/ddd4j/javalin/testcontainers/WireMockContainerIT.java
+- @Testcontainers(disabledWithoutDocker=true) + @Container WireMockTestContainerFixture.newContainer()
+- shouldServeStubRegisteredViaAdminApi: POST /__admin/mappings 注册 stub 期望 201 →
+  GET /smoke 期望 200 且 body=="pong"（JDK HttpClient，无额外依赖）。
+- 动机: WireMock fixture 此前有定义、无任何启动容器的测试。
+- 收集路径: 本模块新增 failsafe 绑定 → -Pjavalin-integration-tests verify 执行。
+
+================================================================================
+6. 改动清单（本次 Testcontainers 治理范围）
+================================================================================
+钉版 + 出处注释（13 个 fixture/IT）:
+  WireMockTestContainerFixture(3.5.4) / Postgres(16.15-alpine) / MySql(8.0.46) /
+  MariaDb(11.8.9) / MongoDb(7.0.43) / Redis(7.4.11-alpine) / LocalStack(3.4.0) /
+  Keycloak(26.2.5) / Kafka(注释) / RabbitMq(注释) / RocketMq(hub 注释) /
+  ActiveMq(重写为 ArtemisContainer) / Ddd4jMqttMqIT(eclipse-mosquitto:2.0.22) /
+  Ddd4jMicaMqttMqIT(同上) / Ddd4jNatsMqIT(nats:2.15.0-alpine) / Ddd4jPulsarMqIT(→PulsarContainer)
+构建:
+  ddd4j-javalin-testcontainers/pom.xml        + org.testcontainers:activemq 依赖 + failsafe 绑定
+  ddd4j-javalin-mq/ddd4j-javalin-mq-pulsar/pom.xml + org.testcontainers:pulsar 依赖(test)
+测试/文档:
+  FixtureContractTest.java                    8 处断言更新为钉版值
+  WireMockContainerIT.java                    新增
+  docs/testcontainers-guide.md                镜像表重写（钉版+出处 URL+官方容器坐标）
+  README.md                                   镜像表重写（钉版）
+  ddd4j-javalin-samples/.../sample-mq-kafka/README.md  apache/kafka:latest → 3.9.2
+  Ddd4jPulsarMqIT javadoc                     修正"无 GA 模块"的错误表述
+
+================================================================================
+7. 风险 / 未尽事项
+================================================================================
+- 分支口径: 任务书写 feature/7.2.x，实际 checkout feature/6.7.x；未授权切分支，按实际分支执行。
+- testcontainers 版本曾出现 1.21.4 过期快照读数，已核实实际为 1.20.6，未改版本号。
+- 历史规格文档保留未改（带日期的记录，非现行状态文档）:
+  docs/superpowers/specs/2026-07-30-testcontainers-foundation-design.md、
+  docs/superpowers/specs/2026-09-07-three-branch-convergence-design.md、
+  docs/superpowers/plans/2026-07-29-javalin-capability-matrix.md（内含旧 tag 记载）。
+- 仓库根目录存在 tmp_*.py / tmp_*.txt 等遗留临时文件（先前 javadoc 门禁作业产物），非本次改动，未删除。
+- 未运行 mvn：编译/测试执行结果未验证；静态等价性依据 = javap 字节码核验 + 断言值与常量逐一比对。

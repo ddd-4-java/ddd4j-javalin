@@ -397,7 +397,7 @@
 
   Compare each official branch against both configured remotes with `git ls-remote --heads`. Report any divergence without force-pushing.
 
-- [ ] **Step 6: Complete the specification status only with evidence**
+- [ ] **Step 6: Complete the specification status only with evidence**【外部阻塞: 依赖上游 ddd4j 发布与必选 CI 全绿方可标记规格完成】
 
   Mark the spec implemented only when all mandatory gates pass. If ddd4j 3.0.x remains unpublished or a required CI job is red, leave the spec/plan incomplete and report the exact blocker.
 
@@ -490,7 +490,7 @@
 - [x] **Step 1: MQ persistence, ACK, retry, dead-letter and recovery tests**
 - [x] **Step 2: Decide every POM-only module: implement, direct-reuse proof, or removal**
 - [x] **Step 3: Re-run Testcontainers matrix and document explicit managed-service exclusions**
-- [ ] **Step 4: Final local, private-repository and GitHub Actions evidence convergence**
+- [ ] **Step 4: Final local, private-repository and GitHub Actions evidence convergence**【外部阻塞: 需 GitHub Actions 与私有仓库发布的最终证据汇聚】
 - [x] **Step 5: Close protocol-specific durability evidence for every remaining MQ adapter**
 
   RabbitMQ is the reference but not a forced semantic template. For ActiveMQ, Kafka, NATS, Pulsar, Redis Stream,
@@ -775,7 +775,7 @@
   Present exact files, local SHAs, test evidence and upstream boundaries. Do not commit, switch official branches or
   push until the corresponding authorization is explicit.
 
-- [ ] **Step 6: Require real GitHub execution**
+- [ ] **Step 6: Require real GitHub execution**【外部阻塞: 等待 GitHub Actions 在最终 SHA 上真实执行成功】
 
   Wait for CI and Integration on final SHAs. steps=0, billing annotations, queued jobs and skipped mandatory matrices are
   not success.
@@ -786,7 +786,7 @@
   Use three independent empty Maven repositories to consume BOM, POM, JAR, sources and javadoc; compile, start Javalin,
   call readiness, then stop cleanly.
 
-- [ ] **Step 8: Close the specification**
+- [ ] **Step 8: Close the specification**【外部阻塞: 需 Actions/私有发布/clean-cache 消费等全部证据通过后关闭规格】
 
   Mark Task 8 Step 6, Task 11 Step 4 and Task 17 complete only when SHA equality, Actions, private publication,
   clean-cache startup and production lifecycle evidence all pass.

@@ -35,6 +35,85 @@ class BuildLineContractTest {
             "7.2.x.20260630-SNAPSHOT",
             new BuildLine("3.0.x.20260630-SNAPSHOT", "7.2.3", "4.1.0", "subprojects", "21", "4.0.0-rc-6"));
 
+    private static Path repositoryRoot() {
+        String configuredRoot = System.getProperty("ddd4j.repo.root");
+        Path start = Path.of(Objects.isNull(configuredRoot) ? "" : configuredRoot).toAbsolutePath().normalize();
+        Path current = start;
+        while (Objects.nonNull(current)
+                && !(Files.isRegularFile(current.resolve("pom.xml"))
+                && Files.isDirectory(current.resolve("ddd4j-javalin-testcontainers")))) {
+            current = current.getParent();
+        }
+        if (Objects.isNull(current)) {
+            throw new IllegalStateException("无法定位 ddd4j-javalin 根目录");
+        }
+        return current;
+    }
+
+    private static Document parse(Path pom) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        factory.setNamespaceAware(false);
+        return factory.newDocumentBuilder().parse(pom.toFile());
+    }
+
+    private static String parentVersion(Document document) {
+        Element parent = (Element) document.getElementsByTagName("parent").item(0);
+        return text(parent, "version");
+    }
+
+    private static String property(Document document, String name) {
+        Element properties = (Element) document.getElementsByTagName("properties").item(0);
+        return text(properties, name);
+    }
+
+    private static String text(Document document, String name) {
+        return document.getElementsByTagName(name).item(0).getTextContent().trim();
+    }
+
+    private static String text(Element element, String name) {
+        NodeList values = element.getElementsByTagName(name);
+        return values.item(0).getTextContent().trim();
+    }
+
+    private static String optionalText(Element element, String name) {
+        NodeList values = element.getElementsByTagName(name);
+        return values.getLength() == 0 ? "" : values.item(0).getTextContent().trim();
+    }
+
+    private static int dependencyCount(Document document, String groupId, String artifactId, String scope) {
+        int count = 0;
+        NodeList dependencies = document.getElementsByTagName("dependency");
+        for (int index = 0; index < dependencies.getLength(); index++) {
+            Element dependency = (Element) dependencies.item(index);
+            if (groupId.equals(text(dependency, "groupId"))
+                    && artifactId.equals(text(dependency, "artifactId"))
+                    && scope.equals(text(dependency, "scope"))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static int managedImportCount(Document document, String groupId, String artifactId) {
+        int count = 0;
+        NodeList dependencies = document.getElementsByTagName("dependency");
+        for (int index = 0; index < dependencies.getLength(); index++) {
+            Element dependency = (Element) dependencies.item(index);
+            if (groupId.equals(text(dependency, "groupId"))
+                    && artifactId.equals(text(dependency, "artifactId"))
+                    && "pom".equals(text(dependency, "type"))
+                    && "import".equals(text(dependency, "scope"))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /**
      * 校验当前发布线的版本与 Maven 聚合模型。
      */
@@ -232,85 +311,6 @@ class BuildLineContractTest {
                         "根 POM 不得配置 surefire skipTests=true");
             }
         }
-    }
-
-    private static Path repositoryRoot() {
-        String configuredRoot = System.getProperty("ddd4j.repo.root");
-        Path start = Path.of(Objects.isNull(configuredRoot) ? "" : configuredRoot).toAbsolutePath().normalize();
-        Path current = start;
-        while (Objects.nonNull(current)
-                && !(Files.isRegularFile(current.resolve("pom.xml"))
-                && Files.isDirectory(current.resolve("ddd4j-javalin-testcontainers")))) {
-            current = current.getParent();
-        }
-        if (Objects.isNull(current)) {
-            throw new IllegalStateException("无法定位 ddd4j-javalin 根目录");
-        }
-        return current;
-    }
-
-    private static Document parse(Path pom) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        factory.setNamespaceAware(false);
-        return factory.newDocumentBuilder().parse(pom.toFile());
-    }
-
-    private static String parentVersion(Document document) {
-        Element parent = (Element) document.getElementsByTagName("parent").item(0);
-        return text(parent, "version");
-    }
-
-    private static String property(Document document, String name) {
-        Element properties = (Element) document.getElementsByTagName("properties").item(0);
-        return text(properties, name);
-    }
-
-    private static String text(Document document, String name) {
-        return document.getElementsByTagName(name).item(0).getTextContent().trim();
-    }
-
-    private static String text(Element element, String name) {
-        NodeList values = element.getElementsByTagName(name);
-        return values.item(0).getTextContent().trim();
-    }
-
-    private static String optionalText(Element element, String name) {
-        NodeList values = element.getElementsByTagName(name);
-        return values.getLength() == 0 ? "" : values.item(0).getTextContent().trim();
-    }
-
-    private static int dependencyCount(Document document, String groupId, String artifactId, String scope) {
-        int count = 0;
-        NodeList dependencies = document.getElementsByTagName("dependency");
-        for (int index = 0; index < dependencies.getLength(); index++) {
-            Element dependency = (Element) dependencies.item(index);
-            if (groupId.equals(text(dependency, "groupId"))
-                    && artifactId.equals(text(dependency, "artifactId"))
-                    && scope.equals(text(dependency, "scope"))) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private static int managedImportCount(Document document, String groupId, String artifactId) {
-        int count = 0;
-        NodeList dependencies = document.getElementsByTagName("dependency");
-        for (int index = 0; index < dependencies.getLength(); index++) {
-            Element dependency = (Element) dependencies.item(index);
-            if (groupId.equals(text(dependency, "groupId"))
-                    && artifactId.equals(text(dependency, "artifactId"))
-                    && "pom".equals(text(dependency, "type"))
-                    && "import".equals(text(dependency, "scope"))) {
-                count++;
-            }
-        }
-        return count;
     }
 
     private record BuildLine(String ddd4jVersion,

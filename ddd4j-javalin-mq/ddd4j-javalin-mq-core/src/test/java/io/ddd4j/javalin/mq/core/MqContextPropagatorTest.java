@@ -28,6 +28,13 @@ class MqContextPropagatorTest {
      */
     static final String CAPTURABLE_KEY = MqContextPropagatorTest.class.getName() + ".capturable";
 
+    private static MQEvent newEvent(String msgId) {
+        MQEvent event = new MQEvent();
+        event.setTopic("orders.test");
+        event.setMsgId(msgId);
+        return event;
+    }
+
     @AfterEach
     void cleanup() {
         BaseContext.remove(MqContextPropagator.SNAPSHOT_REGISTRY_KEY);
@@ -246,13 +253,6 @@ class MqContextPropagatorTest {
             BaseContext.remove(MqContextPropagator.SNAPSHOT_TTL_MILLIS_KEY);
             ThreadContext.clear();
         }
-    }
-
-    private static MQEvent newEvent(String msgId) {
-        MQEvent event = new MQEvent();
-        event.setTopic("orders.test");
-        event.setMsgId(msgId);
-        return event;
     }
 
     interface CapturableBeanInterface {

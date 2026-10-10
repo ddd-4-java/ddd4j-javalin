@@ -27,12 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class AbstractAuthJavalinModuleTest {
 
     /**
-     * 最小 SubjectProvider 桩：接口方法均为 default，无需实现。
-     */
-    static class StubSubjectProvider implements SubjectProvider {
-    }
-
-    /**
      * 提供 subjectProvider() 时：SubjectProvider 可注入且为单例，
      * SubjectKit 静态注册中心写回的是同一实例。
      */
@@ -68,5 +62,11 @@ class AbstractAuthJavalinModuleTest {
                 "未提供 subjectProvider() 时不应创建 SubjectProvider 绑定");
         assertEquals("custom", injector.getInstance(String.class),
                 "configureModule() 钩子应正常执行");
+    }
+
+    /**
+     * 最小 SubjectProvider 桩：接口方法均为 default，无需实现。
+     */
+    static class StubSubjectProvider implements SubjectProvider {
     }
 }

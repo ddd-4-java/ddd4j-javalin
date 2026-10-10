@@ -58,6 +58,83 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
 
     private static final AtomicBoolean SCHEMA_READY = new AtomicBoolean();
 
+    @AfterAll
+    static void tearDownContainer() {
+        if (POSTGRES.isRunning()) {
+            POSTGRES.stop();
+        }
+    }
+
+    private static void ensureSchema() {
+        if (!SCHEMA_READY.compareAndSet(false, true)) {
+            return;
+        }
+        String schema = readSchema();
+        try (Connection connection = DriverManager.getConnection(
+                POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
+             Statement statement = connection.createStatement()) {
+            for (String sql : schema.split(";")) {
+                if (!sql.isBlank()) {
+                    statement.execute(sql.trim());
+                }
+            }
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to create Order Outbox schema", exception);
+        }
+    }
+
+    private static String readSchema() {
+        try (var input = OrderOutboxPostgresIT.class.getResourceAsStream("/db/schema.sql")) {
+            if (input == null) {
+                throw new IllegalStateException("Missing test resource /db/schema.sql");
+            }
+            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to read /db/schema.sql", exception);
+        }
+    }
+
+    private static int countOutboxStatus(DataSource dataSource, String status) {
+        return countRows(dataSource, "SELECT COUNT(*) FROM sample_order_outbox WHERE status = '" + status + "'");
+    }
+
+    private static int countRows(DataSource dataSource, String sql) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet rows = statement.executeQuery()) {
+            rows.next();
+            return rows.getInt(1);
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to query sample schema", exception);
+        }
+    }
+
+    private static String outboxStatus(DataSource dataSource, String id) {
+        return outboxValue(dataSource, id, "status");
+    }
+
+    private static String outboxError(DataSource dataSource, String id) {
+        return outboxValue(dataSource, id, "last_error");
+    }
+
+    private static int outboxAttempts(DataSource dataSource, String id) {
+        return Integer.parseInt(outboxValue(dataSource, id, "attempts"));
+    }
+
+    private static String outboxValue(DataSource dataSource, String id, String column) {
+        String sql = "SELECT " + column + " FROM sample_order_outbox WHERE id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                resultSet.next();
+                return resultSet.getString(1);
+            }
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to query outbox message", exception);
+        }
+    }
+
     @Override
     protected Module[] extraModules() {
         POSTGRES.start();
@@ -80,13 +157,6 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
     @Override
     protected void configureRoutes(Javalin app) {
         injector.getInstance(OrderController.class).register(app);
-    }
-
-    @AfterAll
-    static void tearDownContainer() {
-        if (POSTGRES.isRunning()) {
-            POSTGRES.stop();
-        }
     }
 
     @BeforeEach
@@ -183,75 +253,5 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
         assertThat(retried.published()).isEqualTo(1);
         assertThat(outboxStatus(dataSource, "retry-message")).isEqualTo("PUBLISHED");
         assertThat(outboxAttempts(dataSource, "retry-message")).isEqualTo(2);
-    }
-
-    private static void ensureSchema() {
-        if (!SCHEMA_READY.compareAndSet(false, true)) {
-            return;
-        }
-        String schema = readSchema();
-        try (Connection connection = DriverManager.getConnection(
-                POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
-             Statement statement = connection.createStatement()) {
-            for (String sql : schema.split(";")) {
-                if (!sql.isBlank()) {
-                    statement.execute(sql.trim());
-                }
-            }
-        } catch (Exception exception) {
-            throw new IllegalStateException("Failed to create Order Outbox schema", exception);
-        }
-    }
-
-    private static String readSchema() {
-        try (var input = OrderOutboxPostgresIT.class.getResourceAsStream("/db/schema.sql")) {
-            if (input == null) {
-                throw new IllegalStateException("Missing test resource /db/schema.sql");
-            }
-            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (Exception exception) {
-            throw new IllegalStateException("Failed to read /db/schema.sql", exception);
-        }
-    }
-
-    private static int countOutboxStatus(DataSource dataSource, String status) {
-        return countRows(dataSource, "SELECT COUNT(*) FROM sample_order_outbox WHERE status = '" + status + "'");
-    }
-
-    private static int countRows(DataSource dataSource, String sql) {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet rows = statement.executeQuery()) {
-            rows.next();
-            return rows.getInt(1);
-        } catch (Exception exception) {
-            throw new IllegalStateException("Failed to query sample schema", exception);
-        }
-    }
-
-    private static String outboxStatus(DataSource dataSource, String id) {
-        return outboxValue(dataSource, id, "status");
-    }
-
-    private static String outboxError(DataSource dataSource, String id) {
-        return outboxValue(dataSource, id, "last_error");
-    }
-
-    private static int outboxAttempts(DataSource dataSource, String id) {
-        return Integer.parseInt(outboxValue(dataSource, id, "attempts"));
-    }
-
-    private static String outboxValue(DataSource dataSource, String id, String column) {
-        String sql = "SELECT " + column + " FROM sample_order_outbox WHERE id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                resultSet.next();
-                return resultSet.getString(1);
-            }
-        } catch (Exception exception) {
-            throw new IllegalStateException("Failed to query outbox message", exception);
-        }
     }
 }

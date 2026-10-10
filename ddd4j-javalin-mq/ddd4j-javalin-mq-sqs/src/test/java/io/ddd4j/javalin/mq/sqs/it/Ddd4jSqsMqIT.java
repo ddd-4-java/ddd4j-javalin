@@ -47,6 +47,17 @@ class Ddd4jSqsMqIT {
     private static final LocalStackContainer LOCALSTACK =
             new LocalStackTestContainerFixture().newContainer();
 
+    private static SqsProperties sqsProperties() {
+        SqsProperties props = new SqsProperties();
+        props.setRegion("us-east-1");
+        props.setAccessKey("test");
+        props.setSecretKey("test");
+        props.setEndpointOverride(LOCALSTACK.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
+        props.setWaitTimeSeconds(1);
+        props.setPollIntervalMs(200);
+        return props;
+    }
+
     @Test
     void shouldResolveCoreContractsFromGuice() {
         LOCALSTACK.start();
@@ -111,17 +122,6 @@ class Ddd4jSqsMqIT {
             io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.close();
             LOCALSTACK.stop();
         }
-    }
-
-    private static SqsProperties sqsProperties() {
-        SqsProperties props = new SqsProperties();
-        props.setRegion("us-east-1");
-        props.setAccessKey("test");
-        props.setSecretKey("test");
-        props.setEndpointOverride(LOCALSTACK.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
-        props.setWaitTimeSeconds(1);
-        props.setPollIntervalMs(200);
-        return props;
     }
 
     /**

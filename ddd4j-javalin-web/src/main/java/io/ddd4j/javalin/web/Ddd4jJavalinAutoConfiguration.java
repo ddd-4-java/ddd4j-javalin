@@ -58,6 +58,33 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
         this.sharedIdempotencyGuard = sharedIdempotencyGuard;
     }
 
+    /**
+     * Convenience overload that lets callers customise the public-path list without
+     * subclassing the module.
+     */
+    public static Ddd4jJavalinAutoConfiguration withPublicPaths(String... paths) {
+        Ddd4jJavalinProperties props = new Ddd4jJavalinProperties();
+        props.setPublicPaths(paths);
+        return new Ddd4jJavalinAutoConfiguration(props);
+    }
+
+    /**
+     * Convenience for tests: build a module with {@code port=0}.
+     */
+    public static Ddd4jJavalinAutoConfiguration forTesting() {
+        Ddd4jJavalinProperties props = new Ddd4jJavalinProperties();
+        props.setPort(0);
+        props.setHost("127.0.0.1");
+        return new Ddd4jJavalinAutoConfiguration(props);
+    }
+
+    /**
+     * Static accessor for the convenience helpers above (e.g. {@link #withPublicPaths}).
+     */
+    public static List<String> defaultPublicPaths() {
+        return Arrays.asList("/health", "/health/readiness", "/health/liveness");
+    }
+
     @Override
     protected void configure() {
         if (!properties.isEnabled()) {
@@ -139,36 +166,9 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     }
 
     /**
-     * Convenience overload that lets callers customise the public-path list without
-     * subclassing the module.
-     */
-    public static Ddd4jJavalinAutoConfiguration withPublicPaths(String... paths) {
-        Ddd4jJavalinProperties props = new Ddd4jJavalinProperties();
-        props.setPublicPaths(paths);
-        return new Ddd4jJavalinAutoConfiguration(props);
-    }
-
-    /**
-     * Convenience for tests: build a module with {@code port=0}.
-     */
-    public static Ddd4jJavalinAutoConfiguration forTesting() {
-        Ddd4jJavalinProperties props = new Ddd4jJavalinProperties();
-        props.setPort(0);
-        props.setHost("127.0.0.1");
-        return new Ddd4jJavalinAutoConfiguration(props);
-    }
-
-    /**
      * Current properties. Visible for the bootstrap class.
      */
     public Ddd4jJavalinProperties getProperties() {
         return properties;
-    }
-
-    /**
-     * Static accessor for the convenience helpers above (e.g. {@link #withPublicPaths}).
-     */
-    public static List<String> defaultPublicPaths() {
-        return Arrays.asList("/health", "/health/readiness", "/health/liveness");
     }
 }

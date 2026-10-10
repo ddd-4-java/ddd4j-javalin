@@ -10,6 +10,8 @@ import lombok.Setter;
 @Setter
 public class Ddd4jJavalinMqProperties {
 
+    private Role role = Role.BOTH;
+    private boolean requireListeners = true;
     /**
      * 应用使用 MQ 的角色。
      */
@@ -26,7 +28,4 @@ public class Ddd4jJavalinMqProperties {
             return this == CONSUMER_ONLY || this == BOTH;
         }
     }
-
-    private Role role = Role.BOTH;
-    private boolean requireListeners = true;
 }

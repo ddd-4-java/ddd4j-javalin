@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -36,11 +37,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li>Update and verify changes are visible</li>
  *   <li>Delete and verify removal</li>
  * </ul>
+ *
+ * <p>类级 {@code @Testcontainers(disabledWithoutDocker = true)}：无 Docker 环境时整个
+ * 测试类自动跳过，不伪报通过。
  */
 @Tag("integration")
 @JunitJupiterTestContainers
+@Testcontainers(disabledWithoutDocker = true)
 class Ddd4jMybatisJavalinMySqlIT {
 
+    // 测试镜像来源: https://testcontainers.com/modules/mysql/
     @SuppressWarnings("resource")
     private static final MySQLContainer<?> MYSQL = new MySqlTestContainerFixture().newContainer();
 
@@ -100,7 +106,8 @@ class Ddd4jMybatisJavalinMySqlIT {
         assertNotNull(user.getId());
 
         // READ
-        TestUserRepository.TestUserModel found = repo.findById(user.getId()).orElseThrow();
+        TestUserRepository.TestUserModel found = repo.findById(user.getId())
+                .orElseThrow(() -> new IllegalStateException("saved user must be readable"));
         assertEquals("alice", found.getUsername());
         assertEquals("alice@example.com", found.getEmail());
 
@@ -108,7 +115,8 @@ class Ddd4jMybatisJavalinMySqlIT {
         found.setEmail("alice@updated.com");
         TestUserRepository.TestUserModel updated = repo.updateById(found);
         assertNotNull(updated);
-        TestUserRepository.TestUserModel reloaded = repo.findById(found.getId()).orElseThrow();
+        TestUserRepository.TestUserModel reloaded = repo.findById(found.getId())
+                .orElseThrow(() -> new IllegalStateException("updated user must be readable"));
         assertEquals("alice@updated.com", reloaded.getEmail());
 
         // LIST

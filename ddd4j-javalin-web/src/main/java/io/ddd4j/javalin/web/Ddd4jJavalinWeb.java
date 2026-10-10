@@ -37,6 +37,15 @@ public class Ddd4jJavalinWeb {
     private final WebExceptionTranslator translator;
     private final Optional<WebIdempotencyLifecycle> idempotencyLifecycle;
 
+    /**
+     * 使用请求上下文工厂、请求生命周期、异常翻译器与幂等生命周期创建配置器。
+     *
+     * @param contextFactory      请求上下文工厂，不允许为 {@code null}
+     * @param lifecycle           请求生命周期（认证 + 可观测 + 幂等），不允许为 {@code null}
+     * @param translator          统一异常翻译器，不允许为 {@code null}
+     * @param idempotencyLifecycle 幂等生命周期；为 {@code null} 表示关闭幂等保护
+     * @throws NullPointerException 当任一必填依赖为 {@code null} 时抛出
+     */
     public Ddd4jJavalinWeb(WebRequestContextFactory contextFactory,
                             WebRequestLifecycle lifecycle,
                             WebExceptionTranslator translator,
@@ -48,7 +57,9 @@ public class Ddd4jJavalinWeb {
     }
 
     /**
-     * 配置 Javalin 实例（Javalin 6 API）。
+     * 配置 Javalin 实例（Javalin 6 API）：挂载请求上下文打开/关闭、异常转译钩子。
+     *
+     * @param config 待配置的 Javalin 配置对象，不允许为 {@code null}
      */
     public void configure(JavalinConfig config) {
         config.router.mount(routing -> {

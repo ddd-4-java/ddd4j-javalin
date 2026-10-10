@@ -50,6 +50,8 @@ public abstract class AbstractAuthJavalinModule extends AbstractModule {
     /**
      * SubjectProvider 工厂钩子：返回本模块要注册的 {@link SubjectProvider} 实例；
      * 返回 {@code null} 表示本模块不注册（如 license 模块仅提供 LicenseVerify）。
+     *
+     * @return 本模块要注册的 {@link SubjectProvider} 实例，返回 {@code null} 表示不注册
      */
     protected SubjectProvider subjectProvider() {
         return null;

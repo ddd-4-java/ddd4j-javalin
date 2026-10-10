@@ -30,7 +30,7 @@ import org.springframework.security.core.AuthenticationException;
  * （如通过 Javalin 过滤器从请求头解析 JWT 并填充 SecurityContext）。此模块仅作为兼容选项，
  * 推荐 Javalin 项目使用 sa-token（{@code ddd4j-javalin-auth-satoken}）。
  *
- * <h3>使用方式</h3>
+ * <h2>使用方式</h2>
  * <pre>{@code
  * Injector injector = Guice.createInjector(
  *     new Ddd4jGuiceModule(),                    // 核心基础设施

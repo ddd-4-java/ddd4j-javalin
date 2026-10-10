@@ -19,8 +19,8 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -48,7 +48,7 @@ class NimbusOidcTokenVerifierTest {
         verifier = new NimbusOidcTokenVerifier(OidcProperties.builder()
                 .issuer(issuer)
                 .jwksUri(URI.create("http://127.0.0.1:" + server.getAddress().getPort() + "/certs"))
-                .audiences(Set.of("ddd4j-api"))
+                .audiences(Collections.singleton("ddd4j-api"))
                 .build());
     }
 
@@ -64,7 +64,7 @@ class NimbusOidcTokenVerifierTest {
         assertEquals("user-42", principal.getLoginId());
         assertEquals("user-42", principal.getUserId());
         assertEquals("tenant-7", principal.getOrgId());
-        assertEquals(Set.of("order:read"), principal.getPerms());
+        assertEquals(Collections.singleton("order:read"), principal.getPerms());
         assertEquals("admin", principal.getRoles().get(0).getRoleCode());
     }
 
@@ -100,8 +100,8 @@ class NimbusOidcTokenVerifierTest {
                 .expirationTime(Date.from(expiresAt))
                 .notBeforeTime(Date.from(Instant.now().minusSeconds(5)))
                 .claim("tenant_id", "tenant-7")
-                .claim("permissions", Set.of("order:read"))
-                .claim("roles", Set.of("admin"))
+                .claim("permissions", Collections.singleton("order:read"))
+                .claim("roles", Collections.singleton("admin"))
                 .build();
         SignedJWT jwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(rsaKey.getKeyID()).build(), claims);
         jwt.sign(new RSASSASigner(rsaKey));

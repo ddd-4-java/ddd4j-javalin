@@ -22,7 +22,7 @@ import org.apache.shiro.authz.UnauthorizedException;
  *       统一 Shiro 异常响应（对标 Spring 的 {@code @ControllerAdvice ShiroExceptionHandler}）</li>
  * </ol>
  *
- * <h3>使用方式</h3>
+ * <h2>使用方式</h2>
  * <pre>{@code
  * Injector injector = Guice.createInjector(
  *     new Ddd4jGuiceModule(),                // 核心基础设施

@@ -16,7 +16,7 @@ import io.javalin.Javalin;
 /**
  * ddd4j + Javalin + Disruptor 本地 MQ 示例启动类。
  *
- * <h3>演示链路</h3>
+ * <h2>演示链路</h2>
  * <ol>
  *   <li>客户端 POST /orders 创建订单</li>
  *   <li>OrderApplicationService 创建 Order 聚合并发布 OrderCreatedEvent</li>
@@ -25,7 +25,7 @@ import io.javalin.Javalin;
  *   <li>OrderCreatedMqListener 消费事件并记录日志</li>
  * </ol>
  *
- * <h3>核心要点</h3>
+ * <h2>核心要点</h2>
  * <p>Javalin 无 DI 容器，因此：
  * <ul>
  *   <li>通过 Guice 组装 MQ 基础设施（DisruptorMQBus / DisruptorMQEventPublisher）</li>
@@ -33,7 +33,7 @@ import io.javalin.Javalin;
  *   <li>手动注册 MQListener 到 DisruptorMQEventDispatcher</li>
  * </ul>
  *
- * <h3>运行</h3>
+ * <h2>运行</h2>
  * <pre>{@code
  * mvn -pl ddd4j-javalin/ddd4j-javalin-samples/ddd4j-javalin-sample-mq-disruptor compile exec:java \
  *     -Dexec.mainClass=io.ddd4j.sample.javalin.mq.disruptor.DisruptorMqSample

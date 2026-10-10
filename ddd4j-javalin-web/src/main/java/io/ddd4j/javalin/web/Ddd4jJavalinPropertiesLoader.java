@@ -29,7 +29,13 @@ public final class Ddd4jJavalinPropertiesLoader {
     private Ddd4jJavalinPropertiesLoader() {
     }
 
-    /** 从 application.properties、环境变量、系统属性和 CLI 加载配置。 */
+    /**
+     * 从 application.properties、环境变量、系统属性和 CLI 加载配置。
+     * 优先级从低到高：文件配置、环境变量、系统属性、命令行参数。
+     *
+     * @param args 命令行参数，支持 {@code --port <值>} 或纯数字端口；可为 {@code null}
+     * @return 按固定优先级合并后的 Web 层配置
+     */
     public static Ddd4jJavalinProperties load(String[] args) {
         Properties fileProperties = loadApplicationProperties();
         return load(args, fileProperties, System.getenv(), System.getProperties());

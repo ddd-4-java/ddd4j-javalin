@@ -9,7 +9,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Set;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,7 +37,7 @@ class OidcHttpAuthenticationTest {
             return new AuthPrincipal().setLoginId("user-42");
         });
         app = Javalin.create();
-        OidcHttpAuthentication.register(app, provider, Set.of("/public"));
+        OidcHttpAuthentication.register(app, provider, Collections.singleton("/public"));
         app.get("/public", context -> context.result("public"));
         app.get("/secure", context -> context.result(provider.getSubject().getLoginIdAsString()));
         app.start(0);

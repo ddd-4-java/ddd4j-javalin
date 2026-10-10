@@ -30,10 +30,21 @@ public class Ddd4jJpaJavalinModule extends AbstractModule {
     private final Map<String, Object> properties;
     private final EntityManagerFactory suppliedFactory;
 
+    /**
+     * 按指定持久化单元名装配 JPA，附加属性为空。
+     *
+     * @param persistenceUnitName 持久化单元名（persistence.xml 中声明）
+     */
     public Ddd4jJpaJavalinModule(String persistenceUnitName) {
         this(persistenceUnitName, Collections.emptyMap());
     }
 
+    /**
+     * 按指定持久化单元名与附加属性装配 JPA。
+     *
+     * @param persistenceUnitName 持久化单元名（persistence.xml 中声明）
+     * @param properties          传给持久化提供者的附加属性
+     */
     public Ddd4jJpaJavalinModule(String persistenceUnitName, Map<String, ?> properties) {
         this.persistenceUnitName = Objects.requireNonNull(
                 persistenceUnitName, "persistenceUnitName must not be null");
@@ -42,13 +53,18 @@ public class Ddd4jJpaJavalinModule extends AbstractModule {
         this.suppliedFactory = null;
     }
 
-    /** 使用调用方管理的 EntityManagerFactory。该工厂不会被 Javalin 关闭。 */
+    /**
+     * 使用调用方管理的 EntityManagerFactory。该工厂不会被 Javalin 关闭。
+     *
+     * @param factory 调用方提供并管理生命周期的实体管理器工厂
+     */
     public Ddd4jJpaJavalinModule(EntityManagerFactory factory) {
         this.persistenceUnitName = null;
         this.properties = Collections.emptyMap();
         this.suppliedFactory = Objects.requireNonNull(factory, "factory must not be null");
     }
 
+    /** 使用默认持久化单元名 {@code ddd4j-pu} 装配 JPA。 */
     public Ddd4jJpaJavalinModule() {
         this("ddd4j-pu");
     }

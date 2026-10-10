@@ -3,9 +3,6 @@ package io.ddd4j.javalin.cache;
 import io.ddd4j.cache.CacheKit;
 import io.ddd4j.core.cache.Cache;
 import io.ddd4j.core.cache.CacheConfig;
-import io.ddd4j.cache.CacheKit;
-import io.ddd4j.core.cache.Cache;
-import io.ddd4j.core.cache.CacheConfig;
 
 import java.util.function.Function;
 
@@ -20,7 +17,7 @@ import java.util.function.Function;
  * 要预构建的本地缓存与要注册的外部缓存，Module 在 Injector 创建时统一完成初始化，
  * 让缓存配置集中、可测试、与 Guice 生命周期对齐。
  *
- * <h3>核心职责</h3>
+ * <h2>核心职责</h2>
  * <ul>
  *   <li><b>默认缓存类型</b>：设置 {@link CacheKit} 默认本地缓存引擎（Caffeine/Guava/Hutool）</li>
  *   <li><b>本地缓存预构建</b>：声明 biz → 过期时间，Injector 创建时自动 {@code CacheKit.build()}</li>
@@ -28,7 +25,7 @@ import java.util.function.Function;
  *       Injector 创建时自动 {@code CacheKit.register()}</li>
  * </ul>
  *
- * <h3>使用方式</h3>
+ * <h2>使用方式</h2>
  * <pre>{@code
  * Ddd4jCacheJavalinModule module = new Ddd4jCacheJavalinModule()
  *         .setDefaultType(CacheKit.LocalCacheType.CAFFEINE)

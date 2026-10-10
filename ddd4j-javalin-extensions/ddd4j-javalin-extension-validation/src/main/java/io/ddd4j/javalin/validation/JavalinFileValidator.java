@@ -17,6 +17,11 @@ public final class JavalinFileValidator {
 
     private final FileValidationService validationService;
 
+    /**
+     * 构造函数：注入底层文件校验服务。
+     *
+     * @param validationService 文件校验服务，不允许为 {@code null}
+     */
     public JavalinFileValidator(FileValidationService validationService) {
         this.validationService = Objects.requireNonNull(validationService, "validationService must not be null");
     }

@@ -30,10 +30,22 @@ public final class OrderOutboxScheduler {
     private ScheduledExecutorService executor;
     private ScheduledFuture<?> handle;
 
+    /**
+     * 内存装配构造：委托 {@link OutboxPublisher#dispatchPending(int)} 发布。
+     *
+     * @param publisher 内存 Outbox 发布器，不可为 {@code null}
+     * @param properties 调度配置，不可为 {@code null}
+     */
     public OrderOutboxScheduler(OutboxPublisher publisher, OrderOutboxSampleProperties properties) {
         this(publisher::dispatchPending, properties);
     }
 
+    /**
+     * PostgreSQL 装配构造：委托 {@link TransactionalOutboxPublisher#publishPending(int)} 在单事务内发布。
+     *
+     * @param publisher 事务型 Outbox 发布器，不可为 {@code null}
+     * @param properties 调度配置，不可为 {@code null}
+     */
     public OrderOutboxScheduler(TransactionalOutboxPublisher publisher, OrderOutboxSampleProperties properties) {
         this(publisher::publishPending, properties);
     }

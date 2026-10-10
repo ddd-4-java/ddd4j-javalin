@@ -6,7 +6,7 @@ import io.ddd4j.core.subject.SubjectProvider;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -18,7 +18,7 @@ class Ddd4jOidcJavalinModuleTest {
         OidcProperties properties = OidcProperties.builder()
                 .issuer("https://id.example.com/realms/main")
                 .jwksUri(URI.create("https://id.example.com/realms/main/certs"))
-                .audiences(Set.of("ddd4j-api"))
+                .audiences(Collections.singleton("ddd4j-api"))
                 .build();
 
         Injector injector = Guice.createInjector(new Ddd4jOidcJavalinModule(properties));

@@ -27,10 +27,18 @@ public class SnowflakeIdGenerator implements IdentifierGenerator {
 
     private static final SnowflakeIdGenerator INSTANCE = new SnowflakeIdGenerator();
 
+    /** 本机节点 ID（由网卡 MAC 派生，取低 {@link #NODE_ID_BITS} 位）。 */
     private final int nodeId;
+
+    /** 上一次发号的时间戳（毫秒），用于同毫秒内序列推进与时钟回拨检测。 */
     private volatile long lastTimestamp = -1L;
+
+    /** 当前毫秒内的序列号（取值 {@code 0..MAX_SEQUENCE}）。 */
     private volatile long sequence = 0L;
 
+    /**
+     * 构造生成器并按本机网卡地址派生节点 ID。
+     */
     public SnowflakeIdGenerator() {
         this.nodeId = createNodeId();
     }

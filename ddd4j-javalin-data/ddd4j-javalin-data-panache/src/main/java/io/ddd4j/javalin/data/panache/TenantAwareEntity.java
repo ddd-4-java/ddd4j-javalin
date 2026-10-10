@@ -58,7 +58,7 @@ public abstract class TenantAwareEntity extends TenantAwareEntityBase {
     public Long id;
 
     /**
-     * 租户 ID 已由 {@link TenantAwareEntityBase#tenantId} 提供，
+     * 租户 ID 已由 {@code TenantAwareEntityBase.tenantId} 提供，
      * 此处重新声明并标注 {@code @Id}，使其纳入本基类固定的两字段复合主键。
      */
     @Id

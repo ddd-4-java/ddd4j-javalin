@@ -26,15 +26,31 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
     private final SequenceProperties sequenceProperties;
     private final IpRegionTemplate ipRegionTemplate;
 
+    /**
+     * 无参构造：使用默认外部配置与序列配置，区域模板为不可用的离线实现。
+     */
     public Ddd4jExternalJavalinModule() {
         this(new ExternalProperties(), new SequenceProperties(), IpRegionTemplate.none());
     }
 
+    /**
+     * 构造函数：注入外部系统配置与序列配置，区域模板为不可用的离线实现。
+     *
+     * @param externalProperties 外部系统配置，不允许为 {@code null}
+     * @param sequenceProperties 全局序列配置，不允许为 {@code null}
+     */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
                                      SequenceProperties sequenceProperties) {
         this(externalProperties, sequenceProperties, IpRegionTemplate.none());
     }
 
+    /**
+     * 构造函数：注入外部系统配置、序列配置与 IP 地域查询模板。
+     *
+     * @param externalProperties 外部系统配置，不允许为 {@code null}
+     * @param sequenceProperties 全局序列配置，不允许为 {@code null}
+     * @param ipRegionTemplate IP 地域查询模板，不允许为 {@code null}
+     */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
                                      SequenceProperties sequenceProperties,
                                      IpRegionTemplate ipRegionTemplate) {

@@ -24,11 +24,24 @@ public class QrCodeRoutes {
     private final QrCodeService service;
     private final QrCodeModuleConfig config;
 
+    /**
+     * 使用二维码服务与模块配置创建路由。
+     *
+     * @param service 二维码生成与解码服务，不允许为 {@code null}
+     * @param config  路由配置（基础路径与上传限制），不允许为 {@code null}
+     * @throws NullPointerException 当 {@code service} 或 {@code config} 为 {@code null} 时抛出
+     */
     public QrCodeRoutes(QrCodeService service, QrCodeModuleConfig config) {
         this.service = Objects.requireNonNull(service, "service must not be null");
         this.config = Objects.requireNonNull(config, "config must not be null");
     }
 
+    /**
+     * 注册 render、base64 与 decode 三个二维码路由，并统一转译非法参数为 400 错误。
+     *
+     * @param app 待注册路由的 Javalin 实例，不允许为 {@code null}
+     * @throws NullPointerException 当 {@code app} 为 {@code null} 时抛出
+     */
     public void register(Javalin app) {
         Objects.requireNonNull(app, "app must not be null");
         app.post(config.getBasePath() + "/render", this::render);

@@ -23,6 +23,8 @@ public class AuthController {
 
     /**
      * 用 Javalin 编程式 API 注册路由（Javalin 无注解路由，这是原生方式）。
+     *
+     * @param app Javalin 应用实例
      */
     public void register(Javalin app) {
         app.post("/auth/login", this::login);
@@ -34,7 +36,9 @@ public class AuthController {
     }
 
     /**
-     * 登录：SubjectKit.login(AuthRequest)
+     * 登录：SubjectKit.login(AuthRequest)。
+     *
+     * @param ctx Javalin 请求上下文
      */
     public void login(Context ctx) {
         String userId = ctx.queryParam("userId");
@@ -54,7 +58,9 @@ public class AuthController {
     }
 
     /**
-     * 登出：SubjectKit.logout()
+     * 登出：SubjectKit.logout()。
+     *
+     * @param ctx Javalin 请求上下文
      */
     public void logout(Context ctx) {
         SubjectKit.logout();
@@ -62,7 +68,9 @@ public class AuthController {
     }
 
     /**
-     * 当前用户：SubjectKit.getPrincipal()
+     * 当前用户：SubjectKit.getPrincipal()。
+     *
+     * @param ctx Javalin 请求上下文
      */
     public void me(Context ctx) {
         AuthPrincipal principal = SubjectKit.getPrincipal();
@@ -79,7 +87,9 @@ public class AuthController {
     }
 
     /**
-     * 权限校验：SubjectKit.hasPermission()
+     * 权限校验：SubjectKit.hasPermission()。
+     *
+     * @param ctx Javalin 请求上下文
      */
     public void checkPermission(Context ctx) {
         String permission = ctx.queryParam("permission");
@@ -88,7 +98,9 @@ public class AuthController {
     }
 
     /**
-     * 角色校验：SubjectKit.hasRole()
+     * 角色校验：SubjectKit.hasRole()。
+     *
+     * @param ctx Javalin 请求上下文
      */
     public void checkRole(Context ctx) {
         String role = ctx.queryParam("role");
@@ -97,7 +109,9 @@ public class AuthController {
     }
 
     /**
-     * 登录状态：SubjectKit.isLogin()
+     * 登录状态：SubjectKit.isLogin()。
+     *
+     * @param ctx Javalin 请求上下文
      */
     public void status(Context ctx) {
         ctx.json(Map.of("login", SubjectKit.isLogin()));

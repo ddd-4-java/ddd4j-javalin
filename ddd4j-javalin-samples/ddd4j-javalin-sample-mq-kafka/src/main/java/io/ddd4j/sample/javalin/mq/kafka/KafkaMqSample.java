@@ -14,7 +14,7 @@ import io.javalin.Javalin;
 /**
  * ddd4j + Javalin + Kafka MQ 示例启动类。
  *
- * <h3>演示链路</h3>
+ * <h2>演示链路</h2>
  * <ol>
  *   <li>客户端 POST /orders 创建订单</li>
  *   <li>OrderApplicationService 创建 Order 聚合并发布 OrderCreatedEvent</li>
@@ -22,7 +22,7 @@ import io.javalin.Javalin;
  *   <li>Kafka 消费者拉取并调用 @MQEventListener 方法</li>
  * </ol>
  *
- * <h3>前置条件</h3>
+ * <h2>前置条件</h2>
  * <p>需要运行中的 Kafka Broker，默认连接 {@code localhost:9092}。
  * 可通过 {@code ddd4j.mq.kafka.bootstrap-servers} 环境变量修改。
  *

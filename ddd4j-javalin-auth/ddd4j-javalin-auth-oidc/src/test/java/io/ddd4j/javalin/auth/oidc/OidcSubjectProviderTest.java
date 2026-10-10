@@ -7,7 +7,7 @@ import io.ddd4j.core.subject.Subject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,7 +25,8 @@ class OidcSubjectProviderTest {
 
     @Test
     void shouldExposeVerifiedPrincipalOnlyInsideRequestScope() {
-        AuthPrincipal principal = new AuthPrincipal().setLoginId("user-42").setPerms(Set.of("order:read"));
+        AuthPrincipal principal = new AuthPrincipal().setLoginId("user-42")
+                .setPerms(Collections.singleton("order:read"));
         OidcSubjectProvider provider = new OidcSubjectProvider(token -> principal);
         Subject subject = provider.getSubject();
 

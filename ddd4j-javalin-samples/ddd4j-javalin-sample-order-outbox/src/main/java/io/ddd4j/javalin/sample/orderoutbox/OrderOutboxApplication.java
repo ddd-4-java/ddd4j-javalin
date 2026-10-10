@@ -21,6 +21,11 @@ public class OrderOutboxApplication {
 
     private static final String BASE_PACKAGE = "io.ddd4j.javalin.sample.orderoutbox";
 
+    /**
+     * 示例启动入口：装配 Guice 容器并启动 Javalin 应用。
+     *
+     * @param args 命令行参数（未使用）
+     */
     public static void main(String[] args) {
         OrderOutboxGuiceModule module = new OrderOutboxGuiceModule();
         Javalin app = Ddd4jJavalinApplication.run(args, BASE_PACKAGE, module);

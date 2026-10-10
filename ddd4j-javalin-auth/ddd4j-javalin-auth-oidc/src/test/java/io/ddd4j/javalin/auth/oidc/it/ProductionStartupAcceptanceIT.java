@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -39,6 +40,9 @@ import java.net.http.HttpResponse;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,8 +52,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-/** Phase D production startup acceptance across HTTP, OIDC, PostgreSQL, MQ and shared idempotency. */
+/**
+ * Phase D production startup acceptance across HTTP, OIDC, PostgreSQL, MQ and shared idempotency.
+ *
+ * <p>Keycloak / PostgreSQL / RabbitMQ 三个容器在测试方法内以 try-with-resources 手动启停；
+ * 类级 {@code @Testcontainers(disabledWithoutDocker = true)}：无 Docker 环境时整个测试类
+ * 自动跳过，不伪报通过。
+ */
 @Tag("integration")
+@Testcontainers(disabledWithoutDocker = true)
 class ProductionStartupAcceptanceIT {
 
     private static final String TOPIC = "ddd4j.production.acceptance";
@@ -59,6 +70,10 @@ class ProductionStartupAcceptanceIT {
     void shouldStartServeAndDrainProductionComposition() throws Exception {
         JdbcParticipant database = null;
         Javalin app = null;
+        // 测试镜像来源:
+        //   keycloak:   https://testcontainers.com/modules/keycloak/
+        //   postgresql: https://testcontainers.com/modules/postgresql/
+        //   rabbitmq:   https://testcontainers.com/modules/rabbitmq/
         try (KeycloakContainer keycloak = new KeycloakTestContainerFixture().newContainer();
              PostgreSQLContainer<?> postgres = new PostgresTestContainerFixture().newContainer();
              RabbitMQContainer rabbit = new RabbitMqTestContainerFixture().newContainer()) {
@@ -71,7 +86,7 @@ class ProductionStartupAcceptanceIT {
             OidcProperties oidc = OidcProperties.builder()
                     .issuer(issuer)
                     .jwksUri(URI.create(issuer + "/protocol/openid-connect/certs"))
-                    .audiences(Set.of("ddd4j-test-client"))
+                    .audiences(Collections.singleton("ddd4j-test-client"))
                     .build();
             OidcSubjectProvider provider = new OidcSubjectProvider(new NimbusOidcTokenVerifier(oidc));
 
@@ -97,7 +112,7 @@ class ProductionStartupAcceptanceIT {
                     new Ddd4jRabbitMqGuiceModule(new RabbitMQClient(rabbitProperties), rabbitProperties),
                     participantModule(database));
             OidcHttpAuthentication.register(app, provider,
-                    Set.of("/health", "/health/readiness", "/health/liveness"));
+                    new HashSet<>(Arrays.asList("/health", "/health/readiness", "/health/liveness")));
             app.post("/production", context -> context.result("accepted"));
 
             assertThat(get(app, "/health/readiness", null, null).statusCode()).isEqualTo(200);

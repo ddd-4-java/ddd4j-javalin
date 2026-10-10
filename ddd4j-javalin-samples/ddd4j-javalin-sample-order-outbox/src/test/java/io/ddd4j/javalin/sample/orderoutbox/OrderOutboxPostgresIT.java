@@ -14,14 +14,17 @@ import io.ddd4j.sample.order.jdbc.JdbcOrderTransactionPort;
 import io.ddd4j.sample.order.jdbc.JdbcOutboxPort;
 import io.ddd4j.sample.order.jdbc.TransactionalOutboxPublisher;
 import io.javalin.Javalin;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -30,8 +33,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.List;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,22 +48,29 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 通过 {@link OrderPostgresGuiceModule} + 注入的 {@link DataSource} 完成 Postgres 装配，
  * 然后走完整 create → publish → read round-trip：HTTP 写入订单与行（同事务落库订单表、
  * Outbox 表与读模型表），再调用 {@link TransactionalOutboxPublisher#publishPending(int)}
- * 发布待发送事件并断言数据库中的 PUBLISHED 状态。
+ * 发布待发送事件并断言数据库中的 PUBLISHED 状态；另覆盖 {@link OrderOutboxScheduler}
+ * 周期轮询自动投递的闭环（不手动触发发布，由调度器在默认 5 秒间隔内自行投递）。
+ *
+ * <p>类级 {@code @Testcontainers(disabledWithoutDocker = true)}：无 Docker 环境时整个
+ * 测试类自动跳过，不伪报通过（与仓库自有 {@code @JunitJupiterTestContainers} 叠加）。
  */
 @Tag("integration")
 @JunitJupiterTestContainers
+@Testcontainers(disabledWithoutDocker = true)
 class OrderOutboxPostgresIT extends JavalinTestFixture {
 
     private static final ObjectMapper JSON = new ObjectMapper();
 
+    // 测试镜像来源: https://testcontainers.com/modules/postgresql/
     @SuppressWarnings("resource")
+    @Container
     private static final PostgreSQLContainer<?> POSTGRES = new PostgresTestContainerFixture().newContainer();
 
     private static final AtomicBoolean SCHEMA_READY = new AtomicBoolean();
 
     @Override
     protected Module[] extraModules() {
-        POSTGRES.start();
+        // 容器已由 TestcontainersExtension 在 beforeAll 阶段静态启动，这里只需幂等建表
         ensureSchema();
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUrl(POSTGRES.getJdbcUrl());
@@ -82,12 +92,7 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
         injector.getInstance(OrderController.class).register(app);
     }
 
-    @AfterAll
-    static void tearDownContainer() {
-        if (POSTGRES.isRunning()) {
-            POSTGRES.stop();
-        }
-    }
+    // 容器启停交给 TestcontainersExtension（静态 @Container，afterAll 自动回收），无需手工 tearDown
 
     @BeforeEach
     void cleanDatabase() {
@@ -164,8 +169,8 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
         JdbcOrderTransactionPort transaction = new JdbcOrderTransactionPort(dataSource);
         JdbcOutboxPort outbox = new JdbcOutboxPort(transaction, JSON);
         OutboxMessage message = new OutboxMessage("retry-message", "retry-order", "RetryEvent",
-                java.util.Map.of("value", "retry"), Instant.now());
-        transaction.execute(() -> outbox.append(List.of(message)));
+                Collections.singletonMap("value", "retry"), Instant.now());
+        transaction.execute(() -> outbox.append(Collections.singletonList(message)));
         AtomicInteger attempts = new AtomicInteger();
         OutboxPublisher publisher = new OutboxPublisher(outbox, ignored -> {
             if (attempts.getAndIncrement() == 0) {
@@ -185,6 +190,58 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
         assertThat(outboxAttempts(dataSource, "retry-message")).isEqualTo(2);
     }
 
+    @Test
+    void shouldDeliverPendingOutboxThroughSchedulerPolling() throws Exception {
+        String runId = java.util.UUID.randomUUID().toString();
+        String orderNo = "ORDER-POLL-" + runId;
+        // 1. HTTP 创建订单 + 添加行：订单、Outbox（PENDING）与读模型仍在同一事务落库
+        HttpResponse<String> create = http(HttpRequest.newBuilder(url("/api/orders"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", OrderOutboxTestSupport.AUTHORIZATION)
+                .header("Idempotency-Key", "create-order-" + runId)
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        "{\"orderNo\":\"" + orderNo + "\",\"buyerId\":\"buyer-1\",\"buyerName\":\"Alice\"}"))
+                .build());
+        assertThat(create.statusCode()).withFailMessage(create.body()).isEqualTo(200);
+        String orderId = JSON.readTree(create.body()).path("data").path("id").asText();
+        HttpResponse<String> line = http(HttpRequest.newBuilder(url("/api/orders/" + orderId + "/lines"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", OrderOutboxTestSupport.AUTHORIZATION)
+                .header("Idempotency-Key", "add-order-line-" + runId)
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        "{\"goodsId\":\"goods-1\",\"goodsName\":\"DDD Book\",\"quantity\":2,\"unitPrice\":59.90}"))
+                .build());
+        assertThat(line.statusCode()).isEqualTo(200);
+
+        DataSource dataSource = injector.getInstance(DataSource.class);
+        // 轮询前置：两条集成事件均为 PENDING，尚无任何人手动触发发布
+        assertThat(countOutboxStatus(dataSource, "PENDING")).isEqualTo(2);
+
+        // 2. 启动周期调度器（默认 5 秒一轮），验证"无人手动触发"时的自主投递闭环
+        OrderOutboxScheduler scheduler = injector.getInstance(OrderOutboxScheduler.class);
+        scheduler.start();
+        try {
+            // 等待调度器自行轮询并投递（上限 30 秒，远大于默认 5 秒间隔）
+            long deadline = System.currentTimeMillis() + 30_000L;
+            while (System.currentTimeMillis() < deadline && countOutboxStatus(dataSource, "PENDING") > 0) {
+                Thread.sleep(200L);
+            }
+            // 3. 断言闭环：Outbox 全部 PUBLISHED，事件已进入录制发布器
+            assertThat(countOutboxStatus(dataSource, "PENDING")).isZero();
+            assertThat(countOutboxStatus(dataSource, "PUBLISHED")).isEqualTo(2);
+            RecordingIntegrationEventPublisher recording =
+                    injector.getInstance(RecordingIntegrationEventPublisher.class);
+            assertThat(recording.published()).hasSize(2)
+                    .extracting(OutboxMessage::eventType)
+                    .containsExactlyInAnyOrder(
+                            "io.ddd4j.sample.order.domain.event.OrderCreatedEvent",
+                            "io.ddd4j.sample.order.domain.event.OrderLineAddedEvent");
+        } finally {
+            // 无论断言成败都停止调度器，避免后台线程干扰后续用例与 TRUNCATE 清库
+            scheduler.stop();
+        }
+    }
+
     private static void ensureSchema() {
         if (!SCHEMA_READY.compareAndSet(false, true)) {
             return;
@@ -194,7 +251,7 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
                 POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
              Statement statement = connection.createStatement()) {
             for (String sql : schema.split(";")) {
-                if (!sql.isBlank()) {
+                if (!sql.trim().isEmpty()) {
                     statement.execute(sql.trim());
                 }
             }
@@ -204,11 +261,18 @@ class OrderOutboxPostgresIT extends JavalinTestFixture {
     }
 
     private static String readSchema() {
-        try (var input = OrderOutboxPostgresIT.class.getResourceAsStream("/db/schema.sql")) {
+        // JDK 8 兼容：不用 var 与 InputStream#readAllBytes（JDK 9+），手工搬运到内存
+        try (InputStream input = OrderOutboxPostgresIT.class.getResourceAsStream("/db/schema.sql")) {
             if (input == null) {
                 throw new IllegalStateException("Missing test resource /db/schema.sql");
             }
-            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            byte[] chunk = new byte[4096];
+            int read;
+            while ((read = input.read(chunk)) != -1) {
+                buffer.write(chunk, 0, read);
+            }
+            return new String(buffer.toByteArray(), StandardCharsets.UTF_8);
         } catch (Exception exception) {
             throw new IllegalStateException("Failed to read /db/schema.sql", exception);
         }

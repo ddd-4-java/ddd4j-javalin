@@ -24,10 +24,18 @@ public class Ddd4jLicenseJavalinModule extends AbstractAuthJavalinModule {
 
     private final LicenseProperties properties;
 
+    /**
+     * 无参构造：使用默认 {@link LicenseProperties}（从默认证书库路径校验）。
+     */
     public Ddd4jLicenseJavalinModule() {
         this(new LicenseProperties());
     }
 
+    /**
+     * 指定许可属性的构造。
+     *
+     * @param properties 许可校验属性（主题、证书别名、密钥库口令、证书路径等，不能为 {@code null}）
+     */
     public Ddd4jLicenseJavalinModule(LicenseProperties properties) {
         this.properties = properties;
     }

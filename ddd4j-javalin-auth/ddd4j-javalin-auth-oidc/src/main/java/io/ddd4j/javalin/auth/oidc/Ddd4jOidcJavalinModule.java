@@ -12,10 +12,21 @@ public final class Ddd4jOidcJavalinModule extends AbstractAuthJavalinModule {
     private final OidcTokenVerifier verifier;
     private final OidcSubjectProvider provider;
 
+    /**
+     * 使用默认 {@link NimbusOidcTokenVerifier} 验签器装配 OIDC。
+     *
+     * @param properties OIDC 配置（issuer、jwksUri、受众等）
+     */
     public Ddd4jOidcJavalinModule(OidcProperties properties) {
         this(properties, new NimbusOidcTokenVerifier(properties));
     }
 
+    /**
+     * 使用调用方提供的验签器装配 OIDC。
+     *
+     * @param properties OIDC 配置（issuer、jwksUri、受众等）
+     * @param verifier   自定义令牌验签器
+     */
     public Ddd4jOidcJavalinModule(OidcProperties properties, OidcTokenVerifier verifier) {
         this.properties = Objects.requireNonNull(properties, "properties must not be null");
         this.verifier = Objects.requireNonNull(verifier, "verifier must not be null");

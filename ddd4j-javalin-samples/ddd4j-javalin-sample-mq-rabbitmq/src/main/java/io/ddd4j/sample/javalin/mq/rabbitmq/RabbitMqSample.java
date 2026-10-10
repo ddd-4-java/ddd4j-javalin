@@ -14,7 +14,7 @@ import io.javalin.Javalin;
 /**
  * ddd4j + Javalin + RabbitMQ (AMQP) 示例启动类。
  *
- * <h3>演示链路</h3>
+ * <h2>演示链路</h2>
  * <ol>
  *   <li>客户端 POST /orders 创建订单</li>
  *   <li>OrderApplicationService 创建 Order 聚合并发布 OrderCreatedEvent</li>
@@ -22,7 +22,7 @@ import io.javalin.Javalin;
  *   <li>RabbitMQ 按 routingKey 路由到 Queue，消费者调用 @MQEventListener 方法</li>
  * </ol>
  *
- * <h3>前置条件</h3>
+ * <h2>前置条件</h2>
  * <p>需要运行中的 RabbitMQ Broker，默认连接 {@code localhost:5672}（guest/guest）。
  * 可通过环境变量 {@code DDD4J_MQ_RABBITMQ_HOST} / {@code DDD4J_MQ_RABBITMQ_PORT} 修改。
  *

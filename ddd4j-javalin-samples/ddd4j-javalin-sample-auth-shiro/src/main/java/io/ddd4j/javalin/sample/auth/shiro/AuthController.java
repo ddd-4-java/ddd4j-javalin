@@ -18,6 +18,11 @@ import java.util.Map;
 @ApplicationService
 public class AuthController {
 
+    /**
+     * 用 Javalin 编程式 API 注册路由（Javalin 无注解路由，这是原生方式）。
+     *
+     * @param app Javalin 应用实例
+     */
     public void register(Javalin app) {
         app.post("/auth/login", this::login);
         app.post("/auth/logout", this::logout);
@@ -27,6 +32,11 @@ public class AuthController {
         app.get("/auth/status", this::status);
     }
 
+    /**
+     * 登录：SubjectKit.login(AuthRequest)。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void login(Context ctx) {
         String userId = ctx.queryParam("userId");
         AuthPrincipal principal = new AuthPrincipal()
@@ -44,11 +54,21 @@ public class AuthController {
         ctx.json(result);
     }
 
+    /**
+     * 登出：SubjectKit.logout()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void logout(Context ctx) {
         SubjectKit.logout();
         ctx.json(Map.of("success", true));
     }
 
+    /**
+     * 当前用户：SubjectKit.getPrincipal()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void me(Context ctx) {
         AuthPrincipal principal = SubjectKit.getPrincipal();
         if (principal == null) {
@@ -62,18 +82,33 @@ public class AuthController {
         ctx.json(result);
     }
 
+    /**
+     * 权限校验：SubjectKit.hasPermission()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void checkPermission(Context ctx) {
         String permission = ctx.queryParam("permission");
         boolean has = SubjectKit.hasPermission(permission);
         ctx.json(Map.of("permission", permission, "has", has));
     }
 
+    /**
+     * 角色校验：SubjectKit.hasRole()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void checkRole(Context ctx) {
         String role = ctx.queryParam("role");
         boolean has = SubjectKit.hasRole(role);
         ctx.json(Map.of("role", role, "has", has));
     }
 
+    /**
+     * 登录状态：SubjectKit.isLogin()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void status(Context ctx) {
         ctx.json(Map.of("login", SubjectKit.isLogin()));
     }

@@ -43,7 +43,7 @@
         <maven-dockerfile-plugin.version>1.4.13</maven-dockerfile-plugin.version>
         <maven-swagger2markup-plugin.version>1.3.7</maven-swagger2markup-plugin.version>
 
-        <!-- Testcontainers 集成测试镜像版本（对齐 ddd4j-boot mq/README.md §13） -->
+        <!-- Testcontainers 集成测试镜像版本（统一 1.20.6，镜像/模块出处见 https://testcontainers.com/modules/） -->
         <testcontainers.version>1.20.6</testcontainers.version>
         <testcontainers-keycloak.version>3.7.0</testcontainers-keycloak.version>
         <wiremock-standalone.version>3.9.1</wiremock-standalone.version>
@@ -194,7 +194,7 @@
                 <version>${javax.servlet-api.version}</version>
             </dependency>
 
-            <!-- Testcontainers BOM（对齐 ddd4j-boot mq/README.md §13 的 1.20.6） -->
+            <!-- Testcontainers BOM（1.20.6，见 https://testcontainers.com/modules/） -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
@@ -202,7 +202,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- ddd4j 1.0.x 先管理了 Testcontainers 1.17.3；直接声明确保本项目统一覆盖为 1.20.6。 -->
+            <!-- 父 ddd4j-dependencies BOM 先管理了 Testcontainers 旧版本；直接声明确保本项目统一覆盖为 1.20.6。 -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers</artifactId>

@@ -12,17 +12,17 @@ import javax.sql.DataSource;
  * <p>对标 Spring Boot 的 MyBatis-Plus 自动装配（mybatis-plus-spring-boot-starter），
  * 在 Guice 容器中创建 MyBatis 基础设施，让 {@code BaseRepositoryImpl} 子类可用：
  * <ul>
- *   <li>{@link SqlSessionFactory} —— 基于 {@link DataSource} 创建，注册 MyBatis-Plus 分页插件</li>
- *   <li>{@link SqlSession} —— 运行时获取 Mapper 代理（替代 Spring 的 MapperScanner）</li>
- *   <li>{@link TypeHandlerRegistry} —— MyBatis 类型处理器注册表（绑定到 core SPI）</li>
+ *   <li>{@link org.apache.ibatis.session.SqlSessionFactory} —— 基于 {@link DataSource} 创建，注册 MyBatis-Plus 分页插件</li>
+ *   <li>{@link org.apache.ibatis.session.SqlSession} —— 运行时获取 Mapper 代理（替代 Spring 的 MapperScanner）</li>
+ *   <li>{@link org.apache.ibatis.type.TypeHandlerRegistry} —— MyBatis 类型处理器注册表（绑定到 core SPI）</li>
  * </ul>
  *
- * <p>对标 Spring 的 {@code RepositoryBeanPostProcessor}：业务方的 {@code BaseRepositoryImpl}
- * 子类通过 {@link #bindRepository(Class, Class)} 声明，Module 自动从 SqlSession 获取 Mapper 代理
- * 并注入到 Repository 实例。由于 Guice 无 BeanPostProcessor，Mapper 注入在
- * {@link #initRepositories(Injector)} 中显式完成（Injector 创建后调用一次）。
+     * <p>对标 Spring 的 {@code RepositoryBeanPostProcessor}：业务方的 {@code BaseRepositoryImpl}
+     * 子类通过 {@link #bindRepository(Class, Class)} 声明，Module 自动从 SqlSession 获取 Mapper 代理
+     * 并注入到 Repository 实例。由于 Guice 无 BeanPostProcessor，Mapper 注入在
+     * {@code initRepositories(Injector)} 中显式完成（Injector 创建后调用一次）。
  *
- * <h3>使用方式</h3>
+ * <h2>使用方式</h2>
  * <pre>{@code
  * DataSource ds = ...;  // 业务方提供（如 HikariCP）
  * Ddd4jMybatisJavalinModule module = new Ddd4jMybatisJavalinModule(ds)
@@ -38,7 +38,9 @@ import javax.sql.DataSource;
 public class Ddd4jMybatisJavalinModule extends Ddd4jMybatisGuiceModule {
 
     /**
-     * @param dataSource 数据源（业务方提供，如 HikariCP / Druid）
+     * 使用业务方提供的数据源创建 MyBatis 装配模块。
+     *
+     * @param dataSource 数据源（业务方提供，如 HikariCP / Druid），不允许为 {@code null}
      */
     public Ddd4jMybatisJavalinModule(DataSource dataSource) {
         super(dataSource);
@@ -58,7 +60,7 @@ public class Ddd4jMybatisJavalinModule extends Ddd4jMybatisGuiceModule {
     /**
      * 绑定一个 {@code BaseRepositoryImpl} 子类到其所需的 Mapper 接口。
      *
-     * <p>对标 Spring 的 {@code RepositoryBeanPostProcessor}：{@link #initRepositories(Injector)}
+     * <p>对标 Spring 的 {@code RepositoryBeanPostProcessor}：{@code initRepositories(Injector)}
      * 会实例化 Repository，从 SqlSession 获取 Mapper 代理并通过 {@code setMapper} 注入。
      *
      * @param repositoryImpl  Repository 实现类（BaseRepositoryImpl 子类）

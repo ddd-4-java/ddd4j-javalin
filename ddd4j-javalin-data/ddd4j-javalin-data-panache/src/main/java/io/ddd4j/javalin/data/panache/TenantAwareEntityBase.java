@@ -146,6 +146,14 @@ public abstract class TenantAwareEntityBase extends PanacheEntityBase {
 
     /**
      * 使用 Panache {@link Parameters} 的分页重载。
+     *
+     * @param query    HQL 查询语句（含 {@code from ... where ...}）
+     * @param params   命名参数
+     * @param sort     排序
+     * @param page     页码（从 1 开始）
+     * @param pageSize 每页条数
+     * @param <T>      实体泛型
+     * @return 分页结果
      */
     public static <T extends TenantAwareEntityBase> Page<T> toPage(String query, Parameters params, Sort sort, long page, long pageSize) {
         return toPage(query, params.map(), sort, page, pageSize);

@@ -12,7 +12,7 @@
 
 ```bash
 # 启动 Kafka（使用 Docker）
-docker run -d --name kafka -p 9092:9092 apache/kafka:latest
+docker run -d --name kafka -p 9092:9092 apache/kafka:3.9.2  # 钉版，禁止 latest
 
 # 或通过环境变量指定 Broker 地址
 export DDD4J_MQ_KAFKA_BOOTSTRAP_SERVERS=your-kafka-broker:9092

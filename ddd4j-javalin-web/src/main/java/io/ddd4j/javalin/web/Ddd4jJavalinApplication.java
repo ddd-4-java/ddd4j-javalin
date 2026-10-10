@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * <p>The {@code run} method wires:
  * <ol>
- *   <li>{@link Ddd4jGuiceModule} + {@link DddAnnotationModule} (base SPI + DDD annotation
+ *   <li>{@link Ddd4jCoreGuiceModule} + {@link DddAnnotationModule} (base SPI + DDD annotation
  *       scanning over the supplied base packages)</li>
  *   <li>{@link Ddd4jJavalinAutoConfiguration} (web layer assembly)</li>
  *   <li>Any additional {@link Module}s passed by the caller (auth, data, mq, …)</li>

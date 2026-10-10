@@ -144,15 +144,15 @@ gpg --verify target/staging/io/ddd4j/javalin/ddd4j-javalin-core/1.0.0/ddd4j-java
 
 发布前逐项确认：
 
-- [ ] **核心依赖已收敛**：`ddd4j` 父 POM `2.0.x.*` 为正式版（非 SNAPSHOT）——参见「首个正式版阻塞项」
-- [ ] **`mvn clean verify` 全绿**：56 模块单元测试 + 10 个容器级 IT 全部通过
-- [ ] **版本号已更新**：`<revision>` 从 SNAPSHOT 改为正式版号
-- [ ] **GPG 密钥就绪**：本地或 CI 环境可签名
-- [ ] **`settings.xml` 已配置**：`central` 和/或 `codeup` 仓库凭证
-- [ ] **CHANGELOG 已更新**：记录自上个版本以来的变更
-- [ ] **`release` profile 可激活**：`./mvnw help:all-profiles | grep release` 确认存在
-- [ ] **本地 staging 验证通过**：构件完整、签名有效
-- [ ] **远端仓库可连通**：`curl -I https://oss.sonatype.org` 无超时
+- [ ] **核心依赖已收敛**：`ddd4j` 父 POM `2.0.x.*` 为正式版（非 SNAPSHOT）——参见「首个正式版阻塞项」【外部阻塞: 等上游 ddd4j 正式版（非 SNAPSHOT）发布，当前 ddd4j.version=1.0.x.20260630-SNAPSHOT】
+- [ ] **`mvn clean verify` 全绿**：56 模块单元测试 + 10 个容器级 IT 全部通过【外部阻塞: 需执行 mvn clean verify 全量验证（禁 mvn）】
+- [ ] **版本号已更新**：`<revision>` 从 SNAPSHOT 改为正式版号【待办】
+- [ ] **GPG 密钥就绪**：本地或 CI 环境可签名【外部阻塞: GPG 密钥就绪需本地或 CI 环境配置】
+- [ ] **`settings.xml` 已配置**：`central` 和/或 `codeup` 仓库凭证【外部阻塞: settings.xml 需配置 central/codeup 仓库凭证】
+- [ ] **CHANGELOG 已更新**：记录自上个版本以来的变更【待办】
+- [x] **`release` profile 可激活**：`./mvnw help:all-profiles | grep release` 确认存在（证据: pom.xml:457 存在 <id>release</id> profile）
+- [ ] **本地 staging 验证通过**：构件完整、签名有效【外部阻塞: 需本地 staging 发布与签名验证（mvn+GPG，禁 mvn）】
+- [ ] **远端仓库可连通**：`curl -I https://oss.sonatype.org` 无超时【外部阻塞: 需外网连通 oss.sonatype.org 验证】
 
 ---
 

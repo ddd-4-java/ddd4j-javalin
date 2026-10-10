@@ -1,5 +1,11 @@
 package io.ddd4j.javalin.data.mybatis;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import java.util.Objects;
+
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.Data;
@@ -101,9 +107,57 @@ public class TestUserRepository {
     /**
      * Minimal Page wrapper (mirrors the {@code Page<T>} contract).
      */
-    public record Page<T>(List<T> records, long total) {
+    public final static class Page<T> {
+
+        private static final long serialVersionUID = 0L;
+
+        private final List<T> records;
+
+        private final long total;
+
         public List<T> getRecords() {
             return records;
+        }
+
+        @JsonCreator()
+        public Page(@JsonProperty("records") List<T> records, @JsonProperty("total") long total) {
+            this.records = records;
+            this.total = total;
+        }
+
+        @JsonProperty("records")
+        public List<T> records() {
+            return records;
+        }
+
+        @JsonProperty("total")
+        public long total() {
+            return total;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (Objects.isNull(obj) || getClass() != obj.getClass()) {
+                return false;
+            }
+            Page<?> other = (Page<?>) obj;
+            return Objects.equals(this.records, other.records) && this.total == other.total;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + Objects.hashCode(records);
+            result = 31 * result + Long.hashCode(total);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "Page[records=" + records + ", total=" + total + "]";
         }
     }
 }

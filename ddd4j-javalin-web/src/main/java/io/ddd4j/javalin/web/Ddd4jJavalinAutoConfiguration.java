@@ -64,7 +64,7 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
      * @param sharedIdempotencyGuard 跨实例共享的幂等 Guard；仅 SHARED 部署模式下必填，可为 {@code null}
      */
     public Ddd4jJavalinAutoConfiguration(Ddd4jJavalinProperties properties,
-                                          IdempotencyGuard sharedIdempotencyGuard) {
+                                         IdempotencyGuard sharedIdempotencyGuard) {
         this.properties = Objects.requireNonNull(properties, "properties must not be null");
         this.sharedIdempotencyGuard = sharedIdempotencyGuard;
     }
@@ -114,8 +114,8 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     @Provides
     @Singleton
     Ddd4jJavalinWeb ddd4jJavalinWeb(WebRequestContextFactory contextFactory,
-                                     WebRequestLifecycle lifecycle,
-                                     WebExceptionTranslator translator) {
+                                    WebRequestLifecycle lifecycle,
+                                    WebExceptionTranslator translator) {
         // Guard so this @Provides is skipped when the web layer is disabled; otherwise
         // Guice eagerly resolves all parameter types during injector creation.
         if (!properties.isEnabled()) {

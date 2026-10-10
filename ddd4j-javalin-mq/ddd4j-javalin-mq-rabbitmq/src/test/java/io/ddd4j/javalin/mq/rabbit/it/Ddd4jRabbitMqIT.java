@@ -138,7 +138,9 @@ class Ddd4jRabbitMqIT extends AbstractMqIntegrationTest<RabbitMQProperties, Rabb
         }
     }
 
-    /** Listener used to prove that storage failure is nacked and redelivered before business handling. */
+    /**
+     * Listener used to prove that storage failure is nacked and redelivered before business handling.
+     */
     public static class RedeliveryListener {
 
         final AtomicReference<MQEvent> received = new AtomicReference<>();

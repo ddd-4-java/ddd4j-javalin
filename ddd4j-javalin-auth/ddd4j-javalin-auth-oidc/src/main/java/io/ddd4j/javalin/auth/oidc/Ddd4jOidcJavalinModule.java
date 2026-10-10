@@ -5,7 +5,9 @@ import io.ddd4j.javalin.auth.AbstractAuthJavalinModule;
 
 import java.util.Objects;
 
-/** 将通用 OIDC 验签器和只读 SubjectProvider 装配进 Guice。 */
+/**
+ * 将通用 OIDC 验签器和只读 SubjectProvider 装配进 Guice。
+ */
 public final class Ddd4jOidcJavalinModule extends AbstractAuthJavalinModule {
 
     private final OidcProperties properties;

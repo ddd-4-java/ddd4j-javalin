@@ -47,9 +47,9 @@ public class Ddd4jJavalinWeb {
      * @throws NullPointerException 当任一必填依赖为 {@code null} 时抛出
      */
     public Ddd4jJavalinWeb(WebRequestContextFactory contextFactory,
-                            WebRequestLifecycle lifecycle,
-                            WebExceptionTranslator translator,
-                            WebIdempotencyLifecycle idempotencyLifecycle) {
+                           WebRequestLifecycle lifecycle,
+                           WebExceptionTranslator translator,
+                           WebIdempotencyLifecycle idempotencyLifecycle) {
         this.contextFactory = Objects.requireNonNull(contextFactory);
         this.lifecycle = Objects.requireNonNull(lifecycle);
         this.translator = Objects.requireNonNull(translator);

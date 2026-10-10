@@ -6,7 +6,9 @@ import io.javalin.Javalin;
 
 import java.util.Objects;
 
-/** 注册不暴露异常和凭证的 Javalin 健康检查路由。 */
+/**
+ * 注册不暴露异常和凭证的 Javalin 健康检查路由。
+ */
 public final class Ddd4jJavalinReadinessRoutes {
 
     private Ddd4jJavalinReadinessRoutes() {

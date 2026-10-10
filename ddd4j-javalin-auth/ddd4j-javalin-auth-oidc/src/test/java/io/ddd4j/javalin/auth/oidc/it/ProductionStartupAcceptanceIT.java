@@ -220,7 +220,9 @@ class ProductionStartupAcceptanceIT {
         }
 
         @Override
-        public int order() { return 50; }
+        public int order() {
+            return 50;
+        }
 
         @Override
         public void validate() {
@@ -234,7 +236,8 @@ class ProductionStartupAcceptanceIT {
         }
 
         @Override
-        public void start() { }
+        public void start() {
+        }
 
         @Override
         public ReadinessResult readiness() {

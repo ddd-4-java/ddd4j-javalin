@@ -9,7 +9,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** MyBatis repository initialization and resource cleanup contracts. */
+/**
+ * MyBatis repository initialization and resource cleanup contracts.
+ */
 class MybatisRepositoryLifecycleParticipantTest {
 
     @Test

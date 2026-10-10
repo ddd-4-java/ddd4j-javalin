@@ -71,7 +71,8 @@ gpg --export-secret-keys <KEY_ID> | base64 > gpg-key.txt
 
 ### 发布仓库配置
 
-根 `pom.xml` 已通过 `distributionManagement` 配置 `central`（OSSRH）和 `codeup` 两个发布仓库。确认 `server.id` 与 `repository.id` 一致。
+根 `pom.xml` 已通过 `distributionManagement` 配置 `central`（OSSRH）和 `codeup` 两个发布仓库。确认 `server.id` 与
+`repository.id` 一致。
 
 ---
 
@@ -81,12 +82,12 @@ gpg --export-secret-keys <KEY_ID> | base64 > gpg-key.txt
 
 本仓库使用 Maven CI-friendly 版本号（`${revision}`），配合 `flatten-maven-plugin` 打平 POM：
 
-| 阶段 | `${revision}` 值 | 说明 |
-|------|------------------|------|
-| 开发中 | `1.0.x.20260630-SNAPSHOT` | 当前状态 |
-| RC | `1.0.0-rc1` | 发布候选 |
-| 正式版 | `1.0.0` | Maven Central 发布 |
-| 下一迭代 | `1.0.1-SNAPSHOT` | 正式版发布后立即设置 |
+| 阶段     | `${revision}` 值          | 说明                 |
+|----------|---------------------------|----------------------|
+| 开发中   | `1.0.x.20260630-SNAPSHOT` | 当前状态             |
+| RC       | `1.0.0-rc1`               | 发布候选             |
+| 正式版   | `1.0.0`                   | Maven Central 发布   |
+| 下一迭代 | `1.0.1-SNAPSHOT`          | 正式版发布后立即设置 |
 
 ### SNAPSHOT 转正式版步骤
 
@@ -162,19 +163,25 @@ gpg --verify target/staging/io/ddd4j/javalin/ddd4j-javalin-core/1.0.0/ddd4j-java
 
 ### 阻塞项 1：核心依赖 SNAPSHOT 收敛
 
-**现状**：根 `pom.xml` 的父 POM `ddd4j-parent:2.0.x.20260630-SNAPSHOT` 为快照版本。Maven Central 拒绝接受依赖 SNAPSHOT 的正式版构件。
+**现状**：根 `pom.xml` 的父 POM `ddd4j-parent:2.0.x.20260630-SNAPSHOT` 为快照版本。Maven Central 拒绝接受依赖 SNAPSHOT
+的正式版构件。
 
 **解决路径**：
+
 1. 在 `ddd4j` 核心仓库（`feature/2.0.x`）完成 SNAPSHOT → 正式版发布
 2. 或：在本仓库 `pom.xml` 中将 `<parent>` 版本锁定为已发布的正式版号
 
-**关联**：核心仓库 `feature/1.0.x` 远端分叉问题（10 个 MQ 重构提交走 javax 方向 vs 本地修复走 jakarta）需先裁决——这是核心依赖收敛的前提。参见 [superpowers 状态报告](docs/superpowers/reports/2026-08-05-status.md) 已知遗留 #2。
+**关联**：核心仓库 `feature/1.0.x` 远端分叉问题（10 个 MQ 重构提交走 javax 方向 vs 本地修复走
+jakarta）需先裁决——这是核心依赖收敛的前提。参见 [superpowers 状态报告](docs/superpowers/reports/2026-08-05-status.md) 已知遗留
+#2。
 
 ### 阻塞项 2：手工 m2 jar 消除
 
-**现状**：核心仓库 commit `38b0e6d6` 的修复（ActiveMQ JMS 属性名 sanitize、Artemis MessageID 前缀等）仅存在于本地，通过手工安装到 `~/.m2/repository` 生效。构建不可复现。
+**现状**：核心仓库 commit `38b0e6d6` 的修复（ActiveMQ JMS 属性名 sanitize、Artemis MessageID 前缀等）仅存在于本地，通过手工安装到
+`~/.m2/repository` 生效。构建不可复现。
 
 **解决路径**：
+
 1. 核心仓库远端分叉裁决后，将修复合并到正式分支
 2. 发布 `ddd4j` 核心正式版，本仓库自动拉取
 
@@ -199,14 +206,14 @@ on:
 
 发布 workflow 需要以下 GitHub Secrets：
 
-| Secret | 用途 |
-|--------|------|
-| `GPG_PRIVATE_KEY` | GPG 私钥（Base64） |
-| `GPG_PASSPHRASE` | GPG 密码 |
+| Secret             | 用途                  |
+|--------------------|-----------------------|
+| `GPG_PRIVATE_KEY`  | GPG 私钥（Base64）    |
+| `GPG_PASSPHRASE`   | GPG 密码              |
 | `CENTRAL_USERNAME` | Sonatype OSSRH 用户名 |
-| `CENTRAL_PASSWORD` | Sonatype OSSRH 密码 |
-| `CODEUP_USERNAME` | 阿里云 Codeup 用户名 |
-| `CODEUP_TOKEN` | 阿里云 Codeup Token |
+| `CENTRAL_PASSWORD` | Sonatype OSSRH 密码   |
+| `CODEUP_USERNAME`  | 阿里云 Codeup 用户名  |
+| `CODEUP_TOKEN`     | 阿里云 Codeup Token   |
 
 ---
 

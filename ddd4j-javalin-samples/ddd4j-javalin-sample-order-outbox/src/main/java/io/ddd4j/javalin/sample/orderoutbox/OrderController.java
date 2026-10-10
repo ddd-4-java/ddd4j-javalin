@@ -1,5 +1,9 @@
 package io.ddd4j.javalin.sample.orderoutbox;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import com.google.inject.Inject;
 import io.ddd4j.core.api.R;
 import io.ddd4j.sample.order.application.AddOrderLineCommand;
@@ -84,22 +88,184 @@ public class OrderController {
 
     /**
      * 创建订单请求载荷。
-     *
-     * @param orderNo   订单号
-     * @param buyerId   买家 ID
-     * @param buyerName 买家名称
      */
-    public record CreateOrderRequest(String orderNo, String buyerId, String buyerName) {
+    public final static class CreateOrderRequest {
+
+        private static final long serialVersionUID = 0L;
+
+        private final String orderNo;
+
+        private final String buyerId;
+
+        private final String buyerName;
+
+        /**
+         * 构造创建订单请求。
+         *
+         * @param orderNo   订单号
+         * @param buyerId   买家 ID
+         * @param buyerName 买家名称
+         */
+        @JsonCreator()
+        public CreateOrderRequest(@JsonProperty("orderNo") String orderNo, @JsonProperty("buyerId") String buyerId, @JsonProperty("buyerName") String buyerName) {
+            this.orderNo = orderNo;
+            this.buyerId = buyerId;
+            this.buyerName = buyerName;
+        }
+
+        /**
+         * 返回订单号。
+         *
+         * @return 订单号
+         */
+        @JsonProperty("orderNo")
+        public String orderNo() {
+            return orderNo;
+        }
+
+        /**
+         * 返回买家 ID。
+         *
+         * @return 买家 ID
+         */
+        @JsonProperty("buyerId")
+        public String buyerId() {
+            return buyerId;
+        }
+
+        /**
+         * 返回买家名称。
+         *
+         * @return 买家名称
+         */
+        @JsonProperty("buyerName")
+        public String buyerName() {
+            return buyerName;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (Objects.isNull(obj) || getClass() != obj.getClass()) {
+                return false;
+            }
+            CreateOrderRequest other = (CreateOrderRequest) obj;
+            return Objects.equals(this.orderNo, other.orderNo) && Objects.equals(this.buyerId, other.buyerId) && Objects.equals(this.buyerName, other.buyerName);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + Objects.hashCode(orderNo);
+            result = 31 * result + Objects.hashCode(buyerId);
+            result = 31 * result + Objects.hashCode(buyerName);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "CreateOrderRequest[orderNo=" + orderNo + ", buyerId=" + buyerId + ", buyerName=" + buyerName + "]";
+        }
     }
 
     /**
      * 添加订单行请求载荷。
-     *
-     * @param goodsId   商品 ID
-     * @param goodsName 商品名称
-     * @param quantity  数量
-     * @param unitPrice 单价
      */
-    public record AddOrderLineRequest(String goodsId, String goodsName, int quantity, BigDecimal unitPrice) {
+    public final static class AddOrderLineRequest {
+
+        private static final long serialVersionUID = 0L;
+
+        private final String goodsId;
+
+        private final String goodsName;
+
+        private final int quantity;
+
+        private final BigDecimal unitPrice;
+
+        /**
+         * 构造添加订单行请求。
+         *
+         * @param goodsId   商品 ID
+         * @param goodsName 商品名称
+         * @param quantity  数量
+         * @param unitPrice 单价
+         */
+        @JsonCreator()
+        public AddOrderLineRequest(@JsonProperty("goodsId") String goodsId, @JsonProperty("goodsName") String goodsName, @JsonProperty("quantity") int quantity, @JsonProperty("unitPrice") BigDecimal unitPrice) {
+            this.goodsId = goodsId;
+            this.goodsName = goodsName;
+            this.quantity = quantity;
+            this.unitPrice = unitPrice;
+        }
+
+        /**
+         * 返回商品 ID。
+         *
+         * @return 商品 ID
+         */
+        @JsonProperty("goodsId")
+        public String goodsId() {
+            return goodsId;
+        }
+
+        /**
+         * 返回商品名称。
+         *
+         * @return 商品名称
+         */
+        @JsonProperty("goodsName")
+        public String goodsName() {
+            return goodsName;
+        }
+
+        /**
+         * 返回数量。
+         *
+         * @return 数量
+         */
+        @JsonProperty("quantity")
+        public int quantity() {
+            return quantity;
+        }
+
+        /**
+         * 返回单价。
+         *
+         * @return 单价
+         */
+        @JsonProperty("unitPrice")
+        public BigDecimal unitPrice() {
+            return unitPrice;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (Objects.isNull(obj) || getClass() != obj.getClass()) {
+                return false;
+            }
+            AddOrderLineRequest other = (AddOrderLineRequest) obj;
+            return Objects.equals(this.goodsId, other.goodsId) && Objects.equals(this.goodsName, other.goodsName) && this.quantity == other.quantity && Objects.equals(this.unitPrice, other.unitPrice);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + Objects.hashCode(goodsId);
+            result = 31 * result + Objects.hashCode(goodsName);
+            result = 31 * result + Integer.hashCode(quantity);
+            result = 31 * result + Objects.hashCode(unitPrice);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "AddOrderLineRequest[goodsId=" + goodsId + ", goodsName=" + goodsName + ", quantity=" + quantity + ", unitPrice=" + unitPrice + "]";
+        }
     }
 }

@@ -1,6 +1,8 @@
 package io.ddd4j.javalin.core.lifecycle;
 
-/** ddd4j-javalin 运行时状态。 */
+/**
+ * ddd4j-javalin 运行时状态。
+ */
 public enum JavalinRuntimeState {
     /** 已创建但尚未启动。 */
     NEW,

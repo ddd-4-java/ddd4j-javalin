@@ -6,6 +6,7 @@ import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.redisstream.RedisStreamMQClient;
 import io.ddd4j.mq.redisstream.RedisStreamMQProperties;
+
 import java.util.Objects;
 
 /**

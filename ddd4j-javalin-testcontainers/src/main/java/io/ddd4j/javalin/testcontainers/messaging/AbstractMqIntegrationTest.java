@@ -46,7 +46,9 @@ import static org.awaitility.Awaitility.await;
  */
 public abstract class AbstractMqIntegrationTest<P extends MQProperties, C extends MQClient> {
 
-    /** 统一 smoke tag。 */
+    /**
+     * 统一 smoke tag。
+     */
     protected static final String TAG = "smoke";
 
     /**

@@ -6,7 +6,9 @@ import io.ddd4j.data.mybatis.repository.impl.BaseRepositoryImpl;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/** 使用真实 ddd4j BaseRepositoryImpl 的测试仓储。 */
+/**
+ * 使用真实 ddd4j BaseRepositoryImpl 的测试仓储。
+ */
 public class TestUserRepository extends BaseRepositoryImpl<
         TestUserMapper,
         TestUserRepository.TestUserModel,

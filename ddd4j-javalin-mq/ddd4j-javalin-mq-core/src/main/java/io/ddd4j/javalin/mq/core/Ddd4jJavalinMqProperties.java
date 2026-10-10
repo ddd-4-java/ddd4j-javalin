@@ -3,12 +3,16 @@ package io.ddd4j.javalin.mq.core;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Javalin MQ 生命周期策略。 */
+/**
+ * Javalin MQ 生命周期策略。
+ */
 @Getter
 @Setter
 public class Ddd4jJavalinMqProperties {
 
-    /** 应用使用 MQ 的角色。 */
+    /**
+     * 应用使用 MQ 的角色。
+     */
     public enum Role {
         /** 仅生产：启动时不扫描监听器，生命周期只维护生产端资源。 */
         PRODUCER_ONLY,

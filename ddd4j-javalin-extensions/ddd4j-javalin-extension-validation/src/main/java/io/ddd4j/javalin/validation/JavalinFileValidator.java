@@ -30,7 +30,7 @@ public final class JavalinFileValidator {
      * 校验单个 Javalin 上传文件，失败时转换为 HTTP 400。
      *
      * @param uploadedFile 上传文件
-     * @param policy 校验策略
+     * @param policy       校验策略
      * @return 原上传文件
      */
     public UploadedFile validate(UploadedFile uploadedFile, FileValidationPolicy policy) {
@@ -47,7 +47,7 @@ public final class JavalinFileValidator {
      * 校验一组 Javalin 上传文件。
      *
      * @param uploadedFiles 上传文件列表
-     * @param policy 校验策略
+     * @param policy        校验策略
      * @return 原上传文件列表
      */
     public List<UploadedFile> validateAll(List<UploadedFile> uploadedFiles, FileValidationPolicy policy) {

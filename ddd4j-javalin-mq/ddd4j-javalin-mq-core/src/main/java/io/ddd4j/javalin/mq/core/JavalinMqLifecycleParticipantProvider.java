@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/** 构造具有当前 Injector 和扫描包上下文的 MQ 生命周期参与者。 */
+/**
+ * 构造具有当前 Injector 和扫描包上下文的 MQ 生命周期参与者。
+ */
 final class JavalinMqLifecycleParticipantProvider implements Provider<JavalinMqLifecycleParticipant> {
 
     private final Injector injector;

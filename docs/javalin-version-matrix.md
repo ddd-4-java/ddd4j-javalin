@@ -2,11 +2,11 @@
 
 本矩阵是 2026-09-07 三分支收敛后的构建契约。分支版本、上游 ddd4j、Javalin、Maven 模型和 JDK 必须整组变更，不能单独漂移。
 
-| ddd4j-javalin 分支 | 本项目版本 | ddd4j 分支 / 版本 | Javalin | Maven Wrapper | POM 模型 / 聚合元素 | 构建 JDK |
-|---|---|---|---|---|---|---|
-| `feature/6.7.x` | `6.7.x.20260630-SNAPSHOT` | `feature/1.0.x` / `1.0.x.20260630-SNAPSHOT` | `6.7.0` | Maven `3.9.16` | `4.0.0` / `<modules>` | 17 |
-| `feature/7.1.x` | `7.1.x.20260630-SNAPSHOT` | `feature/2.0.x` / `2.0.x.20260630-SNAPSHOT` | `7.1.0` | Maven `3.9.16` | `4.0.0` / `<modules>` | 17 |
-| `feature/7.2.x` | `7.2.x.20260630-SNAPSHOT` | `feature/3.0.x` / `3.0.x.20260630-SNAPSHOT` | `7.2.3` | Maven `4.0.0-rc-6` | `4.1.0` / `<subprojects>` | 21 |
+| ddd4j-javalin 分支 | 本项目版本                | ddd4j 分支 / 版本                           | Javalin | Maven Wrapper      | POM 模型 / 聚合元素       | 构建 JDK |
+|--------------------|---------------------------|---------------------------------------------|---------|--------------------|---------------------------|----------|
+| `feature/6.7.x`    | `6.7.x.20260630-SNAPSHOT` | `feature/1.0.x` / `1.0.x.20260630-SNAPSHOT` | `6.7.0` | Maven `3.9.16`     | `4.0.0` / `<modules>`     | 17       |
+| `feature/7.1.x`    | `7.1.x.20260630-SNAPSHOT` | `feature/2.0.x` / `2.0.x.20260630-SNAPSHOT` | `7.1.0` | Maven `3.9.16`     | `4.0.0` / `<modules>`     | 17       |
+| `feature/7.2.x`    | `7.2.x.20260630-SNAPSHOT` | `feature/3.0.x` / `3.0.x.20260630-SNAPSHOT` | `7.2.3` | Maven `4.0.0-rc-6` | `4.1.0` / `<subprojects>` | 21       |
 
 ## Maven 兼容边界
 

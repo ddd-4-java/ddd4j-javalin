@@ -1,5 +1,9 @@
 package io.ddd4j.javalin.mq.core;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import com.google.inject.Injector;
 import io.ddd4j.kit.lang.StrKit;
 import io.ddd4j.mq.annotation.MQEventListener;
@@ -74,6 +78,62 @@ public final class JavalinMqListenerScanner {
         return List.copyOf(listeners);
     }
 
-    private record ListenerMethod(Class<?> type, Method method, MQEventListener annotation) {
+    private final static class ListenerMethod {
+
+        private static final long serialVersionUID = 0L;
+
+        private final Class<?> type;
+
+        private final Method method;
+
+        private final MQEventListener annotation;
+
+        @JsonCreator()
+        private ListenerMethod(@JsonProperty("type") Class<?> type, @JsonProperty("method") Method method, @JsonProperty("annotation") MQEventListener annotation) {
+            this.type = type;
+            this.method = method;
+            this.annotation = annotation;
+        }
+
+        @JsonProperty("type")
+        public Class<?> type() {
+            return type;
+        }
+
+        @JsonProperty("method")
+        public Method method() {
+            return method;
+        }
+
+        @JsonProperty("annotation")
+        public MQEventListener annotation() {
+            return annotation;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (Objects.isNull(obj) || getClass() != obj.getClass()) {
+                return false;
+            }
+            ListenerMethod other = (ListenerMethod) obj;
+            return Objects.equals(this.type, other.type) && Objects.equals(this.method, other.method) && Objects.equals(this.annotation, other.annotation);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + Objects.hashCode(type);
+            result = 31 * result + Objects.hashCode(method);
+            result = 31 * result + Objects.hashCode(annotation);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "ListenerMethod[type=" + type + ", method=" + method + ", annotation=" + annotation + "]";
+        }
     }
 }

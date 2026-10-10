@@ -1,5 +1,9 @@
 package io.ddd4j.mq.tdmq;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.ddd4j.kit.lang.StrKit;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.MQProperties;
@@ -183,11 +187,11 @@ public class TdmqMQClient implements MQClient {
         /**
          * 发布消息。
          *
-         * @param topic    物理 topic（含 namespace 前缀）
-         * @param tag      tag，可为 null
+         * @param topic 物理 topic（含 namespace 前缀）
+         * @param tag tag，可为 null
          * @param tenantId 租户 ID
-         * @param key      业务 Key
-         * @param payload  序列化字节流
+         * @param key 业务 Key
+         * @param payload 序列化字节流
          */
         void publish(String topic, String tag, String tenantId, String key, byte[] payload);
     }
@@ -201,9 +205,9 @@ public class TdmqMQClient implements MQClient {
         /**
          * 订阅。
          *
-         * @param topic          物理 topic
-         * @param tagExpression  tag 表达式
-         * @param group          订阅组
+         * @param topic 物理 topic
+         * @param tagExpression tag 表达式
+         * @param group 订阅组
          * @param messageHandler 消息处理器（messageId, correlationId, payload, ackCallback）
          * @return 订阅句柄
          */
@@ -234,8 +238,72 @@ public class TdmqMQClient implements MQClient {
     /**
      * 默认内存发布器（本地联调/测试）：把消息路由到同进程内订阅者。
      */
-    public record DeliveredMessage(String messageId, String correlationId, byte[] payload,
-                                   java.util.function.Consumer<Boolean> ackCallback) {
+    public final static class DeliveredMessage {
+
+        private static final long serialVersionUID = 0L;
+
+        private final String messageId;
+
+        private final String correlationId;
+
+        private final byte[] payload;
+
+        private final java.util.function.Consumer<Boolean> ackCallback;
+
+        @JsonCreator()
+        public DeliveredMessage(@JsonProperty("messageId") String messageId, @JsonProperty("correlationId") String correlationId, @JsonProperty("payload") byte[] payload, @JsonProperty("ackCallback") java.util.function.Consumer<Boolean> ackCallback) {
+            this.messageId = messageId;
+            this.correlationId = correlationId;
+            this.payload = payload;
+            this.ackCallback = ackCallback;
+        }
+
+        @JsonProperty("messageId")
+        public String messageId() {
+            return messageId;
+        }
+
+        @JsonProperty("correlationId")
+        public String correlationId() {
+            return correlationId;
+        }
+
+        @JsonProperty("payload")
+        public byte[] payload() {
+            return payload;
+        }
+
+        @JsonProperty("ackCallback")
+        public java.util.function.Consumer<Boolean> ackCallback() {
+            return ackCallback;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (Objects.isNull(obj) || getClass() != obj.getClass()) {
+                return false;
+            }
+            DeliveredMessage other = (DeliveredMessage) obj;
+            return Objects.equals(this.messageId, other.messageId) && Objects.equals(this.correlationId, other.correlationId) && Objects.equals(this.payload, other.payload) && Objects.equals(this.ackCallback, other.ackCallback);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + Objects.hashCode(messageId);
+            result = 31 * result + Objects.hashCode(correlationId);
+            result = 31 * result + Objects.hashCode(payload);
+            result = 31 * result + Objects.hashCode(ackCallback);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "DeliveredMessage[messageId=" + messageId + ", correlationId=" + correlationId + ", payload=" + payload + ", ackCallback=" + ackCallback + "]";
+        }
     }
 
     /**

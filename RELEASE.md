@@ -1,6 +1,6 @@
 # ddd4j-javalin 发布工程演练手册
 
-> 本手册指导如何将 ddd4j-javalin 从 SNAPSHOT 发布为正式版到 Maven Central（及内部 Codeup 仓库）。
+> 本手册指导如何将 ddd4j-javalin 从 SNAPSHOT 发布为正式版到 Maven Central（及内部 内网平台 仓库）。
 
 ## 前置条件
 
@@ -47,11 +47,11 @@ gpg --export-secret-keys <KEY_ID> | base64 > gpg-key.txt
       <username>${CENTRAL_USERNAME}</username>
       <password>${CENTRAL_PASSWORD}</password>
     </server>
-    <!-- 阿里云 Codeup 制品仓库（内部分发） -->
+    <!-- 阿里云 内网平台 制品仓库（内部分发） -->
     <server>
-      <id>codeup</id>
-      <username>${CODEUP_USERNAME}</username>
-      <password>${CODEUP_TOKEN}</password>
+      <id>内网平台</id>
+      <username>${内网平台_USERNAME}</username>
+      <password>${内网平台_TOKEN}</password>
     </server>
   </servers>
   <profiles>
@@ -71,7 +71,7 @@ gpg --export-secret-keys <KEY_ID> | base64 > gpg-key.txt
 
 ### 发布仓库配置
 
-根 `pom.xml` 已通过 `distributionManagement` 配置 `central`（OSSRH）和 `codeup` 两个发布仓库。确认 `server.id` 与
+根 `pom.xml` 已通过 `distributionManagement` 配置 `central`（OSSRH）和 `内网平台` 两个发布仓库。确认 `server.id` 与
 `repository.id` 一致。
 
 ---
@@ -149,7 +149,7 @@ gpg --verify target/staging/io/ddd4j/javalin/ddd4j-javalin-core/1.0.0/ddd4j-java
 - [ ] **`mvn clean verify` 全绿**：56 模块单元测试 + 10 个容器级 IT 全部通过【外部阻塞: 需执行 mvn clean verify 全量验证（禁 mvn）】
 - [ ] **版本号已更新**：`<revision>` 从 SNAPSHOT 改为正式版号【待办】
 - [ ] **GPG 密钥就绪**：本地或 CI 环境可签名【外部阻塞: GPG 密钥就绪需本地或 CI 环境配置】
-- [ ] **`settings.xml` 已配置**：`central` 和/或 `codeup` 仓库凭证【外部阻塞: settings.xml 需配置 central/codeup 仓库凭证】
+- [ ] **`settings.xml` 已配置**：`central` 和/或 `内网平台` 仓库凭证【外部阻塞: settings.xml 需配置 central/内网平台 仓库凭证】
 - [ ] **CHANGELOG 已更新**：记录自上个版本以来的变更【待办】
 - [x] **`release` profile 可激活**：`./mvnw help:all-profiles | grep release` 确认存在（证据: pom.xml:457 存在 <id>release</id> profile）
 - [ ] **本地 staging 验证通过**：构件完整、签名有效【外部阻塞: 需本地 staging 发布与签名验证（mvn+GPG，禁 mvn）】
@@ -212,8 +212,8 @@ on:
 | `GPG_PASSPHRASE`   | GPG 密码              |
 | `CENTRAL_USERNAME` | Sonatype OSSRH 用户名 |
 | `CENTRAL_PASSWORD` | Sonatype OSSRH 密码   |
-| `CODEUP_USERNAME`  | 阿里云 Codeup 用户名  |
-| `CODEUP_TOKEN`     | 阿里云 Codeup Token   |
+| `内网平台_USERNAME`  | 阿里云 内网平台 用户名  |
+| `内网平台_TOKEN`     | 阿里云 内网平台 Token   |
 
 ---
 

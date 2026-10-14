@@ -194,7 +194,7 @@
 
 - Modify: `.gitignore`（feature/6.3.x + master）
 
-- [x] **Step 10.1:** 复制 `/Users/wandl/workspaces/workspace-github-easy-4-java/dreamina-java-sdk/.gitignore`。
+- [x] **Step 10.1:** 复制 `/Users/dev//workspaces/workspace-github-easy-4-java/dreamina-java-sdk/.gitignore`。
 - [x] **Step 10.2:** 两个分支各自 commit + push github。
 
 ---

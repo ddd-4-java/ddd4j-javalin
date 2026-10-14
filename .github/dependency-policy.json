@@ -1,0 +1,15 @@
+{
+  "exclude": [
+    "io.ddd4j*:*",
+    "io.javalin:*",
+    "io.javalin.community.openapi:*"
+  ],
+  "exclude_properties": [
+    "javalin.version",
+    "ddd4j*.version"
+  ],
+  "branches": {},
+  "fixed_properties": {},
+  "fixed_dependencies": {},
+  "cvss_threshold": 7
+}

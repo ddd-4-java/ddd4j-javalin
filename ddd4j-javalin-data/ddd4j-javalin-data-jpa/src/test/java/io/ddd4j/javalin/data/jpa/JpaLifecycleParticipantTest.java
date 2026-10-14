@@ -16,7 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** JPA lifecycle ownership and rollback contracts. */
+/**
+ * JPA lifecycle ownership and rollback contracts.
+ */
 class JpaLifecycleParticipantTest {
 
     @Test

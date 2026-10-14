@@ -59,30 +59,47 @@ public class Order {
      * 返回订单标识。
      * @return 订单标识。
      */
-    public String getId() { return id; }
+    public String getId() {
+        return id;
+    }
+
     /**
      * 返回订单号。
      * @return 方法执行结果。
      */
-    public String getOrderNo() { return orderNo; }
+    public String getOrderNo() {
+        return orderNo;
+    }
+
     /**
      * 返回买家标识。
      * @return 方法执行结果。
      */
-    public String getBuyerId() { return buyerId; }
+    public String getBuyerId() {
+        return buyerId;
+    }
+
     /**
      * 返回买家名称。
      * @return 方法执行结果。
      */
-    public String getBuyerName() { return buyerName; }
+    public String getBuyerName() {
+        return buyerName;
+    }
+
     /**
      * 返回订单状态。
      * @return 订单状态。
      */
-    public String getStatus() { return status; }
+    public String getStatus() {
+        return status;
+    }
+
     /**
      * 返回订单总金额。
      * @return 方法执行结果。
      */
-    public BigDecimal getTotalAmount() { return totalAmount; }
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
 }

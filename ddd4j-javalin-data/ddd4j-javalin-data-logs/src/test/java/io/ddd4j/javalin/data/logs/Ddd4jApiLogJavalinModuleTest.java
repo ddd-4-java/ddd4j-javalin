@@ -65,7 +65,11 @@ class Ddd4jApiLogJavalinModuleTest {
              * @param point point 参数。
              * @param operation operation 参数。
              */
-            @Override public void doBefore(org.aspectj.lang.JoinPoint point, Operation operation) { before.incrementAndGet(); }
+            @Override
+            public void doBefore(org.aspectj.lang.JoinPoint point, Operation operation) {
+                before.incrementAndGet();
+            }
+
             /**
              * 切面返回通知实现。
              * @param point point 参数。
@@ -73,10 +77,12 @@ class Ddd4jApiLogJavalinModuleTest {
              * @param result 对象参数。
              * @param stopwatch stopwatch 参数。
              */
-            @Override public void afterReturing(org.aspectj.lang.JoinPoint point, Operation operation,
-                                                Object result, com.google.common.base.Stopwatch stopwatch) {
+            @Override
+            public void afterReturing(org.aspectj.lang.JoinPoint point, Operation operation,
+                                      Object result, com.google.common.base.Stopwatch stopwatch) {
                 returned.incrementAndGet();
             }
+
             /**
              * 切面异常通知实现。
              * @param point point 参数。
@@ -84,8 +90,9 @@ class Ddd4jApiLogJavalinModuleTest {
              * @param error 根因异常。
              * @param stopwatch stopwatch 参数。
              */
-            @Override public void afterThrowing(org.aspectj.lang.JoinPoint point, Operation operation,
-                                                Throwable error, com.google.common.base.Stopwatch stopwatch) {
+            @Override
+            public void afterThrowing(org.aspectj.lang.JoinPoint point, Operation operation,
+                                      Throwable error, com.google.common.base.Stopwatch stopwatch) {
                 throwing.incrementAndGet();
             }
         };

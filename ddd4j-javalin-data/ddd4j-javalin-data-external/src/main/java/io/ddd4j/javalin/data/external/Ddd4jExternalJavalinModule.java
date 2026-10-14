@@ -39,7 +39,7 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
      * @param sequenceProperties 序列生成配置。
      */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
-                                     SequenceProperties sequenceProperties) {
+                                      SequenceProperties sequenceProperties) {
         this(externalProperties, sequenceProperties, IpRegionTemplate.none());
     }
 
@@ -50,8 +50,8 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
      * @param ipRegionTemplate IP 归属地模板。
      */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
-                                     SequenceProperties sequenceProperties,
-                                     IpRegionTemplate ipRegionTemplate) {
+                                      SequenceProperties sequenceProperties,
+                                      IpRegionTemplate ipRegionTemplate) {
         this.externalProperties = Objects.requireNonNull(
                 externalProperties, "externalProperties must not be null");
         this.sequenceProperties = Objects.requireNonNull(

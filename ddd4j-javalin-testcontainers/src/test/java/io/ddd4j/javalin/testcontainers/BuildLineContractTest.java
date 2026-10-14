@@ -1,5 +1,9 @@
 package io.ddd4j.javalin.testcontainers;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -149,7 +153,9 @@ class BuildLineContractTest {
         }
     }
 
-    /** 测试运行时必须提供唯一 SLF4J provider，避免静默降级为 NOP 日志。 */
+    /**
+     * 测试运行时必须提供唯一 SLF4J provider，避免静默降级为 NOP 日志。
+     */
     @Test
     void shouldProvideTestLoggingBinding() throws Exception {
         Document rootPom = parse(repositoryRoot().resolve("pom.xml"));
@@ -157,7 +163,9 @@ class BuildLineContractTest {
                 "测试运行时必须提供一个 SLF4J binding/provider");
     }
 
-    /** 公共 BOM 必须直接继承运行时依赖管理，父级版本不能抢占本发布线的 Javalin 版本。 */
+    /**
+     * 公共 BOM 必须直接继承运行时依赖管理，父级版本不能抢占本发布线的 Javalin 版本。
+     */
     @Test
     void shouldInheritRuntimeDependenciesInPublicBom() throws Exception {
         Document bom = parse(repositoryRoot().resolve("ddd4j-javalin-bom/pom.xml"));
@@ -203,7 +211,9 @@ class BuildLineContractTest {
         }
     }
 
-    /** 根 POM 不得硬编码跳过 Surefire，否则新增模块的测试会被静默遗漏。 */
+    /**
+     * 根 POM 不得硬编码跳过 Surefire，否则新增模块的测试会被静默遗漏。
+     */
     @Test
     void shouldNotDisableUnitTestsInRootPluginManagement() throws Exception {
         Document rootPom = parse(repositoryRoot().resolve("pom.xml"));
@@ -313,11 +323,89 @@ class BuildLineContractTest {
      * @param jdkVersion JDK 版本。
      * @param mavenVersion Maven 版本。
      */
-    private record BuildLine(String ddd4jVersion,
-                             String javalinVersion,
-                             String modelVersion,
-                             String aggregateElement,
-                             String jdkVersion,
-                             String mavenVersion) {
+    private final static class BuildLine {
+
+        private static final long serialVersionUID = 0L;
+
+        private final String ddd4jVersion;
+
+        private final String javalinVersion;
+
+        private final String modelVersion;
+
+        private final String aggregateElement;
+
+        private final String jdkVersion;
+
+        private final String mavenVersion;
+
+        @JsonCreator()
+        private BuildLine(@JsonProperty("ddd4jVersion") String ddd4jVersion, @JsonProperty("javalinVersion") String javalinVersion, @JsonProperty("modelVersion") String modelVersion, @JsonProperty("aggregateElement") String aggregateElement, @JsonProperty("jdkVersion") String jdkVersion, @JsonProperty("mavenVersion") String mavenVersion) {
+            this.ddd4jVersion = ddd4jVersion;
+            this.javalinVersion = javalinVersion;
+            this.modelVersion = modelVersion;
+            this.aggregateElement = aggregateElement;
+            this.jdkVersion = jdkVersion;
+            this.mavenVersion = mavenVersion;
+        }
+
+        @JsonProperty("ddd4jVersion")
+        public String ddd4jVersion() {
+            return ddd4jVersion;
+        }
+
+        @JsonProperty("javalinVersion")
+        public String javalinVersion() {
+            return javalinVersion;
+        }
+
+        @JsonProperty("modelVersion")
+        public String modelVersion() {
+            return modelVersion;
+        }
+
+        @JsonProperty("aggregateElement")
+        public String aggregateElement() {
+            return aggregateElement;
+        }
+
+        @JsonProperty("jdkVersion")
+        public String jdkVersion() {
+            return jdkVersion;
+        }
+
+        @JsonProperty("mavenVersion")
+        public String mavenVersion() {
+            return mavenVersion;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (Objects.isNull(obj) || getClass() != obj.getClass()) {
+                return false;
+            }
+            BuildLine other = (BuildLine) obj;
+            return Objects.equals(this.ddd4jVersion, other.ddd4jVersion) && Objects.equals(this.javalinVersion, other.javalinVersion) && Objects.equals(this.modelVersion, other.modelVersion) && Objects.equals(this.aggregateElement, other.aggregateElement) && Objects.equals(this.jdkVersion, other.jdkVersion) && Objects.equals(this.mavenVersion, other.mavenVersion);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + Objects.hashCode(ddd4jVersion);
+            result = 31 * result + Objects.hashCode(javalinVersion);
+            result = 31 * result + Objects.hashCode(modelVersion);
+            result = 31 * result + Objects.hashCode(aggregateElement);
+            result = 31 * result + Objects.hashCode(jdkVersion);
+            result = 31 * result + Objects.hashCode(mavenVersion);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "BuildLine[ddd4jVersion=" + ddd4jVersion + ", javalinVersion=" + javalinVersion + ", modelVersion=" + modelVersion + ", aggregateElement=" + aggregateElement + ", jdkVersion=" + jdkVersion + ", mavenVersion=" + mavenVersion + "]";
+        }
     }
 }

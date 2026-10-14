@@ -26,7 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Strict MQ initialization and cleanup contract owned by ddd4j-javalin. */
+/**
+ * Strict MQ initialization and cleanup contract owned by ddd4j-javalin.
+ */
 class JavalinMqLifecycleParticipantTest {
 
     @Test

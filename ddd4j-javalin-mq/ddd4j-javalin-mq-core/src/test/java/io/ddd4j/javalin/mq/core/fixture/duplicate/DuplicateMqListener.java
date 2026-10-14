@@ -3,7 +3,9 @@ package io.ddd4j.javalin.mq.core.fixture.duplicate;
 import io.ddd4j.mq.annotation.MQEventListener;
 import io.ddd4j.mq.event.MQEvent;
 
-/** Scanner fixture with an intentionally duplicated route. */
+/**
+ * Scanner fixture with an intentionally duplicated route.
+ */
 public class DuplicateMqListener {
 
     /**

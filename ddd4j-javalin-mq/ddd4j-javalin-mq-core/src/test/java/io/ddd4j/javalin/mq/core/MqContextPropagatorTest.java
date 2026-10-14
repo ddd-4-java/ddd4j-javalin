@@ -23,7 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class MqContextPropagatorTest {
 
-    /** Test-only sentinel used to simulate a {@code Subject} payload in {@link ThreadContext}. */
+    /**
+     * Test-only sentinel used to simulate a {@code Subject} payload in {@link ThreadContext}.
+     */
     static final String CAPTURABLE_KEY = MqContextPropagatorTest.class.getName() + ".capturable";
 
     @AfterEach
@@ -213,7 +215,7 @@ class MqContextPropagatorTest {
         }
     }
 
-/**
+    /**
      * Fix B：purgeExpired 清理所有过期 snapshot（运维手动调用）。
      *
      * <p>本测试只验证"以当前 TTL 配置判定哪些快照已过期并 remove"——

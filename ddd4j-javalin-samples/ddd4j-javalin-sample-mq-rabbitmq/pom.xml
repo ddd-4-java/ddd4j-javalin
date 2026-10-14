@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         
+
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -11,7 +11,8 @@
     </parent>
 
     <artifactId>ddd4j-javalin-sample-mq-rabbitmq</artifactId>
-    <description>ddd4j-javalin RabbitMQ (AMQP) 示例：业务发布 DomainEvent → RabbitMQ 投递 → @MQEventListener 消费</description>
+    <description>ddd4j-javalin RabbitMQ (AMQP) 示例：业务发布 DomainEvent → RabbitMQ 投递 → @MQEventListener 消费
+    </description>
 
     <dependencies>
         <!-- ddd4j 核心与注解 -->

@@ -24,7 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Production readiness and idempotency deployment contracts. */
+/**
+ * Production readiness and idempotency deployment contracts.
+ */
 class Ddd4jJavalinProductionReadinessTest {
 
     @AfterEach
@@ -136,17 +138,24 @@ class Ddd4jJavalinProductionReadinessTest {
              * @return 启动顺序值。
              */
             @Override
-            public int order() { return 10; }
+            public int order() {
+                return 10;
+            }
+
             /**
              * 启动前校验组件状态与依赖。
              */
             @Override
-            public void validate() { }
+            public void validate() {
+            }
+
             /**
              * 启动组件。
              */
             @Override
-            public void start() { }
+            public void start() {
+            }
+
             /**
              * 返回组件就绪状态。
              * @return 就绪状态。
@@ -155,11 +164,13 @@ class Ddd4jJavalinProductionReadinessTest {
             public ReadinessResult readiness() {
                 return ReadinessResult.unavailable("postgresql", "database-password");
             }
+
             /**
              * 关闭组件并释放资源。
              */
             @Override
-            public void close() { }
+            public void close() {
+            }
         };
     }
 

@@ -6,13 +6,17 @@ import io.javalin.Javalin;
 
 import java.util.Objects;
 
-/** 注册不暴露异常和凭证的 Javalin 健康检查路由。 */
+/**
+ * 注册不暴露异常和凭证的 Javalin 健康检查路由。
+ */
 public final class Ddd4jJavalinReadinessRoutes {
 
     private Ddd4jJavalinReadinessRoutes() {
     }
 
-    /** 注册 liveness、readiness 与聚合 health 路由。 */
+    /**
+     * 注册 liveness、readiness 与聚合 health 路由。
+     */
     public static void register(Javalin app, Ddd4jJavalinRuntime runtime) {
         Objects.requireNonNull(app, "app must not be null");
         Objects.requireNonNull(runtime, "runtime must not be null");

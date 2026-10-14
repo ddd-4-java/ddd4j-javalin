@@ -6,7 +6,9 @@ import jakarta.persistence.EntityManagerFactory;
 
 import java.util.Objects;
 
-/** 管理 JPA EntityManagerFactory 的就绪状态和显式所有权。 */
+/**
+ * 管理 JPA EntityManagerFactory 的就绪状态和显式所有权。
+ */
 public final class JpaLifecycleParticipant implements JavalinLifecycleParticipant {
 
     private final EntityManagerFactory factory;

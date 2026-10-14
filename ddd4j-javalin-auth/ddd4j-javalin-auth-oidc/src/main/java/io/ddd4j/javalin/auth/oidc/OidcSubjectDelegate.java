@@ -250,56 +250,95 @@ final class OidcSubjectDelegate implements Subject {
      * 判断主体是否已认证。
      * @return 已认证返回 {@code true}。
      */
-    @Override public boolean isAuthenticated() { return true; }
+    @Override
+    public boolean isAuthenticated() {
+        return true;
+    }
+
     /**
      * 判断主体是否已认证。
      * @param loginId 登录标识。
      * @return 已认证返回 {@code true}。
      */
-    @Override public boolean isAuthenticated(Object loginId) { return Objects.nonNull(getPrincipalByLoginId(loginId)); }
+    @Override
+    public boolean isAuthenticated(Object loginId) {
+        return Objects.nonNull(getPrincipalByLoginId(loginId));
+    }
+
     /**
      * 判断主体是否处于记住登录状态。
      * @return 记住登录返回 {@code true}。
      */
-    @Override public boolean isRemembered() { return false; }
+    @Override
+    public boolean isRemembered() {
+        return false;
+    }
+
     /**
      * 判断设备标识是否受信任。
      * @param deviceId 设备标识。
      * @return 受信任返回 {@code true}。
      */
-    @Override public boolean isTrustDeviceId(String deviceId) { return false; }
+    @Override
+    public boolean isTrustDeviceId(String deviceId) {
+        return false;
+    }
+
     /**
      * 判断设备标识是否受信任。
      * @param userId 用户标识。
      * @param deviceId 设备标识。
      * @return 受信任返回 {@code true}。
      */
-    @Override public boolean isTrustDeviceId(Object userId, String deviceId) { return false; }
+    @Override
+    public boolean isTrustDeviceId(Object userId, String deviceId) {
+        return false;
+    }
+
     /**
      * 执行登录。
      * @param request 登录请求参数。
      * @return 登录成功返回登录标识。
      */
-    @Override public String login(AuthRequest request) { throw readOnly(); }
+    @Override
+    public String login(AuthRequest request) {
+        throw readOnly();
+    }
+
     /**
      * 执行登出。
      */
-    @Override public void logout() { throw readOnly(); }
+    @Override
+    public void logout() {
+        throw readOnly();
+    }
+
     /**
      * 执行登出。
      * @param loginId 登录标识。
      */
-    @Override public void logout(Object loginId) { throw readOnly(); }
+    @Override
+    public void logout(Object loginId) {
+        throw readOnly();
+    }
+
     /**
      * 强制下线指定登录标识。
      * @param loginId 登录标识。
      */
-    @Override public void kickout(Object loginId) { throw readOnly(); }
+    @Override
+    public void kickout(Object loginId) {
+        throw readOnly();
+    }
+
     /**
      * 刷新登录凭证。
      * @return 刷新成功返回新的登录标识。
      */
-    @Override public String refresh() { throw readOnly(); }
+    @Override
+    public String refresh() {
+        throw readOnly();
+    }
 
     /**
      * 验证令牌并返回认证主体。
@@ -320,18 +359,29 @@ final class OidcSubjectDelegate implements Subject {
      * @param loginId 登录标识。
      * @param timeout 禁用时长（毫秒）。
      */
-    @Override public void disable(Object loginId, long timeout) { throw readOnly(); }
+    @Override
+    public void disable(Object loginId, long timeout) {
+        throw readOnly();
+    }
+
     /**
      * 判断登录标识是否已被禁用。
      * @param loginId 登录标识。
      * @return 已禁用返回 {@code true}。
      */
-    @Override public boolean isDisabled(Object loginId) { return false; }
+    @Override
+    public boolean isDisabled(Object loginId) {
+        return false;
+    }
+
     /**
      * 解除登录标识的禁用状态。
      * @param loginId 登录标识。
      */
-    @Override public void untieDisable(Object loginId) { throw readOnly(); }
+    @Override
+    public void untieDisable(Object loginId) {
+        throw readOnly();
+    }
 
     private UnsupportedOperationException readOnly() {
         return new UnsupportedOperationException("OIDC resource-server subject is read-only");

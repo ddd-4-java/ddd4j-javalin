@@ -86,6 +86,11 @@ public class RabbitMqConfig {
         }
     }
 
-    public String getHost() { return host; }
-    public int getPort() { return port; }
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
 }

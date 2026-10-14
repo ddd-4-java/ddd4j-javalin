@@ -132,10 +132,10 @@ class Ddd4jRedisStreamMqIT {
             AtomicInteger storeAttempts = new AtomicInteger();
             io.ddd4j.javalin.testcontainers.messaging.JavalinMqLifecycleTestFixture.start(
                     mqClient, List.of(listener), mqProps, new JsonMQEventSerialization(), event -> {
-                if (storeAttempts.incrementAndGet() == 1) {
-                    throw new IllegalStateException("simulated persistence outage");
-                }
-            });
+                        if (storeAttempts.incrementAndGet() == 1) {
+                            throw new IllegalStateException("simulated persistence outage");
+                        }
+                    });
             MQEvent event = new MQEvent();
             event.setMsgId("redis-recovery-it-" + System.nanoTime());
             event.setTopic(TOPIC);

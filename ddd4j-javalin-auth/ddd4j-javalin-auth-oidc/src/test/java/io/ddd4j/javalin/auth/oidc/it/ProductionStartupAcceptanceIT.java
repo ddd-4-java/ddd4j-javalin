@@ -48,7 +48,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-/** Phase D production startup acceptance across HTTP, OIDC, PostgreSQL, MQ and shared idempotency. */
+/**
+ * Phase D production startup acceptance across HTTP, OIDC, PostgreSQL, MQ and shared idempotency.
+ */
 @Tag("integration")
 class ProductionStartupAcceptanceIT {
 
@@ -245,7 +247,9 @@ class ProductionStartupAcceptanceIT {
          * @return 启动顺序值。
          */
         @Override
-        public int order() { return 50; }
+        public int order() {
+            return 50;
+        }
 
         /**
          * 启动前校验组件状态。
@@ -265,7 +269,8 @@ class ProductionStartupAcceptanceIT {
          * 空启动实现，仅用于占位。
          */
         @Override
-        public void start() { }
+        public void start() {
+        }
 
         /**
          * 返回就绪状态。

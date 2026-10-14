@@ -92,7 +92,7 @@ public class OrderPostgresGuiceModule extends AbstractModule {
     @Provides
     @Singleton
     TransactionalOutboxPublisher transactionalOutboxPublisher(JdbcOrderTransactionPort transaction,
-                                                               OutboxPublisher publisher) {
+                                                              OutboxPublisher publisher) {
         return new TransactionalOutboxPublisher(transaction, publisher);
     }
 

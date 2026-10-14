@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-/** 统一管理 Javalin 集成组件与上游 Guice Runtime 的启动和关闭。 */
+/**
+ * 统一管理 Javalin 集成组件与上游 Guice Runtime 的启动和关闭。
+ */
 @Slf4j
 public final class Ddd4jJavalinRuntime implements AutoCloseable {
 
@@ -23,15 +25,17 @@ public final class Ddd4jJavalinRuntime implements AutoCloseable {
     private JavalinRuntimeState state = JavalinRuntimeState.NEW;
     private boolean coreClosed;
 
-    /** Guice 生产构造器。 */
+    /**
+     * Guice 生产构造器。
+     */
     @Inject
     public Ddd4jJavalinRuntime(Set<JavalinLifecycleParticipant> participants,
-                              Ddd4jGuiceRuntime coreRuntime) {
+                               Ddd4jGuiceRuntime coreRuntime) {
         this(participants, (AutoCloseable) coreRuntime);
     }
 
     Ddd4jJavalinRuntime(Collection<JavalinLifecycleParticipant> participants,
-                       AutoCloseable coreRuntime) {
+                        AutoCloseable coreRuntime) {
         Objects.requireNonNull(participants, "participants must not be null");
         this.participants = participants.stream()
                 .map(participant -> Objects.requireNonNull(participant, "participant must not be null"))
@@ -40,7 +44,9 @@ public final class Ddd4jJavalinRuntime implements AutoCloseable {
         this.coreRuntime = Objects.requireNonNull(coreRuntime, "coreRuntime must not be null");
     }
 
-    /** 校验并启动全部参与者。 */
+    /**
+     * 校验并启动全部参与者。
+     */
     public synchronized void start() {
         if (state != JavalinRuntimeState.NEW) {
             throw new IllegalStateException("Javalin runtime cannot start from state " + state);
@@ -61,12 +67,16 @@ public final class Ddd4jJavalinRuntime implements AutoCloseable {
         }
     }
 
-    /** 返回当前运行状态。 */
+    /**
+     * 返回当前运行状态。
+     */
     public synchronized JavalinRuntimeState state() {
         return state;
     }
 
-    /** 汇总当前参与者的安全就绪状态。 */
+    /**
+     * 汇总当前参与者的安全就绪状态。
+     */
     public synchronized ReadinessReport readiness() {
         if (state != JavalinRuntimeState.RUNNING) {
             return new ReadinessReport(false,
@@ -78,7 +88,9 @@ public final class Ddd4jJavalinRuntime implements AutoCloseable {
         return new ReadinessReport(results.stream().allMatch(ReadinessResult::ready), results);
     }
 
-    /** 逆序关闭参与者并撤销上游 Guice Runtime。 */
+    /**
+     * 逆序关闭参与者并撤销上游 Guice Runtime。
+     */
     @Override
     public synchronized void close() {
         if (state == JavalinRuntimeState.STOPPED) {

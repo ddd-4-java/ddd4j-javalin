@@ -6,6 +6,7 @@ import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.sqs.SqsMQClient;
 import io.ddd4j.mq.sqs.SqsProperties;
+
 import java.util.Objects;
 
 /**

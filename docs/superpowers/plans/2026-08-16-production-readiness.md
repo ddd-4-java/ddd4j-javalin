@@ -5,9 +5,11 @@
 
 **Goal:** 实施三项生产就绪改进（CI workflows、quality profile、release profile + 文档），消除零 CI/CD、零质量门禁、零发布工程三个硬缺口。
 
-**Architecture:** 在 `.github/workflows/` 新增 CI workflow；在根 `pom.xml` 新增 `quality` profile（jacoco/owasp/spotbugs）；补充 `release` profile 完整配置；新增 `RELEASE.md` 发布工程手册。
+**Architecture:** 在 `.github/workflows/` 新增 CI workflow；在根 `pom.xml` 新增 `quality`
+profile（jacoco/owasp/spotbugs）；补充 `release` profile 完整配置；新增 `RELEASE.md` 发布工程手册。
 
-**Tech Stack:** GitHub Actions、Maven profiles、jacoco-maven-plugin、dependency-check-maven、spotbugs-maven-plugin、maven-gpg-plugin
+**Tech Stack:** GitHub Actions、Maven
+profiles、jacoco-maven-plugin、dependency-check-maven、spotbugs-maven-plugin、maven-gpg-plugin
 
 **Related Design Doc:** `docs/superpowers/specs/2026-08-16-production-readiness-design.md`
 
@@ -25,21 +27,22 @@
 
 ## 实施阶段总览
 
-| Stage | 目标 | 状态 | Commit |
-|-------|------|------|--------|
-| 1 | `RELEASE.md` 发布工程演练手册 | [x] | — |
-| 2 | `docs/superpowers/specs/2026-08-16-production-readiness-design.md` | [x] | — |
-| 3 | `docs/superpowers/plans/2026-08-16-production-readiness.md`（本文件） | [x] | — |
-| 4 | 更新 `docs/superpowers/reports/2026-08-05-status.md` | [x] | — |
-| 5 | 更新 `docs/superpowers/README.md` 索引 | [x] | — |
-| 6 | 更新根 `README.md` 生产就绪状态 | [x] | — |
-| 7 | 链接自检 | [x] | — |
+| Stage | 目标                                                                  | 状态 | Commit |
+|-------|-----------------------------------------------------------------------|------|--------|
+| 1     | `RELEASE.md` 发布工程演练手册                                         | [x]  | —      |
+| 2     | `docs/superpowers/specs/2026-08-16-production-readiness-design.md`    | [x]  | —      |
+| 3     | `docs/superpowers/plans/2026-08-16-production-readiness.md`（本文件） | [x]  | —      |
+| 4     | 更新 `docs/superpowers/reports/2026-08-05-status.md`                  | [x]  | —      |
+| 5     | 更新 `docs/superpowers/README.md` 索引                                | [x]  | —      |
+| 6     | 更新根 `README.md` 生产就绪状态                                       | [x]  | —      |
+| 7     | 链接自检                                                              | [x]  | —      |
 
 ---
 
 ## Task 1: 创建 RELEASE.md
 
 **Files:**
+
 - Create: `RELEASE.md`
 
 **目标:** 发布工程演练手册，覆盖前置条件、版本策略、演练命令、正式发布 checklist、首个正式版阻塞项。
@@ -53,6 +56,7 @@
 ## Task 2: 创建生产就绪设计文档
 
 **Files:**
+
 - Create: `docs/superpowers/specs/2026-08-16-production-readiness-design.md`
 
 **目标:** 按既有 spec 模板编写，包含日期/状态/目标 + 章节（目标与范围、设计、关键决策、风险、验收标准）。
@@ -67,6 +71,7 @@
 ## Task 3: 创建生产就绪实施计划
 
 **Files:**
+
 - Create: `docs/superpowers/plans/2026-08-16-production-readiness.md`
 
 **目标:** 按 plan 模板，所有 checkbox 标记为 [x]，Files 清单完整，验收记录表引用三个并行产出。
@@ -79,6 +84,7 @@
 ## Task 4: 更新状态报告
 
 **Files:**
+
 - Modify: `docs/superpowers/reports/2026-08-05-status.md`
 
 **目标:** 追加「历史状态」表新行（2026-08-16 三项生产就绪改进），在「已知遗留」补核心分叉决策待裁决说明。
@@ -90,6 +96,7 @@
 ## Task 5: 更新 superpowers README 索引
 
 **Files:**
+
 - Modify: `docs/superpowers/README.md`
 
 **目标:** 索引表追加本次 spec 和 plan 两行。
@@ -100,6 +107,7 @@
 ## Task 6: 更新根 README.md
 
 **Files:**
+
 - Modify: `README.md`
 
 **目标:** 在「历史与版本」章节后加「生产就绪状态」小节，链接 `RELEASE.md` 与 superpowers spec。
@@ -125,12 +133,12 @@
 
 ## 验收记录
 
-| 产出 | 文件 | 验收方式 |
-|------|------|---------|
-| Release 文档 | `RELEASE.md` | 文件存在，内容覆盖前置条件/版本策略/演练/阻塞项 |
-| Spec | `docs/superpowers/specs/2026-08-16-production-readiness-design.md` | 文件存在，按模板含 5 个标准章节 |
-| Plan | `docs/superpowers/plans/2026-08-16-production-readiness.md` | 文件存在，checkbox 全 [x] |
-| Status 更新 | `docs/superpowers/reports/2026-08-05-status.md` | 历史状态表新增行，已知遗留新增 #5 |
-| Index 更新 | `docs/superpowers/README.md` | 索引表新增 2 行 |
-| README 更新 | `README.md` | 新增「生产就绪状态」章节 |
-| 链接自检 | 全部文件 | 无断链，无 Spring 字样 |
+| 产出         | 文件                                                               | 验收方式                                        |
+|--------------|--------------------------------------------------------------------|-------------------------------------------------|
+| Release 文档 | `RELEASE.md`                                                       | 文件存在，内容覆盖前置条件/版本策略/演练/阻塞项 |
+| Spec         | `docs/superpowers/specs/2026-08-16-production-readiness-design.md` | 文件存在，按模板含 5 个标准章节                 |
+| Plan         | `docs/superpowers/plans/2026-08-16-production-readiness.md`        | 文件存在，checkbox 全 [x]                       |
+| Status 更新  | `docs/superpowers/reports/2026-08-05-status.md`                    | 历史状态表新增行，已知遗留新增 #5               |
+| Index 更新   | `docs/superpowers/README.md`                                       | 索引表新增 2 行                                 |
+| README 更新  | `README.md`                                                        | 新增「生产就绪状态」章节                        |
+| 链接自检     | 全部文件                                                           | 无断链，无 Spring 字样                          |

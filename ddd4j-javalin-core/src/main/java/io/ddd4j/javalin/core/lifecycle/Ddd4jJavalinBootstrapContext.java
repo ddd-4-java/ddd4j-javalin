@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-/** 向生命周期参与者提供应用扫描包。 */
+/**
+ * 向生命周期参与者提供应用扫描包。
+ */
 public final class Ddd4jJavalinBootstrapContext {
 
     private final List<String> basePackages;

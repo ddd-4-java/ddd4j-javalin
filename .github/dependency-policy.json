@@ -15,7 +15,8 @@
     "io.github.easy4j:easyexcel-parent": "5.0.1",
     "io.github.easy4j:easyexcel-core": "5.0.1",
     "io.github.easy4j:easyexcel-support": "5.0.1",
-    "io.github.easy4j:easyexcel-markdown": "5.0.1"
+    "io.github.easy4j:easyexcel-markdown": "5.0.1",
+    "io.github.easy4j:dozer-extra-converters": "1.0.x.20260630-SNAPSHOT"
   },
   "cvss_threshold": 7
 }

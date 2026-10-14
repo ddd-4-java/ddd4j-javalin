@@ -26,7 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Strict MQ initialization and cleanup contract owned by ddd4j-javalin. */
+/**
+ * Strict MQ initialization and cleanup contract owned by ddd4j-javalin.
+ */
 class JavalinMqLifecycleParticipantTest {
 
     @Test
@@ -132,12 +134,6 @@ class JavalinMqLifecycleParticipantTest {
         return MQListener.of(bean, method, method.getAnnotation(MQEventListener.class));
     }
 
-    public static final class ListenerBean {
-        @MQEventListener(topic = "orders", group = "production")
-        public void onEvent(MQEvent event) {
-        }
-    }
-
     /**
      * Fix A：{@link JavalinMqLifecycleParticipant#close()} 应清理
      * {@link MqContextPropagator#SNAPSHOT_REGISTRY_KEY}，避免长时间运行的
@@ -159,6 +155,12 @@ class JavalinMqLifecycleParticipantTest {
         participant.close();
 
         assertThat((Object) BaseContext.get(MqContextPropagator.SNAPSHOT_REGISTRY_KEY)).isNull();
+    }
+
+    public static final class ListenerBean {
+        @MQEventListener(topic = "orders", group = "production")
+        public void onEvent(MQEvent event) {
+        }
     }
 
     private static final class RecordingClient implements MQClient {

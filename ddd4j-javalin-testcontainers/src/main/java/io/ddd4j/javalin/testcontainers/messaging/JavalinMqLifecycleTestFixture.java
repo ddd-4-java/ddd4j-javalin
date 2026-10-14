@@ -12,7 +12,9 @@ import io.ddd4j.mq.listener.MQListener;
 import java.util.List;
 import java.util.Objects;
 
-/** 让独立 broker IT 通过 Javalin 的生产 MQ 生命周期启动和关闭。 */
+/**
+ * 让独立 broker IT 通过 Javalin 的生产 MQ 生命周期启动和关闭。
+ */
 public final class JavalinMqLifecycleTestFixture {
 
     private static final ThreadLocal<JavalinMqLifecycleParticipant> ACTIVE = new ThreadLocal<>();
@@ -45,7 +47,9 @@ public final class JavalinMqLifecycleTestFixture {
         ACTIVE.set(participant);
     }
 
-    /** 关闭当前测试线程启动的 MQ 生命周期。 */
+    /**
+     * 关闭当前测试线程启动的 MQ 生命周期。
+     */
     public static void close() {
         JavalinMqLifecycleParticipant participant = ACTIVE.get();
         if (Objects.nonNull(participant)) {

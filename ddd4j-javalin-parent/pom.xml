@@ -10,7 +10,8 @@
 
     <artifactId>ddd4j-javalin-parent</artifactId>
     <packaging>pom</packaging>
-    <description>Javalin Projects Parent: common plugins and dependency versions for ddd4j-javalin modules.</description>
+    <description>Javalin Projects Parent: common plugins and dependency versions for ddd4j-javalin modules.
+    </description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -189,7 +190,10 @@
                             <skipTests>false</skipTests>
                             <!-- jacoco agent 路径直接写入 argLine，与 quality-jacoco-agent profile 的
                                  ${argLine} 属性解耦，确保 integration-tests 独立激活时也有 jacoco -->
-                            <argLine>-javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec -Xmx2048m -Dfile.encoding=UTF-8</argLine>
+                            <argLine>
+                                -javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec
+                                -Xmx2048m -Dfile.encoding=UTF-8
+                            </argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -220,7 +224,9 @@
             <!-- jacoco agent argLine 直接作为 property 注入，surefire 的 ${argLine} 可直接引用；
                  必须在 parent pom（而非根聚合 pom）中定义，否则子模块不继承 -->
             <properties>
-                <argLine>-javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
+                <argLine>
+                    -javaagent:${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec
+                </argLine>
             </properties>
             <build>
                 <plugins>

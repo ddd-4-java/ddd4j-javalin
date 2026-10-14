@@ -64,9 +64,36 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
      * @param sharedIdempotencyGuard 跨实例共享的幂等 Guard；仅 SHARED 部署模式下必填，可为 {@code null}
      */
     public Ddd4jJavalinAutoConfiguration(Ddd4jJavalinProperties properties,
-                                          IdempotencyGuard sharedIdempotencyGuard) {
+                                         IdempotencyGuard sharedIdempotencyGuard) {
         this.properties = Objects.requireNonNull(properties, "properties must not be null");
         this.sharedIdempotencyGuard = sharedIdempotencyGuard;
+    }
+
+    /**
+     * Convenience overload that lets callers customise the public-path list without
+     * subclassing the module.
+     */
+    public static Ddd4jJavalinAutoConfiguration withPublicPaths(String... paths) {
+        Ddd4jJavalinProperties props = new Ddd4jJavalinProperties();
+        props.setPublicPaths(paths);
+        return new Ddd4jJavalinAutoConfiguration(props);
+    }
+
+    /**
+     * Convenience for tests: build a module with {@code port=0}.
+     */
+    public static Ddd4jJavalinAutoConfiguration forTesting() {
+        Ddd4jJavalinProperties props = new Ddd4jJavalinProperties();
+        props.setPort(0);
+        props.setHost("127.0.0.1");
+        return new Ddd4jJavalinAutoConfiguration(props);
+    }
+
+    /**
+     * Static accessor for the convenience helpers above (e.g. {@link #withPublicPaths}).
+     */
+    public static List<String> defaultPublicPaths() {
+        return Arrays.asList("/health", "/health/readiness", "/health/liveness");
     }
 
     @Override
@@ -114,8 +141,8 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     @Provides
     @Singleton
     Ddd4jJavalinWeb ddd4jJavalinWeb(WebRequestContextFactory contextFactory,
-                                     WebRequestLifecycle lifecycle,
-                                     WebExceptionTranslator translator) {
+                                    WebRequestLifecycle lifecycle,
+                                    WebExceptionTranslator translator) {
         // Guard so this @Provides is skipped when the web layer is disabled; otherwise
         // Guice eagerly resolves all parameter types during injector creation.
         if (!properties.isEnabled()) {
@@ -150,44 +177,11 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     }
 
     /**
-     * 便捷重载：自定义免认证公共路径列表，无需子类化本模块。
-     *
-     * @param paths 免认证的公共路径
-     * @return 使用指定公共路径的装配模块
-     */
-    public static Ddd4jJavalinAutoConfiguration withPublicPaths(String... paths) {
-        Ddd4jJavalinProperties props = new Ddd4jJavalinProperties();
-        props.setPublicPaths(paths);
-        return new Ddd4jJavalinAutoConfiguration(props);
-    }
-
-    /**
-     * 测试便捷方法：构建监听随机空闲端口（{@code port=0}）的装配模块。
-     *
-     * @return 绑定 {@code 127.0.0.1:0} 的测试用装配模块
-     */
-    public static Ddd4jJavalinAutoConfiguration forTesting() {
-        Ddd4jJavalinProperties props = new Ddd4jJavalinProperties();
-        props.setPort(0);
-        props.setHost("127.0.0.1");
-        return new Ddd4jJavalinAutoConfiguration(props);
-    }
-
-    /**
      * 返回当前配置。供引导类读取。
      *
      * @return 本模块持有的 Web 层配置
      */
     public Ddd4jJavalinProperties getProperties() {
         return properties;
-    }
-
-    /**
-     * 返回默认免认证公共路径，供上方便捷方法使用（如 {@link #withPublicPaths}）。
-     *
-     * @return 默认公共路径列表：{@code /health}、{@code /health/readiness}、{@code /health/liveness}
-     */
-    public static List<String> defaultPublicPaths() {
-        return Arrays.asList("/health", "/health/readiness", "/health/liveness");
     }
 }

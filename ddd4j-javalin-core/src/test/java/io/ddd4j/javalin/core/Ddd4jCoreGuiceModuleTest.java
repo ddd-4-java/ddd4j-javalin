@@ -36,6 +36,26 @@ class Ddd4jCoreGuiceModuleTest {
 
     private Injector injector;
 
+    /**
+     * 构造仅含手工装配所需绑定的 Injector（EventBus + DomainEventPublisher + 投影位置仓储）。
+     */
+    private static Injector newManualInjector() {
+        return Guice.createInjector(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(DomainEventPublisher.class).to(GuiceDomainEventPublisher.class).in(Singleton.class);
+                bind(ProjectionPositionRepository.class)
+                        .to(InMemoryProjectionPositionRepository.class).in(Singleton.class);
+            }
+
+            @Provides
+            @Singleton
+            EventBus eventBus() {
+                return new EventBus();
+            }
+        });
+    }
+
     @AfterEach
     void tearDown() {
         // 恢复全局状态：关闭 Ddd4jGuiceRuntime（回滚 BaseContext 核心 SPI 注册 + GuiceContext.clear()）
@@ -124,25 +144,5 @@ class Ddd4jCoreGuiceModuleTest {
         assertThat(GuiceContext.isInitialized()).isTrue();
         assertThat(Contexts.get(SpiKeys.PROJECTION_POSITION_REPOSITORY, ProjectionPositionRepository.class))
                 .isEmpty();
-    }
-
-    /**
-     * 构造仅含手工装配所需绑定的 Injector（EventBus + DomainEventPublisher + 投影位置仓储）。
-     */
-    private static Injector newManualInjector() {
-        return Guice.createInjector(new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(DomainEventPublisher.class).to(GuiceDomainEventPublisher.class).in(Singleton.class);
-                bind(ProjectionPositionRepository.class)
-                        .to(InMemoryProjectionPositionRepository.class).in(Singleton.class);
-            }
-
-            @Provides
-            @Singleton
-            EventBus eventBus() {
-                return new EventBus();
-            }
-        });
     }
 }

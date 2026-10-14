@@ -70,7 +70,9 @@ public final class OidcProperties {
         }
     }
 
-    /** OIDC 配置构建器。 */
+    /**
+     * OIDC 配置构建器。
+     */
     public static final class Builder {
         private String issuer;
         private URI jwksUri;

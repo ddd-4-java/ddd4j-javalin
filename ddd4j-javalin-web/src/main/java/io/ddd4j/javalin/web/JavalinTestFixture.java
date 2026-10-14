@@ -60,12 +60,6 @@ public abstract class JavalinTestFixture {
     protected HttpClient client;
 
     /**
-     * 构造测试夹具。
-     */
-    protected JavalinTestFixture() {
-    }
-
-    /**
      * 覆写以扫描额外包中的 DDD 注解。默认：空数组（不扫描）。
      *
      * @return 需要扫描的应用包名数组

@@ -6,6 +6,7 @@ import io.ddd4j.javalin.mq.core.AbstractDdd4jMqGuiceModule;
 import io.ddd4j.mq.MQClient;
 import io.ddd4j.mq.rabbitmq.RabbitMQClient;
 import io.ddd4j.mq.rabbitmq.RabbitMQProperties;
+
 import java.util.Objects;
 
 /**

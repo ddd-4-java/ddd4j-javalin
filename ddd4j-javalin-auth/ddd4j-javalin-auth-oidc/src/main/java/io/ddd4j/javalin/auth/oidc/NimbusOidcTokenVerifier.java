@@ -22,7 +22,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-/** 基于 Nimbus JOSE + JWT 的 OIDC resource-server 验签器。 */
+/**
+ * 基于 Nimbus JOSE + JWT 的 OIDC resource-server 验签器。
+ */
 public final class NimbusOidcTokenVerifier implements OidcTokenVerifier {
 
     private final OidcProperties properties;

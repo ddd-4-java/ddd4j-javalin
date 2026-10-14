@@ -49,6 +49,16 @@ class Ddd4jNatsMqIT {
             .withCommand("-js")
             .withExposedPorts(4222);
 
+    private static void createStream(String server) throws Exception {
+        try (Connection connection = Nats.connect(server)) {
+            connection.jetStreamManagement().addStream(StreamConfiguration.builder()
+                    .name("DDD4J_IT")
+                    .subjects(TOPIC + ".>")
+                    .storageType(StorageType.File)
+                    .build());
+        }
+    }
+
     @Test
     void shouldResolveCoreContractsFromGuice() {
         NATS.start();
@@ -67,16 +77,6 @@ class Ddd4jNatsMqIT {
             assertThat(injector.getInstance(MQProperties.class)).isSameAs(brokerProps);
         } finally {
             NATS.stop();
-        }
-    }
-
-    private static void createStream(String server) throws Exception {
-        try (Connection connection = Nats.connect(server)) {
-            connection.jetStreamManagement().addStream(StreamConfiguration.builder()
-                    .name("DDD4J_IT")
-                    .subjects(TOPIC + ".>")
-                    .storageType(StorageType.File)
-                    .build());
         }
     }
 

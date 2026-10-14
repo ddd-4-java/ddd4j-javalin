@@ -40,7 +40,7 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
      * @param sequenceProperties 全局发号器配置，不允许为 {@code null}
      */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
-                                     SequenceProperties sequenceProperties) {
+                                      SequenceProperties sequenceProperties) {
         this(externalProperties, sequenceProperties, IpRegionTemplate.none());
     }
 
@@ -53,8 +53,8 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
      * @throws NullPointerException 任一参数为 {@code null} 时抛出
      */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
-                                     SequenceProperties sequenceProperties,
-                                     IpRegionTemplate ipRegionTemplate) {
+                                      SequenceProperties sequenceProperties,
+                                      IpRegionTemplate ipRegionTemplate) {
         this.externalProperties = Objects.requireNonNull(
                 externalProperties, "externalProperties must not be null");
         this.sequenceProperties = Objects.requireNonNull(

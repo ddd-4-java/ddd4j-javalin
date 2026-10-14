@@ -57,13 +57,20 @@ class Ddd4jApiLogJavalinModuleTest {
         AtomicInteger returned = new AtomicInteger();
         AtomicInteger throwing = new AtomicInteger();
         ApiOperationLogProvider provider = new ApiOperationLogProvider() {
-            @Override public void doBefore(org.aspectj.lang.JoinPoint point, Operation operation) { before.incrementAndGet(); }
-            @Override public void afterReturing(org.aspectj.lang.JoinPoint point, Operation operation,
-                                                Object result, com.google.common.base.Stopwatch stopwatch) {
+            @Override
+            public void doBefore(org.aspectj.lang.JoinPoint point, Operation operation) {
+                before.incrementAndGet();
+            }
+
+            @Override
+            public void afterReturing(org.aspectj.lang.JoinPoint point, Operation operation,
+                                      Object result, com.google.common.base.Stopwatch stopwatch) {
                 returned.incrementAndGet();
             }
-            @Override public void afterThrowing(org.aspectj.lang.JoinPoint point, Operation operation,
-                                                Throwable error, com.google.common.base.Stopwatch stopwatch) {
+
+            @Override
+            public void afterThrowing(org.aspectj.lang.JoinPoint point, Operation operation,
+                                      Throwable error, com.google.common.base.Stopwatch stopwatch) {
                 throwing.incrementAndGet();
             }
         };

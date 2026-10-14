@@ -8,7 +8,9 @@ import org.apache.ibatis.session.SqlSession;
 
 import java.util.Objects;
 
-/** 在统一 Javalin 生命周期中初始化 Repository mapper 并关闭 SqlSession。 */
+/**
+ * 在统一 Javalin 生命周期中初始化 Repository mapper 并关闭 SqlSession。
+ */
 public final class MybatisRepositoryLifecycleParticipant implements JavalinLifecycleParticipant {
 
     private final Injector injector;

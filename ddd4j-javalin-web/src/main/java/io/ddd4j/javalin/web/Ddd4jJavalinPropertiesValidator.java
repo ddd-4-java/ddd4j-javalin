@@ -6,7 +6,9 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Objects;
 
-/** 在创建 Guice 和监听端口前校验 Javalin 配置。 */
+/**
+ * 在创建 Guice 和监听端口前校验 Javalin 配置。
+ */
 public final class Ddd4jJavalinPropertiesValidator {
 
     private Ddd4jJavalinPropertiesValidator() {

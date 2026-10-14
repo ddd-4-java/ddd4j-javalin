@@ -43,7 +43,9 @@ public final class RecordingIntegrationEventPublisher implements IntegrationEven
         return List.copyOf(published);
     }
 
-    /** 清空已发布记录（测试隔离用）。 */
+    /**
+     * 清空已发布记录（测试隔离用）。
+     */
     public void clear() {
         published.clear();
     }

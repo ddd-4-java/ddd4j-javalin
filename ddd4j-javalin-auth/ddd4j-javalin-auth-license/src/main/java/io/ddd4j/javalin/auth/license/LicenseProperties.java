@@ -19,26 +19,32 @@ public class LicenseProperties {
     public static final String PREFIX = "ddd4j.auth.license";
 
     /**
-     * 使用默认值创建许可证配置。
+     * License certificate subject.
      */
-    public LicenseProperties() {
-    }
-
-    /** License certificate subject. */
     private String subject;
 
-    /** Public-key alias inside the keystore. */
+    /**
+     * Public-key alias inside the keystore.
+     */
     private String publicAlias;
 
-    /** Password protecting the keystore. */
+    /**
+     * Password protecting the keystore.
+     */
     private String storePass;
 
-    /** Path to the {@code .lic} certificate file. */
+    /**
+     * Path to the {@code .lic} certificate file.
+     */
     private String licensePath;
 
-    /** Path to the {@code publicKeys.store} keystore. */
+    /**
+     * Path to the {@code publicKeys.store} keystore.
+     */
     private String publicKeysStorePath;
 
-    /** Whether to install the certificate on startup. Default {@code true}. */
+    /**
+     * Whether to install the certificate on startup. Default {@code true}.
+     */
     private boolean installOnStart = true;
 }

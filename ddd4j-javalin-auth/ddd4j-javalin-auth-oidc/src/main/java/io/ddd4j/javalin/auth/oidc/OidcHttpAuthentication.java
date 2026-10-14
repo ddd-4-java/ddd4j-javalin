@@ -9,7 +9,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/** Javalin 7 的 Bearer Token 请求边界。 */
+/**
+ * Javalin 7 的 Bearer Token 请求边界。
+ */
 public final class OidcHttpAuthentication {
 
     private static final String SCOPE_ATTRIBUTE = OidcHttpAuthentication.class.getName() + ".scope";

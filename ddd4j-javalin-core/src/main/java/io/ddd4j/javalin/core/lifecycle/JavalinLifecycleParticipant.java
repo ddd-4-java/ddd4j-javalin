@@ -2,7 +2,9 @@ package io.ddd4j.javalin.core.lifecycle;
 
 import io.ddd4j.core.health.ReadinessResult;
 
-/** 由 Javalin Runtime 统一排序和管理的组件生命周期。 */
+/**
+ * 由 Javalin Runtime 统一排序和管理的组件生命周期。
+ */
 public interface JavalinLifecycleParticipant extends AutoCloseable {
 
     /**
@@ -12,10 +14,14 @@ public interface JavalinLifecycleParticipant extends AutoCloseable {
      */
     int order();
 
-    /** 在任何组件启动前执行无副作用校验。 */
+    /**
+     * 在任何组件启动前执行无副作用校验。
+     */
     void validate();
 
-    /** 启动组件。 */
+    /**
+     * 启动组件。
+     */
     void start();
 
     /**
@@ -25,7 +31,9 @@ public interface JavalinLifecycleParticipant extends AutoCloseable {
      */
     ReadinessResult readiness();
 
-    /** 关闭组件；实现必须支持重复调用。 */
+    /**
+     * 关闭组件；实现必须支持重复调用。
+     */
     @Override
     void close();
 }

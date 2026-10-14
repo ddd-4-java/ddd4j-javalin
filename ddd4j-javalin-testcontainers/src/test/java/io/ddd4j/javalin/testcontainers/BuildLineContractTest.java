@@ -1,5 +1,9 @@
 package io.ddd4j.javalin.testcontainers;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,6 +38,85 @@ class BuildLineContractTest {
             new BuildLine("2.0.x.20260630-SNAPSHOT", "7.1.0", "4.0.0", "modules", "17", "3.9.16"),
             "7.2.x.20260630-SNAPSHOT",
             new BuildLine("3.0.x.20260630-SNAPSHOT", "7.2.3", "4.1.0", "subprojects", "21", "4.0.0-rc-6"));
+
+    private static Path repositoryRoot() {
+        String configuredRoot = System.getProperty("ddd4j.repo.root");
+        Path start = Path.of(Objects.isNull(configuredRoot) ? "" : configuredRoot).toAbsolutePath().normalize();
+        Path current = start;
+        while (Objects.nonNull(current)
+                && !(Files.isRegularFile(current.resolve("pom.xml"))
+                && Files.isDirectory(current.resolve("ddd4j-javalin-testcontainers")))) {
+            current = current.getParent();
+        }
+        if (Objects.isNull(current)) {
+            throw new IllegalStateException("无法定位 ddd4j-javalin 根目录");
+        }
+        return current;
+    }
+
+    private static Document parse(Path pom) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        factory.setNamespaceAware(false);
+        return factory.newDocumentBuilder().parse(pom.toFile());
+    }
+
+    private static String parentVersion(Document document) {
+        Element parent = (Element) document.getElementsByTagName("parent").item(0);
+        return text(parent, "version");
+    }
+
+    private static String property(Document document, String name) {
+        Element properties = (Element) document.getElementsByTagName("properties").item(0);
+        return text(properties, name);
+    }
+
+    private static String text(Document document, String name) {
+        return document.getElementsByTagName(name).item(0).getTextContent().trim();
+    }
+
+    private static String text(Element element, String name) {
+        NodeList values = element.getElementsByTagName(name);
+        return values.item(0).getTextContent().trim();
+    }
+
+    private static String optionalText(Element element, String name) {
+        NodeList values = element.getElementsByTagName(name);
+        return values.getLength() == 0 ? "" : values.item(0).getTextContent().trim();
+    }
+
+    private static int dependencyCount(Document document, String groupId, String artifactId, String scope) {
+        int count = 0;
+        NodeList dependencies = document.getElementsByTagName("dependency");
+        for (int index = 0; index < dependencies.getLength(); index++) {
+            Element dependency = (Element) dependencies.item(index);
+            if (groupId.equals(text(dependency, "groupId"))
+                    && artifactId.equals(text(dependency, "artifactId"))
+                    && scope.equals(text(dependency, "scope"))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static int managedImportCount(Document document, String groupId, String artifactId) {
+        int count = 0;
+        NodeList dependencies = document.getElementsByTagName("dependency");
+        for (int index = 0; index < dependencies.getLength(); index++) {
+            Element dependency = (Element) dependencies.item(index);
+            if (groupId.equals(text(dependency, "groupId"))
+                    && artifactId.equals(text(dependency, "artifactId"))
+                    && "pom".equals(text(dependency, "type"))
+                    && "import".equals(text(dependency, "scope"))) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     /**
      * 校验当前发布线的版本与 Maven 聚合模型。
@@ -153,7 +236,9 @@ class BuildLineContractTest {
         }
     }
 
-    /** 测试运行时必须提供唯一 SLF4J provider，避免静默降级为 NOP 日志。 */
+    /**
+     * 测试运行时必须提供唯一 SLF4J provider，避免静默降级为 NOP 日志。
+     */
     @Test
     void shouldProvideTestLoggingBinding() throws Exception {
         Document rootPom = parse(repositoryRoot().resolve("pom.xml"));
@@ -161,7 +246,9 @@ class BuildLineContractTest {
                 "测试运行时必须提供一个 SLF4J binding/provider");
     }
 
-    /** 公共 BOM 必须直接继承运行时依赖管理，父级版本不能抢占本发布线的 Javalin 版本。 */
+    /**
+     * 公共 BOM 必须直接继承运行时依赖管理，父级版本不能抢占本发布线的 Javalin 版本。
+     */
     @Test
     void shouldInheritRuntimeDependenciesInPublicBom() throws Exception {
         Document bom = parse(repositoryRoot().resolve("ddd4j-javalin-bom/pom.xml"));
@@ -207,7 +294,9 @@ class BuildLineContractTest {
         }
     }
 
-    /** 根 POM 不得硬编码跳过 Surefire，否则新增模块的测试会被静默遗漏。 */
+    /**
+     * 根 POM 不得硬编码跳过 Surefire，否则新增模块的测试会被静默遗漏。
+     */
     @Test
     void shouldNotDisableUnitTestsInRootPluginManagement() throws Exception {
         Document rootPom = parse(repositoryRoot().resolve("pom.xml"));
@@ -228,90 +317,89 @@ class BuildLineContractTest {
         }
     }
 
-    private static Path repositoryRoot() {
-        String configuredRoot = System.getProperty("ddd4j.repo.root");
-        Path start = Path.of(Objects.isNull(configuredRoot) ? "" : configuredRoot).toAbsolutePath().normalize();
-        Path current = start;
-        while (Objects.nonNull(current)
-                && !(Files.isRegularFile(current.resolve("pom.xml"))
-                && Files.isDirectory(current.resolve("ddd4j-javalin-testcontainers")))) {
-            current = current.getParent();
+    private final static class BuildLine {
+
+        private static final long serialVersionUID = 0L;
+
+        private final String ddd4jVersion;
+
+        private final String javalinVersion;
+
+        private final String modelVersion;
+
+        private final String aggregateElement;
+
+        private final String jdkVersion;
+
+        private final String mavenVersion;
+
+        @JsonCreator()
+        private BuildLine(@JsonProperty("ddd4jVersion") String ddd4jVersion, @JsonProperty("javalinVersion") String javalinVersion, @JsonProperty("modelVersion") String modelVersion, @JsonProperty("aggregateElement") String aggregateElement, @JsonProperty("jdkVersion") String jdkVersion, @JsonProperty("mavenVersion") String mavenVersion) {
+            this.ddd4jVersion = ddd4jVersion;
+            this.javalinVersion = javalinVersion;
+            this.modelVersion = modelVersion;
+            this.aggregateElement = aggregateElement;
+            this.jdkVersion = jdkVersion;
+            this.mavenVersion = mavenVersion;
         }
-        if (Objects.isNull(current)) {
-            throw new IllegalStateException("无法定位 ddd4j-javalin 根目录");
+
+        @JsonProperty("ddd4jVersion")
+        public String ddd4jVersion() {
+            return ddd4jVersion;
         }
-        return current;
-    }
 
-    private static Document parse(Path pom) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        factory.setNamespaceAware(false);
-        return factory.newDocumentBuilder().parse(pom.toFile());
-    }
+        @JsonProperty("javalinVersion")
+        public String javalinVersion() {
+            return javalinVersion;
+        }
 
-    private static String parentVersion(Document document) {
-        Element parent = (Element) document.getElementsByTagName("parent").item(0);
-        return text(parent, "version");
-    }
+        @JsonProperty("modelVersion")
+        public String modelVersion() {
+            return modelVersion;
+        }
 
-    private static String property(Document document, String name) {
-        Element properties = (Element) document.getElementsByTagName("properties").item(0);
-        return text(properties, name);
-    }
+        @JsonProperty("aggregateElement")
+        public String aggregateElement() {
+            return aggregateElement;
+        }
 
-    private static String text(Document document, String name) {
-        return document.getElementsByTagName(name).item(0).getTextContent().trim();
-    }
+        @JsonProperty("jdkVersion")
+        public String jdkVersion() {
+            return jdkVersion;
+        }
 
-    private static String text(Element element, String name) {
-        NodeList values = element.getElementsByTagName(name);
-        return values.item(0).getTextContent().trim();
-    }
+        @JsonProperty("mavenVersion")
+        public String mavenVersion() {
+            return mavenVersion;
+        }
 
-    private static String optionalText(Element element, String name) {
-        NodeList values = element.getElementsByTagName(name);
-        return values.getLength() == 0 ? "" : values.item(0).getTextContent().trim();
-    }
-
-    private static int dependencyCount(Document document, String groupId, String artifactId, String scope) {
-        int count = 0;
-        NodeList dependencies = document.getElementsByTagName("dependency");
-        for (int index = 0; index < dependencies.getLength(); index++) {
-            Element dependency = (Element) dependencies.item(index);
-            if (groupId.equals(text(dependency, "groupId"))
-                    && artifactId.equals(text(dependency, "artifactId"))
-                    && scope.equals(text(dependency, "scope"))) {
-                count++;
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
             }
-        }
-        return count;
-    }
-
-    private static int managedImportCount(Document document, String groupId, String artifactId) {
-        int count = 0;
-        NodeList dependencies = document.getElementsByTagName("dependency");
-        for (int index = 0; index < dependencies.getLength(); index++) {
-            Element dependency = (Element) dependencies.item(index);
-            if (groupId.equals(text(dependency, "groupId"))
-                    && artifactId.equals(text(dependency, "artifactId"))
-                    && "pom".equals(text(dependency, "type"))
-                    && "import".equals(text(dependency, "scope"))) {
-                count++;
+            if (Objects.isNull(obj) || getClass() != obj.getClass()) {
+                return false;
             }
+            BuildLine other = (BuildLine) obj;
+            return Objects.equals(this.ddd4jVersion, other.ddd4jVersion) && Objects.equals(this.javalinVersion, other.javalinVersion) && Objects.equals(this.modelVersion, other.modelVersion) && Objects.equals(this.aggregateElement, other.aggregateElement) && Objects.equals(this.jdkVersion, other.jdkVersion) && Objects.equals(this.mavenVersion, other.mavenVersion);
         }
-        return count;
-    }
 
-    private record BuildLine(String ddd4jVersion,
-                             String javalinVersion,
-                             String modelVersion,
-                             String aggregateElement,
-                             String jdkVersion,
-                             String mavenVersion) {
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + Objects.hashCode(ddd4jVersion);
+            result = 31 * result + Objects.hashCode(javalinVersion);
+            result = 31 * result + Objects.hashCode(modelVersion);
+            result = 31 * result + Objects.hashCode(aggregateElement);
+            result = 31 * result + Objects.hashCode(jdkVersion);
+            result = 31 * result + Objects.hashCode(mavenVersion);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "BuildLine[ddd4jVersion=" + ddd4jVersion + ", javalinVersion=" + javalinVersion + ", modelVersion=" + modelVersion + ", aggregateElement=" + aggregateElement + ", jdkVersion=" + jdkVersion + ", mavenVersion=" + mavenVersion + "]";
+        }
     }
 }

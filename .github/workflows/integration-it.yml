@@ -23,7 +23,7 @@ name: Integration Tests
 on:
   workflow_dispatch:
   push:
-    branches: [feature/7.2.x]
+    branches: [ feature/7.2.x ]
     paths:
       - '.github/workflows/integration-it.yml'
   schedule:

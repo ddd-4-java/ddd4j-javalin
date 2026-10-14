@@ -1,13 +1,16 @@
 # ddd4j-javalin
 
-> 基于 [Javalin 6/7](https://javalin.io/) + [Google Guice](https://github.com/google/guice) 的 [ddd4j](https://github.com/ddd4j/ddd4j) 框架适配层。
+> 基于 [Javalin 6/7](https://javalin.io/) + [Google Guice](https://github.com/google/guice)
+> 的 [ddd4j](https://github.com/ddd4j/ddd4j) 框架适配层。
 >
 > 对齐目标:与 [`ddd4j-boot`](../ddd4j-boot) 能力矩阵一致,与 [`ddd4j`](../ddd4j) 全面适配。
 
 ## 项目定位
 
-ddd4j 是面向 DDD + CQRS + Event Sourcing 的服务端基础库,提供 6 大 Runtime 适配(Spring / Quarkus / Micronaut / Helidon / Dropwizard / Guice)。
-ddd4j-javalin 是其中"Guice Runtime + Javalin 7 Web"的实现轨,目标是为不使用 Spring 生态、又追求轻量的 Java 服务端项目提供与 Spring Boot 同等的"开箱即用"体验。
+ddd4j 是面向 DDD + CQRS + Event Sourcing 的服务端基础库,提供 6 大 Runtime 适配 (Spring / Quarkus / Micronaut / Helidon /
+Dropwizard / Guice)。
+ddd4j-javalin 是其中"Guice Runtime + Javalin 7 Web"的实现轨,目标是为不使用 Spring 生态、又追求轻量的 Java 服务端项目提供与
+Spring Boot 同等的"开箱即用"体验。
 
 ## 核心设计原则
 
@@ -17,38 +20,38 @@ ddd4j-javalin 是其中"Guice Runtime + Javalin 7 Web"的实现轨,目标是为�
 4. **ddd4j 核心 100% 复用** —— javalin 适配层只是 Guice Module 包装,不重新造底层。
 5. **测试双轨** —— 单元测试用 H2 / Mockito / In-Memory;集成测试用 Testcontainers。
 
-## 能力矩阵(对齐 ddd4j-boot 状态)
+## 能力矩阵 (对齐 ddd4j-boot 状态)
 
-| 能力 | ddd4j-boot 对标 | ddd4j-javalin 模块 | 状态 |
-|---|---|---|---|
-| **Web 启动入口** | `ddd4j-boot-web-webmvc` | `ddd4j-javalin-web` (`Ddd4jJavalinApplication.run`) | ✅ |
-| **Web 配置** | `Ddd4jWebMvcProperties` | `Ddd4jJavalinProperties` (`ddd4j.web.javalin.*`) | ✅ |
-| **Javalin 测试基类** | `MockMvc` / `WebTestClient` | `JavalinTestFixture` (`app.start(0)` + HttpClient) | ✅ |
-| **Cache** | `Ddd4jCacheAutoConfiguration` | 直接复用 `ddd4j-cache` 的 `CacheKit` | ✅ |
-| **MyBatis-Plus** | `Ddd4jMybatisAutoConfiguration` | `Ddd4jMybatisJavalinModule` (H2 + MySQL IT) | ✅ |
-| **API 操作日志** | `Ddd4jApiLogAspectAutoConfiguration` | `Ddd4jApiLogJavalinModule` | ✅ |
-| **外部数据源(IP/天气)** | `Ddd4jExternalAutoConfiguration` | `Ddd4jExternalJavalinModule` | ✅ |
-| **数据权限** | `Ddd4jDataScopeAutoConfiguration` | `Ddd4jDataScopeJavalinModule` | ✅ |
-| **JPA/Hibernate** | `ddd4j-boot-data-jpa` | `Ddd4jJpaJavalinModule` (PostgreSQL IT 占位) | ✅ |
-| **License** | `DefaultLicenseAutoConfiguration` | `Ddd4jLicenseJavalinModule` | ✅ |
-| **Sa-Token** | `SaTokenEnhanceAutoConfiguration` | `Ddd4jSaTokenJavalinModule` (Keycloak IT) | ✅ |
-| **Spring Security** | `SecurityEnhanceAutoConfiguration` | `Ddd4jSecurityJavalinModule` (Keycloak IT) | ✅ |
-| **Apache Shiro** | `ShiroEnhanceAutoConfiguration` | `Ddd4jShiroJavalinModule` (Keycloak IT) | ✅ |
-| **MQ 14 broker** | `ddd4j-boot-mq-*` | `ddd4j-javalin-mq-*` (Testcontainers IT) | ✅ |
-| **二维码** | `Ddd4jQrCodeBootAutoConfiguration` | `Ddd4jQrCodeJavalinModule` | ✅ |
-| **QLExpress 规则** | `Ddd4jQLExpressBootAutoConfiguration` | `Ddd4jQLExpressJavalinModule` | ✅ |
-| **文件上传校验（Validator）** | javalin 独有 | `ddd4j-javalin-extension-validation` | ✅ |
-| **akka / excel / jackson / monitor / pf4j** | 各 `Ddd4j*BootAutoConfiguration` | 占位 pom | ⚠️ 待补 |
+| 能力                                        | ddd4j-boot 对标                       | ddd4j-javalin 模块                                  | 状态    |
+|---------------------------------------------|---------------------------------------|-----------------------------------------------------|---------|
+| **Web 启动入口**                            | `ddd4j-boot-web-webmvc`               | `ddd4j-javalin-web` (`Ddd4jJavalinApplication.run`) | ✅      |
+| **Web 配置**                                | `Ddd4jWebMvcProperties`               | `Ddd4jJavalinProperties` (`ddd4j.web.javalin.*`)    | ✅      |
+| **Javalin 测试基类**                        | `MockMvc` / `WebTestClient`           | `JavalinTestFixture` (`app.start(0)` + HttpClient)  | ✅      |
+| **Cache**                                   | `Ddd4jCacheAutoConfiguration`         | 直接复用 `ddd4j-cache` 的 `CacheKit`                | ✅      |
+| **MyBatis-Plus**                            | `Ddd4jMybatisAutoConfiguration`       | `Ddd4jMybatisJavalinModule` (H2 + MySQL IT)         | ✅      |
+| **API 操作日志**                            | `Ddd4jApiLogAspectAutoConfiguration`  | `Ddd4jApiLogJavalinModule`                          | ✅      |
+| **外部数据源(IP/天气)**                     | `Ddd4jExternalAutoConfiguration`      | `Ddd4jExternalJavalinModule`                        | ✅      |
+| **数据权限**                                | `Ddd4jDataScopeAutoConfiguration`     | `Ddd4jDataScopeJavalinModule`                       | ✅      |
+| **JPA/Hibernate**                           | `ddd4j-boot-data-jpa`                 | `Ddd4jJpaJavalinModule` (PostgreSQL IT 占位)        | ✅      |
+| **License**                                 | `DefaultLicenseAutoConfiguration`     | `Ddd4jLicenseJavalinModule`                         | ✅      |
+| **Sa-Token**                                | `SaTokenEnhanceAutoConfiguration`     | `Ddd4jSaTokenJavalinModule` (Keycloak IT)           | ✅      |
+| **Spring Security**                         | `SecurityEnhanceAutoConfiguration`    | `Ddd4jSecurityJavalinModule` (Keycloak IT)          | ✅      |
+| **Apache Shiro**                            | `ShiroEnhanceAutoConfiguration`       | `Ddd4jShiroJavalinModule` (Keycloak IT)             | ✅      |
+| **MQ 14 broker**                            | `ddd4j-boot-mq-*`                     | `ddd4j-javalin-mq-*` (Testcontainers IT)            | ✅      |
+| **二维码**                                  | `Ddd4jQrCodeBootAutoConfiguration`    | `Ddd4jQrCodeJavalinModule`                          | ✅      |
+| **QLExpress 规则**                          | `Ddd4jQLExpressBootAutoConfiguration` | `Ddd4jQLExpressJavalinModule`                       | ✅      |
+| **文件上传校验（Validator）**               | javalin 独有                          | `ddd4j-javalin-extension-validation`                | ✅      |
+| **akka / excel / jackson / monitor / pf4j** | 各 `Ddd4j*BootAutoConfiguration`      | 占位 pom                                            | ⚠️ 待补 |
 
 ## Testcontainers 集成测试镜像
 
-| 类别 | 镜像 | Module |
-|---|---|---|
-| RDBMS | `mysql:8.0` / `postgres:16-alpine` / `mariadb:11` | `ddd4j-javalin-testcontainers` |
-| NoSQL | `mongo:7` / `redis:7-alpine` | `ddd4j-javalin-testcontainers` |
-| MQ | `confluentinc/cp-kafka:7.5.0` / `rabbitmq:3.13.7-management-alpine` / `apache/activemq-artemis:2.39.0` / `apache/rocketmq:5.3.2` / `apachepulsar/pulsar:3.2.0` / `nats:2-alpine` / `eclipse-mosquitto:2.0` / `localstack/localstack:3.4` | `ddd4j-javalin-testcontainers` |
-| Auth | `quay.io/keycloak/keycloak:26.2` | `ddd4j-javalin-testcontainers` |
-| HTTP Mock | `wiremock/wiremock:3.5.0` | `ddd4j-javalin-testcontainers` |
+| 类别      | 镜像                                                                                                                                                                                                                                     | Module                         |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|
+| RDBMS     | `mysql:8.0` / `postgres:16-alpine` / `mariadb:11`                                                                                                                                                                                        | `ddd4j-javalin-testcontainers` |
+| NoSQL     | `mongo:7` / `redis:7-alpine`                                                                                                                                                                                                             | `ddd4j-javalin-testcontainers` |
+| MQ        | `confluentinc/cp-kafka:7.5.0` / `rabbitmq:3.13.7-management-alpine` / `apache/activemq-artemis:2.39.0` / `apache/rocketmq:5.3.2` / `apachepulsar/pulsar:3.2.0` / `nats:2-alpine` / `eclipse-mosquitto:2.0` / `localstack/localstack:3.4` | `ddd4j-javalin-testcontainers` |
+| Auth      | `quay.io/keycloak/keycloak:26.2`                                                                                                                                                                                                         | `ddd4j-javalin-testcontainers` |
+| HTTP Mock | `wiremock/wiremock:3.5.0`                                                                                                                                                                                                                | `ddd4j-javalin-testcontainers` |
 
 ## 跑集成测试
 
@@ -134,27 +137,30 @@ class MyIT extends JavalinTestFixture {
 
 ## 三分支版本矩阵（2026-09 定版）
 
-| ddd4j-javalin 分支 | 本项目版本 | ddd4j | Javalin | Maven / POM | JDK |
-|---|---|---|---|---|---|
-| `feature/6.7.x` | `6.7.x.20260630-SNAPSHOT` | `1.0.x.20260630-SNAPSHOT` | `6.7.0` | Maven 3 / `4.0.0` / `<modules>` | 17 |
-| `feature/7.1.x` | `7.1.x.20260630-SNAPSHOT` | `2.0.x.20260630-SNAPSHOT` | `7.1.0` | Maven 3 / `4.0.0` / `<modules>` | 17 |
-| `feature/7.2.x` | `7.2.x.20260630-SNAPSHOT` | `3.0.x.20260630-SNAPSHOT` | `7.2.3` | Maven 4 / `4.1.0` / `<subprojects>` | 21 |
+| ddd4j-javalin 分支 | 本项目版本                | ddd4j                     | Javalin | Maven / POM                         | JDK |
+|--------------------|---------------------------|---------------------------|---------|-------------------------------------|-----|
+| `feature/6.7.x`    | `6.7.x.20260630-SNAPSHOT` | `1.0.x.20260630-SNAPSHOT` | `6.7.0` | Maven 3 / `4.0.0` / `<modules>`     | 17  |
+| `feature/7.1.x`    | `7.1.x.20260630-SNAPSHOT` | `2.0.x.20260630-SNAPSHOT` | `7.1.0` | Maven 3 / `4.0.0` / `<modules>`     | 17  |
+| `feature/7.2.x`    | `7.2.x.20260630-SNAPSHOT` | `3.0.x.20260630-SNAPSHOT` | `7.2.3` | Maven 4 / `4.1.0` / `<subprojects>` | 21  |
 
-`feature/7.1.x` 必须保持 Maven 3：它消费的 ddd4j 2.0.x 仍是 Maven 3 模型。只有消费 ddd4j 3.0.x 的 `feature/7.2.x` 使用 Maven 4。
+`feature/7.1.x` 必须保持 Maven 3：它消费的 ddd4j 2.0.x 仍是 Maven 3 模型。只有消费 ddd4j 3.0.x 的 `feature/7.2.x` 使用
+Maven 4。
 
 ## 生产就绪状态
 
-当前阶段：**internal beta**。三分支本地单元回归均通过，并分别完成 MySQL、三套 Keycloak 适配和 9 个可本地运行的 broker round-trip；远端 GitHub Actions 仍需推送后验收。
+当前阶段： **internal beta**。三分支本地单元回归均通过，并分别完成 MySQL、三套 Keycloak 适配和 9 个可本地运行的 broker
+round-trip；远端 GitHub Actions 仍需推送后验收。
 
 2026-08-16 实施了三项生产就绪改进：
 
-| 改进项 | 说明 | 状态 |
-|--------|------|------|
-| **CI workflows** | GitHub Actions 自动化 build + test + quality | 已实施（待推送验证） |
-| **Quality profile** | Jacoco 覆盖率（骨架就位，agent 注入点待修）+ OWASP 漏洞扫描 + SpotBugs 手动分析 | 部分实施 |
-| **Release profile + 文档** | GPG 签名发布配置 + 发布工程演练手册 | 已实施 |
+| 改进项                     | 说明                                                                            | 状态                 |
+|----------------------------|---------------------------------------------------------------------------------|----------------------|
+| **CI workflows**           | GitHub Actions 自动化 build + test + quality                                    | 已实施（待推送验证） |
+| **Quality profile**        | Jacoco 覆盖率（骨架就位，agent 注入点待修）+ OWASP 漏洞扫描 + SpotBugs 手动分析 | 部分实施             |
+| **Release profile + 文档** | GPG 签名发布配置 + 发布工程演练手册                                             | 已实施               |
 
 **剩余阻塞项**（首个正式版发布前必须解决）：
+
 1. 三分支本地提交尚未推送，GitHub Actions 尚无最终 SHA 验收结果。
 2. ddd4j 3.0.x 远端 Verify/Deploy 仍需恢复，之后补做空白 Maven 本地仓库消费验证。
 
@@ -176,10 +182,18 @@ class MyIT extends JavalinTestFixture {
 - `docs/superpowers/reports/YYYY-MM-DD-status.md` —— 真实状态报告
 
 主要历史：
-- [`specs/2026-07-29-javalin-capability-matrix-design.md`](docs/superpowers/specs/2026-07-29-javalin-capability-matrix-design.md) — 能力矩阵对齐设计
-- [`plans/2026-07-29-javalin-capability-matrix.md`](docs/superpowers/plans/2026-07-29-javalin-capability-matrix.md) — 实施计划（4 阶段 + 容器级 IT 验收）
-- [`specs/2026-07-30-testcontainers-foundation-design.md`](docs/superpowers/specs/2026-07-30-testcontainers-foundation-design.md) — Testcontainers Fixture 设计
-- [`specs/2026-08-04-container-it-roundspec-design.md`](docs/superpowers/specs/2026-08-04-container-it-roundspec-design.md) — 容器级 IT 真实 round-trip 修复设计
+
+- [
+  `specs/2026-07-29-javalin-capability-matrix-design.md`](docs/superpowers/specs/2026-07-29-javalin-capability-matrix-design.md) —
+  能力矩阵对齐设计
+- [`plans/2026-07-29-javalin-capability-matrix.md`](docs/superpowers/plans/2026-07-29-javalin-capability-matrix.md) —
+  实施计划（4 阶段 + 容器级 IT 验收）
+- [
+  `specs/2026-07-30-testcontainers-foundation-design.md`](docs/superpowers/specs/2026-07-30-testcontainers-foundation-design.md) —
+  Testcontainers Fixture 设计
+- [
+  `specs/2026-08-04-container-it-roundspec-design.md`](docs/superpowers/specs/2026-08-04-container-it-roundspec-design.md) —
+  容器级 IT 真实 round-trip 修复设计
 - [`reports/2026-08-05-status.md`](docs/superpowers/reports/2026-08-05-status.md) — 当前真实状态
 
 ## 许可证

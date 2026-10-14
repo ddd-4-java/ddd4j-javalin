@@ -8,7 +8,9 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-/** RESOURCE_LOCAL JPA 事务模板，每次调用独占并关闭一个 EntityManager。 */
+/**
+ * RESOURCE_LOCAL JPA 事务模板，每次调用独占并关闭一个 EntityManager。
+ */
 public final class JpaTransactionTemplate {
 
     private final EntityManagerFactory entityManagerFactory;

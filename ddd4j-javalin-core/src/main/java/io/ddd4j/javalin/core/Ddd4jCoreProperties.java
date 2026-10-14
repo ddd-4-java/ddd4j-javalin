@@ -20,12 +20,8 @@ public class Ddd4jCoreProperties {
     public static final String PREFIX = "ddd4j.core";
 
     /**
-     * 使用全部默认开关创建核心配置。
+     * Whether the ddd4j core layer (SPI bindings + GuiceContext registration) is enabled. Default {@code true}.
      */
-    public Ddd4jCoreProperties() {
-    }
-
-    /** Whether the ddd4j core layer (SPI bindings + GuiceContext registration) is enabled. Default {@code true}. */
     private boolean enabled = true;
 
     /**

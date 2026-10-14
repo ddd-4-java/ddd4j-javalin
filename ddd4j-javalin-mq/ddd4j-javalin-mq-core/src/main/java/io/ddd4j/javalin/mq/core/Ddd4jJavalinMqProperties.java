@@ -3,18 +3,18 @@ package io.ddd4j.javalin.mq.core;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Javalin MQ 生命周期策略。 */
+/**
+ * Javalin MQ 生命周期策略。
+ */
 @Getter
 @Setter
 public class Ddd4jJavalinMqProperties {
 
+    private Role role = Role.BOTH;
+    private boolean requireListeners = true;
     /**
-     * 默认构造方法：以 {@link Role#BOTH}、{@code requireListeners=true} 作为默认策略。
+     * 应用使用 MQ 的角色。
      */
-    public Ddd4jJavalinMqProperties() {
-    }
-
-    /** 应用使用 MQ 的角色。 */
     public enum Role {
         /** 仅作为生产者，不初始化消费者。 */
         PRODUCER_ONLY,
@@ -31,7 +31,4 @@ public class Ddd4jJavalinMqProperties {
             return this == CONSUMER_ONLY || this == BOTH;
         }
     }
-
-    private Role role = Role.BOTH;
-    private boolean requireListeners = true;
 }

@@ -41,6 +41,13 @@ class MybatisTestcontainersIT extends JavalinTestFixture {
 
     private HikariDataSource dataSource;
 
+    @org.junit.jupiter.api.AfterAll
+    static void tearDownContainer() {
+        if (MYSQL.isRunning()) {
+            MYSQL.stop();
+        }
+    }
+
     @Override
     protected String[] basePackages() {
         return new String[]{"io.ddd4j.javalin.sample.mybatistc"};
@@ -73,13 +80,6 @@ class MybatisTestcontainersIT extends JavalinTestFixture {
     void tearDownDataSource() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
-        }
-    }
-
-    @org.junit.jupiter.api.AfterAll
-    static void tearDownContainer() {
-        if (MYSQL.isRunning()) {
-            MYSQL.stop();
         }
     }
 

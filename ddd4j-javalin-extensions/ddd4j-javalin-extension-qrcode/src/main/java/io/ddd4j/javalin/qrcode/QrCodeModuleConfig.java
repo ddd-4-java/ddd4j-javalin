@@ -3,7 +3,9 @@ package io.ddd4j.javalin.qrcode;
 import lombok.Builder;
 import lombok.Getter;
 
-/** Explicit Javalin route and resource limits. Routes are disabled by default. */
+/**
+ * Explicit Javalin route and resource limits. Routes are disabled by default.
+ */
 @Getter
 @Builder
 public class QrCodeModuleConfig {

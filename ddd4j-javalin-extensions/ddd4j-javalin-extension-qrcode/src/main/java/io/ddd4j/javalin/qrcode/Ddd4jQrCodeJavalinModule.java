@@ -10,7 +10,9 @@ import io.javalin.Javalin;
 
 import java.util.Objects;
 
-/** Guice assembly for the framework-neutral QR code service. */
+/**
+ * Guice assembly for the framework-neutral QR code service.
+ */
 public class Ddd4jQrCodeJavalinModule extends AbstractModule implements AutoCloseable {
 
     private final QrCodeModuleConfig config;

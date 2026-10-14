@@ -87,55 +87,14 @@ final class MqContextPropagator {
      * 默认 registry 容量上限：10000 条。
      */
     static final int DEFAULT_MAX_SNAPSHOTS = 10000;
-
-    /**
-     * 包装 snapshot + 写入时间戳，使 consumer 端可以做 TTL 判断。
-     */
-    private static final class TimedSnapshot {
-
-        final long captureMillis;
-        final Map<Object, Object> resources;
-
-        TimedSnapshot(long captureMillis, Map<Object, Object> resources) {
-            this.captureMillis = captureMillis;
-            this.resources = resources;
-        }
-
-        boolean isExpired(long ttlMillis) {
-            return System.currentTimeMillis() - captureMillis > ttlMillis;
-        }
-    }
-
-    /**
-     * 不可快照作用域：进入时直接 {@code ThreadContext.setResources(snapshot)}
-     * （与 {@link ThreadContext#open(Map)} 不同——后者在 close 时恢复原值，
-     * 我们的语义是"消费完彻底清理，避免 broker 线程复用串扰"）。
-     */
-    private static final class SnapshotScope implements AutoCloseable {
-
-        private final Map<Object, Object> snapshot;
-        private boolean closed;
-
-        private SnapshotScope(Map<Object, Object> snapshot) {
-            this.snapshot = Objects.requireNonNull(snapshot, "snapshot must not be null");
-            ThreadContext.setResources(this.snapshot);
-        }
-
-        @Override
-        public void close() {
-            if (closed) {
-                return;
-            }
-            ThreadContext.clear();
-            closed = true;
-        }
-    }
-
     /**
      * 类级缓存：避免 {@link #registry()} 中 BaseContext.get → inject 的 check-then-act 竞态。
      * volatile 保证跨线程可见性；首次初始化后所有线程直接读缓存，不再进入竞态分支。
      */
     private static volatile Map<String, TimedSnapshot> cachedRegistry;
+
+    private MqContextPropagator() {
+    }
 
     /**
      * 清除类级缓存。用于测试隔离——当 BaseContext 被重置后调用，避免缓存持有过期引用。
@@ -143,9 +102,6 @@ final class MqContextPropagator {
      */
     static void clearCache() {
         cachedRegistry = null;
-    }
-
-    private MqContextPropagator() {
     }
 
     /**
@@ -329,5 +285,48 @@ final class MqContextPropagator {
     private static int maxSnapshots() {
         Integer override = BaseContext.get(MAX_SNAPSHOTS_KEY);
         return Objects.nonNull(override) && override > 0 ? override : DEFAULT_MAX_SNAPSHOTS;
+    }
+
+    /**
+     * 包装 snapshot + 写入时间戳，使 consumer 端可以做 TTL 判断。
+     */
+    private static final class TimedSnapshot {
+
+        final long captureMillis;
+        final Map<Object, Object> resources;
+
+        TimedSnapshot(long captureMillis, Map<Object, Object> resources) {
+            this.captureMillis = captureMillis;
+            this.resources = resources;
+        }
+
+        boolean isExpired(long ttlMillis) {
+            return System.currentTimeMillis() - captureMillis > ttlMillis;
+        }
+    }
+
+    /**
+     * 不可快照作用域：进入时直接 {@code ThreadContext.setResources(snapshot)}
+     * （与 {@link ThreadContext#open(Map)} 不同——后者在 close 时恢复原值，
+     * 我们的语义是"消费完彻底清理，避免 broker 线程复用串扰"）。
+     */
+    private static final class SnapshotScope implements AutoCloseable {
+
+        private final Map<Object, Object> snapshot;
+        private boolean closed;
+
+        private SnapshotScope(Map<Object, Object> snapshot) {
+            this.snapshot = Objects.requireNonNull(snapshot, "snapshot must not be null");
+            ThreadContext.setResources(this.snapshot);
+        }
+
+        @Override
+        public void close() {
+            if (closed) {
+                return;
+            }
+            ThreadContext.clear();
+            closed = true;
+        }
     }
 }

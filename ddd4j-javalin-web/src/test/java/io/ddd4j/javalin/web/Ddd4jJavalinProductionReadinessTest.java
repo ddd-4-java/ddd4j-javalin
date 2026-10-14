@@ -24,7 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Production readiness and idempotency deployment contracts. */
+/**
+ * Production readiness and idempotency deployment contracts.
+ */
 class Ddd4jJavalinProductionReadinessTest {
 
     @AfterEach
@@ -129,17 +131,26 @@ class Ddd4jJavalinProductionReadinessTest {
     private JavalinLifecycleParticipant unavailableParticipant() {
         return new JavalinLifecycleParticipant() {
             @Override
-            public int order() { return 10; }
+            public int order() {
+                return 10;
+            }
+
             @Override
-            public void validate() { }
+            public void validate() {
+            }
+
             @Override
-            public void start() { }
+            public void start() {
+            }
+
             @Override
             public ReadinessResult readiness() {
                 return ReadinessResult.unavailable("postgresql", "database-password");
             }
+
             @Override
-            public void close() { }
+            public void close() {
+            }
         };
     }
 

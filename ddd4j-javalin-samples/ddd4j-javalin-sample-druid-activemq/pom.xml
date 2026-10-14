@@ -1301,7 +1301,7 @@
 
         <!-- https://mvnrepository.com/artifact/com.alibaba/easyexcel -->
         <dependency>
-            <groupId>com.alibaba</groupId>
+            <groupId>io.github.easy4j</groupId>
             <artifactId>easyexcel</artifactId>
             <version>${easyexcel.version}</version>
         </dependency>

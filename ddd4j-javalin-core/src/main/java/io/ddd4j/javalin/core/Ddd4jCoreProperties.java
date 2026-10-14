@@ -16,6 +16,10 @@ import lombok.Setter;
 @Setter
 public class Ddd4jCoreProperties {
 
+    /** 创建使用默认开关值的核心配置。 */
+    public Ddd4jCoreProperties() {
+    }
+
     /** 核心层配置键前缀（{@code ddd4j.core}）。 */
     public static final String PREFIX = "ddd4j.core";
 

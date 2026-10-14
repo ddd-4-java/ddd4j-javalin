@@ -30,6 +30,13 @@ public final class NimbusOidcTokenVerifier implements OidcTokenVerifier {
     private final OidcProperties properties;
     private final ConfigurableJWTProcessor<SecurityContext> processor;
 
+    /**
+     * 基于 OIDC 配置初始化 Nimbus 验签处理器。
+     *
+     * @param properties OIDC 配置，不允许为 {@code null}
+     * @throws NullPointerException     当 {@code properties} 为 {@code null} 时抛出
+     * @throws IllegalArgumentException 当 JWKS 地址无法解析时抛出
+     */
     public NimbusOidcTokenVerifier(OidcProperties properties) {
         this.properties = Objects.requireNonNull(properties, "properties must not be null");
         try {

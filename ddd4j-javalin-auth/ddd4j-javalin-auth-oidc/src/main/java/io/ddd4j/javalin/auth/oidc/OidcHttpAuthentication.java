@@ -21,6 +21,11 @@ public final class OidcHttpAuthentication {
 
     /**
      * 注册默认拒绝、路径白名单放行的请求认证处理器。
+     *
+     * @param app         待注册处理器的 Javalin 实例，不允许为 {@code null}
+     * @param provider    负责 token 验证与身份作用域建立的 Subject 提供方，不允许为 {@code null}
+     * @param publicPaths 免认证的公共路径集合，{@code null} 视为空集合
+     * @throws NullPointerException 当 {@code app} 或 {@code provider} 为 {@code null} 时抛出
      */
     public static void register(Javalin app, OidcSubjectProvider provider, Set<String> publicPaths) {
         Objects.requireNonNull(app, "app must not be null");

@@ -15,7 +15,13 @@ import org.testcontainers.utility.DockerImageName;
  * a long-running cluster.
  */
 public class KafkaTestContainerFixture extends AbstractTestContainerFixture<KafkaContainer> {
+    /**
+     * 默认构造方法：Fixture 仅持有镜像与端口常量，容器由 {@link #newContainer()} 构建。
+     */
+    public KafkaTestContainerFixture() {
+    }
 
+    /** 默认容器镜像。 */
     public static final String DEFAULT_IMAGE = "confluentinc/cp-kafka:7.5.0";
 
     @Override

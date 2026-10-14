@@ -26,15 +26,32 @@ public class Ddd4jExternalJavalinModule extends AbstractModule {
     private final SequenceProperties sequenceProperties;
     private final IpRegionTemplate ipRegionTemplate;
 
+    /**
+     * 使用全部默认配置创建模块（离线 IP 归属地，不发起外网请求）。
+     */
     public Ddd4jExternalJavalinModule() {
         this(new ExternalProperties(), new SequenceProperties(), IpRegionTemplate.none());
     }
 
+    /**
+     * 使用指定外部集成配置创建模块。
+     *
+     * @param externalProperties 外部集成配置，不允许为 {@code null}
+     * @param sequenceProperties 全局发号器配置，不允许为 {@code null}
+     */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
                                       SequenceProperties sequenceProperties) {
         this(externalProperties, sequenceProperties, IpRegionTemplate.none());
     }
 
+    /**
+     * 使用指定外部集成配置与 IP 归属地模板创建模块。
+     *
+     * @param externalProperties 外部集成配置，不允许为 {@code null}
+     * @param sequenceProperties 全局发号器配置，不允许为 {@code null}
+     * @param ipRegionTemplate   IP 归属地查询模板，不允许为 {@code null}
+     * @throws NullPointerException 任一参数为 {@code null} 时抛出
+     */
     public Ddd4jExternalJavalinModule(ExternalProperties externalProperties,
                                       SequenceProperties sequenceProperties,
                                       IpRegionTemplate ipRegionTemplate) {

@@ -27,10 +27,18 @@ public class Ddd4jLicenseJavalinModule extends AbstractAuthJavalinModule {
 
     private final LicenseProperties properties;
 
+    /**
+     * 使用默认许可证配置创建模块。
+     */
     public Ddd4jLicenseJavalinModule() {
         this(new LicenseProperties());
     }
 
+    /**
+     * 使用指定许可证配置创建模块。
+     *
+     * @param properties 许可证配置，不允许为 {@code null}
+     */
     public Ddd4jLicenseJavalinModule(LicenseProperties properties) {
         this.properties = properties;
     }

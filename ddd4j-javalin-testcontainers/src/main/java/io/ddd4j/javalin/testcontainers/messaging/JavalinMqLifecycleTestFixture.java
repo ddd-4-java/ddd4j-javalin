@@ -24,6 +24,13 @@ public final class JavalinMqLifecycleTestFixture {
 
     /**
      * 启动严格 MQ 生命周期，并记录到当前测试线程。
+     *
+     * @param client broker 客户端，不可为 {@code null}
+     * @param listeners 监听器列表，不可为 {@code null}
+     * @param properties broker 级 MQ 属性，不可为 {@code null}
+     * @param serialization MQ 事件序列化器，不可为 {@code null}
+     * @param storer MQ 事件持久化器，允许为 {@code null}（persist=false 时）
+     * @throws NullPointerException 除 {@code storer} 外任一参数为 {@code null}
      */
     public static void start(MQClient client, List<MQListener> listeners, MQProperties properties,
                              MQEventSerialization serialization, MQEventStorer<MQEvent> storer) {

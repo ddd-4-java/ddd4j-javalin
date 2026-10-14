@@ -17,6 +17,12 @@ public final class JavalinFileValidator {
 
     private final FileValidationService validationService;
 
+    /**
+     * 构造校验入口。
+     *
+     * @param validationService 校验服务，不可为 {@code null}
+     * @throws NullPointerException 当 {@code validationService} 为 {@code null}
+     */
     public JavalinFileValidator(FileValidationService validationService) {
         this.validationService = Objects.requireNonNull(validationService, "validationService must not be null");
     }

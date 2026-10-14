@@ -21,10 +21,19 @@ public class Ddd4jDataScopeJavalinModule extends AbstractModule {
 
     private final DataScopeProvider provider;
 
+    /**
+     * 创建默认（fail-closed）模块：拒绝所有数据行。
+     */
     public Ddd4jDataScopeJavalinModule() {
         this((dataType, data) -> false);
     }
 
+    /**
+     * 使用指定数据权限提供方创建模块。
+     *
+     * @param provider 数据权限提供方，通常为租户感知实现，不允许为 {@code null}
+     * @throws NullPointerException 当 {@code provider} 为 {@code null} 时抛出
+     */
     public Ddd4jDataScopeJavalinModule(DataScopeProvider provider) {
         this.provider = Objects.requireNonNull(provider, "provider must not be null");
     }

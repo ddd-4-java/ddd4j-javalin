@@ -13,6 +13,12 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  */
 public class Ddd4jTestContainersExtension implements ExecutionCondition {
 
+    /**
+     * 默认构造方法：由 JUnit Jupiter 通过反射创建，无自定义初始化逻辑。
+     */
+    public Ddd4jTestContainersExtension() {
+    }
+
     private static final ConditionEvaluationResult ENABLED =
             ConditionEvaluationResult.enabled("Docker daemon assumed available");
 

@@ -16,6 +16,10 @@ public final class Ddd4jJavalinReadinessRoutes {
 
     /**
      * 注册 liveness、readiness 与聚合 health 路由。
+     *
+     * @param app     待注册路由的 Javalin 实例，不允许为 {@code null}
+     * @param runtime 提供就绪状态的 Javalin 运行时，不允许为 {@code null}
+     * @throws NullPointerException 当 {@code app} 或 {@code runtime} 为 {@code null} 时抛出
      */
     public static void register(Javalin app, Ddd4jJavalinRuntime runtime) {
         Objects.requireNonNull(app, "app must not be null");

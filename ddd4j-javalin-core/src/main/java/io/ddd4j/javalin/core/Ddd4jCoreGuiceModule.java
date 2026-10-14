@@ -55,14 +55,28 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
     private final Ddd4jCoreProperties properties;
     private final Ddd4jJavalinBootstrapContext bootstrapContext;
 
+    /**
+     * 使用默认配置与空扫描包创建核心装配模块。
+     */
     public Ddd4jCoreGuiceModule() {
         this(new Ddd4jCoreProperties(), new Ddd4jJavalinBootstrapContext(""));
     }
 
+    /**
+     * 使用指定配置与空扫描包创建核心装配模块。
+     *
+     * @param properties 核心装配配置，不得为 {@code null}
+     */
     public Ddd4jCoreGuiceModule(Ddd4jCoreProperties properties) {
         this(properties, new Ddd4jJavalinBootstrapContext(""));
     }
 
+    /**
+     * 使用指定配置与应用扫描包创建核心装配模块。
+     *
+     * @param properties 核心装配配置，不得为 {@code null}
+     * @param bootstrapContext 生命周期参与者可见的应用扫描包上下文，不得为 {@code null}
+     */
     public Ddd4jCoreGuiceModule(Ddd4jCoreProperties properties,
                                 Ddd4jJavalinBootstrapContext bootstrapContext) {
         this.properties = Objects.requireNonNull(properties, "properties must not be null");
@@ -81,6 +95,9 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
 
     /**
      * 使用应用扫描包创建默认核心模块。
+     *
+     * @param basePackages 逗号分隔的应用扫描包，空白时视为空扫描包
+     * @return 默认核心装配模块
      */
     public static Ddd4jCoreGuiceModule defaults(String basePackages) {
         return new Ddd4jCoreGuiceModule(
@@ -112,6 +129,8 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
 
     /**
      * 当前装配配置。可见于启动入口与测试。
+     *
+     * @return 本模块使用的不可变配置实例
      */
     public Ddd4jCoreProperties getProperties() {
         return properties;

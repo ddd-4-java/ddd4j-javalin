@@ -25,6 +25,13 @@ import io.ddd4j.sample.order.local.InMemoryOrderAdapters;
  */
 public class OrderOutboxGuiceModule extends AbstractModule {
 
+    /**
+     * 默认构造方法：适配器/依赖在构造期初始化，装配逻辑见 {@link #configure()}。
+     */
+    public OrderOutboxGuiceModule() {
+    }
+
+
     private final InMemoryOrderAdapters adapters = new InMemoryOrderAdapters();
 
     @Override

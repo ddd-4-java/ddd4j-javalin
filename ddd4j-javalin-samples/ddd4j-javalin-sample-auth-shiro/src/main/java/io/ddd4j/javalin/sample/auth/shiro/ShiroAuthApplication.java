@@ -14,6 +14,18 @@ import io.javalin.Javalin;
  */
 public class ShiroAuthApplication {
 
+    /**
+     * 默认构造方法：启动类仅含静态 {@code main} 入口，无实例状态。
+     */
+    public ShiroAuthApplication() {
+    }
+
+
+    /**
+     * 启动示例应用：组装 Guice Injector 并在 8080 端口启动 Javalin。
+     *
+     * @param args 命令行参数（未使用）
+     */
     public static void main(String[] args) {
         Injector injector = Guice.createInjector(
                 new Ddd4jGuiceModule(),

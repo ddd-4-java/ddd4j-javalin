@@ -13,8 +13,16 @@ import org.testcontainers.containers.GenericContainer;
  * as the parameterised type (rather than the usual
  * {@code C extends GenericContainer<C>} self-type idiom) so that subclasses like
  * {@code MySQLContainer<?>} work without requiring them to redeclare the wildcard.
+ *
+ * @param <C> 容器类型，须为 {@link GenericContainer} 的子类型
  */
 public abstract class AbstractTestContainerFixture<C extends GenericContainer<?>> {
+
+    /**
+     * 默认构造方法：子类通过无参构造创建 Fixture 实例，容器由 {@link #newContainer()} 惰性构建。
+     */
+    protected AbstractTestContainerFixture() {
+    }
 
     /**
      * Build a fresh container instance. Tests should keep the returned container as a
@@ -31,6 +39,8 @@ public abstract class AbstractTestContainerFixture<C extends GenericContainer<?>
      * Modules, etc. By default delegates to {@link #newContainer()} and reads the host /
      * mapped port; subclasses may override when the connection string has a different shape
      * (e.g. Keycloak realms, Kafka brokers).
+     *
+     * @return 连接串（JDBC URL 或等价形式）
      */
     public String connectionString() {
         C container = newContainer();
@@ -44,6 +54,9 @@ public abstract class AbstractTestContainerFixture<C extends GenericContainer<?>
 
     /**
      * Hook for subclasses to format the connection string from the started container.
+     *
+     * @param container 已启动的容器实例
+     * @return 连接串（JDBC URL 或等价形式）
      */
     protected abstract String resolveConnectionString(C container);
 }

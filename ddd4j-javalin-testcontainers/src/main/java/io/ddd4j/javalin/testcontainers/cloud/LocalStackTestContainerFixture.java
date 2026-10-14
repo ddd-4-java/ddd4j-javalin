@@ -11,7 +11,13 @@ import org.testcontainers.utility.DockerImageName;
  * 服务启用和端点解析。</p>
  */
 public class LocalStackTestContainerFixture extends AbstractTestContainerFixture<LocalStackContainer> {
+    /**
+     * 默认构造方法：Fixture 仅持有镜像与端口常量，容器由 {@link #newContainer()} 构建。
+     */
+    public LocalStackTestContainerFixture() {
+    }
 
+    /** 默认容器镜像。 */
     public static final String DEFAULT_IMAGE = "localstack/localstack:3.4";
 
     /**

@@ -3,7 +3,7 @@
 - **日期**：2026-07-29
 - **作者**：ddd4j-javalin 团队（与 Claude Code 协同设计）
 - **状态**：已实施（commit `9fb7515` 2026-08-04 + `bc47d8d` 2026-08-05）
-- **关联仓库**：`/Users/wandl/workspaces/workspace-ddd4j/workspace-ddd4j-boot/ddd4j-javalin`（feature/6.3.x）
+- **关联仓库**：`/Users/ddd4j/workspaces/workspace-ddd4j/workspace-ddd4j-boot/ddd4j-javalin`（feature/6.3.x）
 
 ## 1. 目标与范围
 

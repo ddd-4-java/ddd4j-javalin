@@ -18,6 +18,18 @@ import java.util.Map;
 @ApplicationService
 public class AuthController {
 
+    /**
+     * 默认构造方法：控制器无状态，路由通过 {@link #register(Javalin)} 注册。
+     */
+    public AuthController() {
+    }
+
+
+    /**
+     * 用 Javalin 编程式 API 注册示例路由（Javalin 无注解路由，这是原生方式）。
+     *
+     * @param app 目标 Javalin 实例
+     */
     public void register(Javalin app) {
         app.unsafe.routes.post("/auth/login", this::login);
         app.unsafe.routes.post("/auth/logout", this::logout);
@@ -27,6 +39,11 @@ public class AuthController {
         app.unsafe.routes.get("/auth/status", this::status);
     }
 
+    /**
+     * 登录：SubjectKit.login(AuthRequest)，从查询参数 userId 构造主体并签发 token。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void login(Context ctx) {
         String userId = ctx.queryParam("userId");
         AuthPrincipal principal = new AuthPrincipal()
@@ -44,11 +61,21 @@ public class AuthController {
         ctx.json(result);
     }
 
+    /**
+     * 登出：SubjectKit.logout()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void logout(Context ctx) {
         SubjectKit.logout();
         ctx.json(Map.of("success", true));
     }
 
+    /**
+     * 查询当前登录用户：SubjectKit.getPrincipal()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void me(Context ctx) {
         AuthPrincipal principal = SubjectKit.getPrincipal();
         if (principal == null) {
@@ -62,18 +89,33 @@ public class AuthController {
         ctx.json(result);
     }
 
+    /**
+     * 权限校验：SubjectKit.hasPermission()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void checkPermission(Context ctx) {
         String permission = ctx.queryParam("permission");
         boolean has = SubjectKit.hasPermission(permission);
         ctx.json(Map.of("permission", permission, "has", has));
     }
 
+    /**
+     * 角色校验：SubjectKit.hasRole()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void checkRole(Context ctx) {
         String role = ctx.queryParam("role");
         boolean has = SubjectKit.hasRole(role);
         ctx.json(Map.of("role", role, "has", has));
     }
 
+    /**
+     * 登录状态：SubjectKit.isLogin()。
+     *
+     * @param ctx Javalin 请求上下文
+     */
     public void status(Context ctx) {
         ctx.json(Map.of("login", SubjectKit.isLogin()));
     }

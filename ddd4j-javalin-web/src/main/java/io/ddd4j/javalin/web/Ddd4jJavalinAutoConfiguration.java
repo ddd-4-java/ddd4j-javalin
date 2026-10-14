@@ -41,16 +41,27 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     private final Ddd4jJavalinProperties properties;
     private final IdempotencyGuard sharedIdempotencyGuard;
 
+    /**
+     * 使用默认配置创建 Web 装配模块。
+     */
     public Ddd4jJavalinAutoConfiguration() {
         this(new Ddd4jJavalinProperties());
     }
 
+    /**
+     * 使用指定配置创建 Web 装配模块。
+     *
+     * @param properties Web 层配置，不允许为 {@code null}
+     */
     public Ddd4jJavalinAutoConfiguration(Ddd4jJavalinProperties properties) {
         this(properties, null);
     }
 
     /**
      * 使用显式共享 Guard 创建生产级 Web 装配。
+     *
+     * @param properties            Web 层配置，不允许为 {@code null}
+     * @param sharedIdempotencyGuard 跨实例共享的幂等 Guard；仅 SHARED 部署模式下必填，可为 {@code null}
      */
     public Ddd4jJavalinAutoConfiguration(Ddd4jJavalinProperties properties,
                                          IdempotencyGuard sharedIdempotencyGuard) {
@@ -166,7 +177,9 @@ public class Ddd4jJavalinAutoConfiguration extends AbstractModule {
     }
 
     /**
-     * Current properties. Visible for the bootstrap class.
+     * 返回当前配置。供引导类读取。
+     *
+     * @return 本模块持有的 Web 层配置
      */
     public Ddd4jJavalinProperties getProperties() {
         return properties;

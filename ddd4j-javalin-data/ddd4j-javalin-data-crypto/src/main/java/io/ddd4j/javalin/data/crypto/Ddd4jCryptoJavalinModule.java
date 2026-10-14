@@ -12,4 +12,11 @@ import io.ddd4j.guice.Ddd4jCryptoGuiceModule;
  */
 @Deprecated
 public class Ddd4jCryptoJavalinModule extends Ddd4jCryptoGuiceModule {
+
+    /**
+     * 构造加解密装配模块，沿用上游默认策略绑定。
+     */
+    public Ddd4jCryptoJavalinModule() {
+        super();
+    }
 }

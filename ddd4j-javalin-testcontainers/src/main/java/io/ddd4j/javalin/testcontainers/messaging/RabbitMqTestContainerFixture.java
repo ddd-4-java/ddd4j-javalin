@@ -15,7 +15,13 @@ import org.testcontainers.utility.DockerImageName;
  * both the official Java client and {@code ddd4j-javalin-mq-rabbitmq}.
  */
 public class RabbitMqTestContainerFixture extends AbstractTestContainerFixture<RabbitMQContainer> {
+    /**
+     * 默认构造方法：Fixture 仅持有镜像与端口常量，容器由 {@link #newContainer()} 构建。
+     */
+    public RabbitMqTestContainerFixture() {
+    }
 
+    /** 默认容器镜像。 */
     public static final String DEFAULT_IMAGE = "rabbitmq:3.13.7-management-alpine";
 
     @Override

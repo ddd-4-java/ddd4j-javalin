@@ -17,6 +17,7 @@ import java.time.Duration;
 @Setter
 public class Ddd4jJavalinProperties {
 
+    /** 配置键前缀（{@code ddd4j.web.javalin}）。 */
     public static final String PREFIX = "ddd4j.web.javalin";
 
     /**

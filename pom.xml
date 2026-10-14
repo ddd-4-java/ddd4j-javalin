@@ -67,6 +67,13 @@
              （继承链存在字面量 argLine，configuration 合并不可靠，property 拼接 100% 生效） -->
         <jacoco.version>0.8.12</jacoco.version>
         <jacoco.agent.argLine></jacoco.agent.argLine>
+        <!-- Javadoc 门禁：默认全量强校验（doclint all 含 missing 组 + failOnWarnings + failOnError）。
+             父 POM 默认 failOnError=false 会把校验异常吞掉导致门禁假绿，此处必须显式置 true；
+             -Djavadoc.failOnWarning=false / -Djavadoc.failOnError=false / -Djavadoc.doclint=...
+             仅限缺口盘点与应急关断，MUST NOT 作为常态默认值写入 POM -->
+        <javadoc.doclint>all</javadoc.doclint>
+        <javadoc.failOnWarning>true</javadoc.failOnWarning>
+        <javadoc.failOnError>true</javadoc.failOnError>
         <!-- Maven Plugin versions -->
         <maven.version>4.0.0-rc-6</maven.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -292,11 +299,24 @@
                         <charset>${project.build.sourceEncoding}</charset>
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <docencoding>${project.build.sourceEncoding}</docencoding>
+                        <!-- Javadoc 零告警门禁：doclint 全开（含 missing 缺失注释组）+ 任何告警/错误即构建失败 -->
+                        <doclint>${javadoc.doclint}</doclint>
+                        <failOnWarnings>${javadoc.failOnWarning}</failOnWarnings>
+                        <failOnError>${javadoc.failOnError}</failOnError>
+                        <release>${java.version}</release>
+                        <!-- -Xmaxwarns 1000000：突破 javadoc 默认 100 条截断，
+                             防止 ≥1000 条告警被截断成假绿 -->
+                        <additionalOptions>
+                            <additionalOption>-Xmaxwarns</additionalOption>
+                            <additionalOption>1000000</additionalOption>
+                        </additionalOptions>
                     </configuration>
                     <executions>
+                        <!-- 执行目标（jar）绑定 verify 生命周期：缺注释/告警直接失败构建；
+                             report 目标不失败构建，不能作为门禁 -->
                         <execution>
                             <id>attach-javadocs</id>
-                            <phase>package</phase>
+                            <phase>verify</phase>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
@@ -431,15 +451,6 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
-        </profile>
-        <profile>
-            <id>disable-javadoc-doclint</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <properties>
-                <additionalparam>-Xdoclint:none</additionalparam>
-            </properties>
         </profile>
         <profile>
             <id>release</id>

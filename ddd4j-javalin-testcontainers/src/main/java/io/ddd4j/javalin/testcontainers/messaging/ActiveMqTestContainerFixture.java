@@ -13,9 +13,17 @@ import org.testcontainers.utility.DockerImageName;
  * exposes the admin UI for debugging.
  */
 public class ActiveMqTestContainerFixture extends AbstractTestContainerFixture<GenericContainer<?>> {
+    /**
+     * 默认构造方法：Fixture 仅持有镜像与端口常量，容器由 {@link #newContainer()} 构建。
+     */
+    public ActiveMqTestContainerFixture() {
+    }
 
+    /** 默认容器镜像。 */
     public static final String DEFAULT_IMAGE = "apache/activemq-artemis:2.39.0";
+    /** OpenWire 协议端口。 */
     public static final int OPENWIRE_PORT = 61616;
+    /** 管理界面端口。 */
     public static final int ADMIN_PORT = 8161;
 
     @Override

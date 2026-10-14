@@ -39,6 +39,17 @@ public final class JavalinMqLifecycleParticipant implements JavalinLifecyclePart
     private boolean started;
     private boolean closed;
 
+    /**
+     * 构造 MQ 生命周期参与者。
+     *
+     * @param client broker 客户端，不可为 {@code null}
+     * @param brokerProperties broker 级 MQ 属性，不可为 {@code null}
+     * @param integrationProperties Javalin MQ 集成策略，不可为 {@code null}
+     * @param listeners 监听器工厂（延迟从 Guice 取 bean），不可为 {@code null}
+     * @param serialization MQ 事件序列化器，不可为 {@code null}
+     * @param storer MQ 事件持久化器，允许为 {@code null}（persist=false 时）
+     * @throws NullPointerException 任一必填参数为 {@code null}
+     */
     public JavalinMqLifecycleParticipant(MQClient client, MQProperties brokerProperties,
                                          Ddd4jJavalinMqProperties integrationProperties,
                                          Supplier<List<MQListener>> listeners,

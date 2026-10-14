@@ -19,10 +19,22 @@ public class Ddd4jRabbitMqGuiceModule extends AbstractDdd4jMqGuiceModule {
 
     private final RabbitMQClient client;
 
+    /**
+     * 以默认 Rabbit 属性构造模块。
+     *
+     * @param client 已初始化的 RabbitMQClient 实例，不可为 {@code null}
+     */
     public Ddd4jRabbitMqGuiceModule(RabbitMQClient client) {
         this(client, new RabbitMQProperties());
     }
 
+    /**
+     * 以指定 broker 属性构造模块，并将客户端注册为单例。
+     *
+     * @param client 已初始化的 RabbitMQClient 实例，不可为 {@code null}
+     * @param properties RabbitMQProperties 实例，不可为 {@code null}
+     * @throws NullPointerException 当任一参数为 {@code null}
+     */
     public Ddd4jRabbitMqGuiceModule(RabbitMQClient client, RabbitMQProperties properties) {
         super(properties);
         this.client = Objects.requireNonNull(client, "client");
@@ -35,6 +47,11 @@ public class Ddd4jRabbitMqGuiceModule extends AbstractDdd4jMqGuiceModule {
         bind(RabbitMQClient.class).toInstance(client);
     }
 
+    /**
+     * 暴露单例 {@link MQClient} 契约供业务注入。
+     *
+     * @return 本模块持有的 RabbitMQClient 实例
+     */
     @Provides
     @Singleton
     public MQClient mqClient() {

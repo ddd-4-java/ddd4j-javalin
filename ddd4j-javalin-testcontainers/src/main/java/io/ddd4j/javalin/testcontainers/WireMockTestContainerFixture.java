@@ -15,8 +15,21 @@ import org.testcontainers.containers.wait.strategy.Wait;
  */
 public class WireMockTestContainerFixture extends AbstractTestContainerFixture<GenericContainer<?>> {
 
+    /**
+     * 默认 WireMock 镜像。
+     */
     public static final String DEFAULT_IMAGE = "wiremock/wiremock:3.5.0";
+
+    /**
+     * WireMock 容器对外暴露的端口。
+     */
     public static final int DEFAULT_PORT = 8080;
+
+    /**
+     * 默认构造方法：Fixture 不持有实例状态，容器由 {@link #newContainer()} 构建。
+     */
+    public WireMockTestContainerFixture() {
+    }
 
     @Override
     public GenericContainer<?> newContainer() {

@@ -17,12 +17,26 @@ public final class RecordingIntegrationEventPublisher implements IntegrationEven
 
     private final List<OutboxMessage> published = new CopyOnWriteArrayList<>();
 
+    /**
+     * 默认构造方法：以空记录列表初始化。
+     */
+    public RecordingIntegrationEventPublisher() {
+    }
+
+    /**
+     * 记录一条已发布的集成事件。
+     *
+     * @param message Outbox 消息，不可为 {@code null}
+     * @throws NullPointerException 当 {@code message} 为 {@code null}
+     */
     @Override
     public void publish(OutboxMessage message) {
         published.add(Objects.requireNonNull(message, "message must not be null"));
     }
 
     /**
+     * 返回已发布消息的不可变快照。
+     *
      * @return 已发布消息的不可变快照
      */
     public List<OutboxMessage> published() {

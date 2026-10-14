@@ -26,11 +26,24 @@ public class QrCodeRoutes {
     private final QrCodeService service;
     private final QrCodeModuleConfig config;
 
+    /**
+     * 构造路由注册器。
+     *
+     * @param service 二维码服务，不可为 {@code null}
+     * @param config 模块配置（决定 basePath 与上传上限），不可为 {@code null}
+     * @throws NullPointerException 当任一参数为 {@code null}
+     */
     public QrCodeRoutes(QrCodeService service, QrCodeModuleConfig config) {
         this.service = Objects.requireNonNull(service, "service must not be null");
         this.config = Objects.requireNonNull(config, "config must not be null");
     }
 
+    /**
+     * 注册 render / base64 / decode 三条路由及参数校验异常处理器。
+     *
+     * @param app 目标 Javalin 实例，不可为 {@code null}
+     * @throws NullPointerException 当 {@code app} 为 {@code null}
+     */
     public void register(Javalin app) {
         Objects.requireNonNull(app, "app must not be null");
         app.unsafe.routes.post(config.getBasePath() + "/render", this::render);

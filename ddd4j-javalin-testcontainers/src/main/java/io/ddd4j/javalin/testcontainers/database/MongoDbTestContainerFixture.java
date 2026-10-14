@@ -12,7 +12,13 @@ import org.testcontainers.utility.DockerImageName;
  * Panache.
  */
 public class MongoDbTestContainerFixture extends AbstractTestContainerFixture<MongoDBContainer> {
+    /**
+     * 默认构造方法：Fixture 仅持有镜像与端口常量，容器由 {@link #newContainer()} 构建。
+     */
+    public MongoDbTestContainerFixture() {
+    }
 
+    /** 默认容器镜像。 */
     public static final String DEFAULT_IMAGE = "mongo:7";
 
     @Override

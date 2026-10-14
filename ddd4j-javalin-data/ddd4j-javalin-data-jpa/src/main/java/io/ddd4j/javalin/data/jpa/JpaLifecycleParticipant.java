@@ -16,6 +16,13 @@ public final class JpaLifecycleParticipant implements JavalinLifecycleParticipan
     private boolean started;
     private boolean closed;
 
+    /**
+     * 创建 JPA 生命周期参与者。
+     *
+     * @param factory      实体管理器工厂，不允许为 {@code null}
+     * @param ownsFactory  是否由本运行时负责关闭工厂；调用方自管工厂时传 {@code false}
+     * @throws NullPointerException 当 {@code factory} 为 {@code null} 时抛出
+     */
     public JpaLifecycleParticipant(EntityManagerFactory factory, boolean ownsFactory) {
         this.factory = Objects.requireNonNull(factory, "factory must not be null");
         this.ownsFactory = ownsFactory;

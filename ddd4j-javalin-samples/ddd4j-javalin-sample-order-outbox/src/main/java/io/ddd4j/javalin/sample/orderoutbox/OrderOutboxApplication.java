@@ -19,8 +19,20 @@ import io.javalin.Javalin;
  */
 public class OrderOutboxApplication {
 
+    /** 示例包基础名（Guice 注解扫描与 Javalin 启动共用）。 */
     private static final String BASE_PACKAGE = "io.ddd4j.javalin.sample.orderoutbox";
 
+    /**
+     * 默认构造方法：启动类仅含静态 {@code main} 入口，无实例状态。
+     */
+    public OrderOutboxApplication() {
+    }
+
+    /**
+     * 启动示例：装配 Guice + Javalin，注册订单路由并启动 Outbox 周期调度。
+     *
+     * @param args 命令行参数（未使用）
+     */
     public static void main(String[] args) {
         OrderOutboxGuiceModule module = new OrderOutboxGuiceModule();
         Javalin app = Ddd4jJavalinApplication.run(args, BASE_PACKAGE, module);

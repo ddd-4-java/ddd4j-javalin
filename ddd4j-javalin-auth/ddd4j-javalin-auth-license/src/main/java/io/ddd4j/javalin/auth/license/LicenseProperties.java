@@ -15,6 +15,7 @@ import lombok.Setter;
 @Setter
 public class LicenseProperties {
 
+    /** 配置键前缀（{@code ddd4j.auth.license}）。 */
     public static final String PREFIX = "ddd4j.auth.license";
 
     /**

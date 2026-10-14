@@ -22,6 +22,13 @@ public final class MybatisTestcontainersApplication {
     private MybatisTestcontainersApplication() {
     }
 
+    /**
+     * 启动示例应用：以 Testcontainers 数据源装配 MyBatis 模块并启动 Javalin。
+     *
+     * @param dataSource 测试容器提供的数据源
+     * @param args 传给 {@link Ddd4jJavalinApplication#run(String[], String, com.google.inject.Module...)} 的启动参数
+     * @return 已启动的 Javalin 实例
+     */
     public static Javalin run(DataSource dataSource, String... args) {
         Ddd4jMybatisJavalinModule mybatisModule = new Ddd4jMybatisJavalinModule(dataSource)
                 .addMapper(SampleUserMapper.class);

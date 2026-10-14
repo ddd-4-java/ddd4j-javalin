@@ -18,6 +18,12 @@ import io.ddd4j.extension.qlexpress.QLExpressEngineBuilder;
  */
 public class Ddd4jQLExpressJavalinModule extends AbstractModule {
 
+    /**
+     * 默认构造方法：模块无实例状态，引擎由 {@link #qlExpressEngine()} 惰性提供。
+     */
+    public Ddd4jQLExpressJavalinModule() {
+    }
+
     @Override
     protected void configure() {
     }

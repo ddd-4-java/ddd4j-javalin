@@ -24,6 +24,12 @@ public final class OidcSubjectProvider implements SubjectProvider {
     private final OidcSubject subject;
     private final OidcTokenVerifier verifier;
 
+    /**
+     * 使用指定验签器创建只读 Subject 提供方。
+     *
+     * @param verifier OIDC 令牌验签器，不允许为 {@code null}
+     * @throws NullPointerException 当 {@code verifier} 为 {@code null} 时抛出
+     */
     public OidcSubjectProvider(OidcTokenVerifier verifier) {
         this.verifier = Objects.requireNonNull(verifier, "verifier must not be null");
         this.subject = new OidcSubject(verifier);

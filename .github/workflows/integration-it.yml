@@ -67,7 +67,7 @@ jobs:
     steps:
       # ── 1. Checkout ddd4j-javalin ──────────────────────────────────────
       - name: Checkout ddd4j-javalin
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # ── 2. Configure Maven settings (org secret) ─────────────────────
       # ddd-4-java 组织 secret MAVEN_SETTINGS_XML：完整 settings.xml（阿里云私服

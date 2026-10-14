@@ -188,3 +188,6 @@ demos/**/*.mp4
 
 # 本地 dreamina CLI 采集输出
 .cli-audit/
+
+# Versioned weekly dependency policy
+!.github/dependency-policy.json

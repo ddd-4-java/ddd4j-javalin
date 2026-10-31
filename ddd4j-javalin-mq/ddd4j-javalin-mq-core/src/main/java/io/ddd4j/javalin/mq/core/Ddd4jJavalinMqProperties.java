@@ -10,6 +10,10 @@ import lombok.Setter;
 @Setter
 public class Ddd4jJavalinMqProperties {
 
+    /** Creates the default MQ lifecycle policy. */
+    public Ddd4jJavalinMqProperties() {
+    }
+
     /**
      * 应用使用 MQ 的角色。
      */

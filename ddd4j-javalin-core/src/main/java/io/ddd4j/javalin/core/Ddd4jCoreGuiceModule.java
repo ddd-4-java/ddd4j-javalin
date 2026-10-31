@@ -55,14 +55,26 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
     private final Ddd4jCoreProperties properties;
     private final Ddd4jJavalinBootstrapContext bootstrapContext;
 
+    /** 创建使用默认配置的核心模块。 */
     public Ddd4jCoreGuiceModule() {
         this(new Ddd4jCoreProperties(), new Ddd4jJavalinBootstrapContext(""));
     }
 
+    /**
+     * 使用指定配置创建核心模块。
+     *
+     * @param properties 核心模块配置
+     */
     public Ddd4jCoreGuiceModule(Ddd4jCoreProperties properties) {
         this(properties, new Ddd4jJavalinBootstrapContext(""));
     }
 
+    /**
+     * 使用指定配置和启动上下文创建核心模块。
+     *
+     * @param properties 核心模块配置
+     * @param bootstrapContext 启动上下文
+     */
     public Ddd4jCoreGuiceModule(Ddd4jCoreProperties properties,
                                 Ddd4jJavalinBootstrapContext bootstrapContext) {
         this.properties = Objects.requireNonNull(properties, "properties must not be null");
@@ -81,6 +93,9 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
 
     /**
      * 使用应用扫描包创建默认核心模块。
+     *
+     * @param basePackages 应用扫描包
+     * @return 默认核心装配模块
      */
     public static Ddd4jCoreGuiceModule defaults(String basePackages) {
         return new Ddd4jCoreGuiceModule(
@@ -112,6 +127,8 @@ public class Ddd4jCoreGuiceModule extends AbstractModule {
 
     /**
      * 当前装配配置。可见于启动入口与测试。
+     *
+     * @return 当前核心模块配置
      */
     public Ddd4jCoreProperties getProperties() {
         return properties;

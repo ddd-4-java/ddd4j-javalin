@@ -143,6 +143,11 @@ final class MqContextPropagator {
     private MqContextPropagator() {
     }
 
+    /** Reset the registry cache when tests reset BaseContext. */
+    static void clearCache() {
+        cachedRegistry = null;
+    }
+
     /**
      * 包内访问点：发布前 capture 当前线程上下文快照，按 msgId 索引。
      *

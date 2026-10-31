@@ -10,6 +10,10 @@ import lombok.Setter;
 @Setter
 public class Ddd4jJavalinMqProperties {
 
+    /** Creates the default MQ lifecycle policy. */
+    public Ddd4jJavalinMqProperties() {
+    }
+
     private Role role = Role.BOTH;
     private boolean requireListeners = true;
     /**

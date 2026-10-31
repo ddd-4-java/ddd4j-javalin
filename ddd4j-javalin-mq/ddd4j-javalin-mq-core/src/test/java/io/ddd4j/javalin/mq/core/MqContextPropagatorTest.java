@@ -30,6 +30,7 @@ class MqContextPropagatorTest {
 
     @AfterEach
     void cleanup() {
+        MqContextPropagator.clearCache();
         BaseContext.remove(MqContextPropagator.SNAPSHOT_REGISTRY_KEY);
         ThreadContext.clear();
     }

@@ -9,6 +9,8 @@ public interface JavalinLifecycleParticipant extends AutoCloseable {
 
     /**
      * 返回启动顺序；数值较小者先启动、后关闭。
+     *
+     * @return 启动顺序
      */
     int order();
 
@@ -24,6 +26,8 @@ public interface JavalinLifecycleParticipant extends AutoCloseable {
 
     /**
      * 返回不包含凭据和原始异常的就绪状态。
+     *
+     * @return 当前就绪状态
      */
     ReadinessResult readiness();
 

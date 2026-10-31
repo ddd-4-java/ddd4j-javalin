@@ -7,13 +7,13 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Shared MongoDB container fixture.
  *
- * <p>Uses {@code mongo:7} exposing the default 27017 port. The connection string follows the
+ * <p>Uses {@code mongo:7.0.43} exposing the default 27017 port. The connection string follows the
  * standard {@code mongodb://host:port} shape consumed by both the official Java driver and
  * Panache.
  */
 public class MongoDbTestContainerFixture extends AbstractTestContainerFixture<MongoDBContainer> {
 
-    public static final String DEFAULT_IMAGE = "mongo:7";
+    public static final String DEFAULT_IMAGE = "mongo:7.0.43";
 
     @Override
     public MongoDBContainer newContainer() {

@@ -27,6 +27,9 @@ public final class Ddd4jJavalinRuntime implements AutoCloseable {
 
     /**
      * Guice 生产构造器。
+     *
+     * @param participants 参与运行时生命周期的组件
+     * @param coreRuntime 上游 Guice 运行时
      */
     @Inject
     public Ddd4jJavalinRuntime(Set<JavalinLifecycleParticipant> participants,
@@ -69,6 +72,8 @@ public final class Ddd4jJavalinRuntime implements AutoCloseable {
 
     /**
      * 返回当前运行状态。
+     *
+     * @return 当前运行状态
      */
     public synchronized JavalinRuntimeState state() {
         return state;
@@ -76,6 +81,8 @@ public final class Ddd4jJavalinRuntime implements AutoCloseable {
 
     /**
      * 汇总当前参与者的安全就绪状态。
+     *
+     * @return 汇总后的就绪报告
      */
     public synchronized ReadinessReport readiness() {
         if (state != JavalinRuntimeState.RUNNING) {

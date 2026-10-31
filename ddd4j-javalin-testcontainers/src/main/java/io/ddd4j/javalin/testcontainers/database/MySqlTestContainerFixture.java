@@ -7,7 +7,7 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Shared MySQL container fixture.
  *
- * <p>Uses {@code mysql:8.0} with {@code test} database and {@code test/test} credentials by
+ * <p>Uses {@code mysql:8.0.46} with {@code test} database and {@code test/test} credentials by
  * default, exposing port 3306. Waiting strategy is the default JDBC {@code SELECT 1} probe
  * shipped by {@link MySQLContainer}.
  *
@@ -20,7 +20,7 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class MySqlTestContainerFixture extends AbstractTestContainerFixture<MySQLContainer<?>> {
 
-    public static final String DEFAULT_IMAGE = "mysql:8.0";
+    public static final String DEFAULT_IMAGE = "mysql:8.0.46";
     public static final String DEFAULT_DATABASE = "ddd4j_test";
     public static final String DEFAULT_USERNAME = "test";
     public static final String DEFAULT_PASSWORD = "test";

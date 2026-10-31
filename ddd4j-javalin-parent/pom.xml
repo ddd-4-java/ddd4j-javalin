@@ -180,6 +180,15 @@
     <profiles>
         <profile>
             <id>javalin-integration-tests</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>org.jacoco.agent</artifactId>
+                    <version>${jacoco.version}</version>
+                    <classifier>runtime</classifier>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>

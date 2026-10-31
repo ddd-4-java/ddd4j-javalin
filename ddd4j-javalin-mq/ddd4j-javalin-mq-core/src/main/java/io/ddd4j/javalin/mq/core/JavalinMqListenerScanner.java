@@ -27,6 +27,10 @@ import java.util.Set;
  */
 public final class JavalinMqListenerScanner {
 
+    /** Creates a listener scanner. */
+    public JavalinMqListenerScanner() {
+    }
+
     /**
      * 扫描并返回顺序稳定、route 唯一的监听器。
      */

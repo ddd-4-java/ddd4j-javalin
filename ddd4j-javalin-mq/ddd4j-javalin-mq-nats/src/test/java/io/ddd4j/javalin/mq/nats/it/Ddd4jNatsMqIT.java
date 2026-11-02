@@ -53,7 +53,7 @@ class Ddd4jNatsMqIT {
         try (Connection connection = Nats.connect(server)) {
             connection.jetStreamManagement().addStream(StreamConfiguration.builder()
                     .name("DDD4J_IT")
-                    .subjects(TOPIC + ".>")
+                    .subjects(TOPIC, TOPIC + ".>")
                     .storageType(StorageType.File)
                     .build());
         }
